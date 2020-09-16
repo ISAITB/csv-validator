@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:replace="fragments/common :: header">Validator</title>
+        <link rel="stylesheet" th:href="@{/css/style-csv.css}"/>
+        <script th:src="@{/webjars/codemirror/5.50.0/mode/mathematica/mathematica.js}"></script>
+        <script th:src="@{/js/lib/FileSaver.min.js}"></script>
+        <script th:src="@{/js/itb-upload-csv.js}"></script>
+        <script th:if="${report}" th:inline="text">
+        /*<![CDATA[*/
+            getReportData("[[${inputID}]]");
+        /*]]>*/
+        </script>
+        <script th:inline="javascript">
+            var externalArtifacts = {};
+            [# th:each="artifactInfoEntry : ${externalArtifactInfo}"]
+                externalArtifacts[[# th:text="${artifactInfoEntry.key}" /]] = {}
+                [# th:each="artifactTypeInfoEntry : ${artifactInfoEntry.value}"]
+                    externalArtifacts[[# th:text="${artifactInfoEntry.key}" /]][[# th:text="${artifactTypeInfoEntry.key}" /]] = [# th:text="${artifactTypeInfoEntry.value}" /];
+                [/]
+            [/]
+
+            var settingInputs = { headers: {}, delimiter: {}, quote: {} };
+            [# th:each="entry : ${config.csvOptions.userInputForHeader}"]
+                settingInputs.headers[[# th:text="${entry.key}" /]] = { control: [[${entry.value}]] }
+            [/]
+            [# th:each="entry : ${config.csvOptions.userInputForDelimiter}"]
+                settingInputs.delimiter[[# th:text="${entry.key}" /]] = { control: [[${entry.value}]] }
+            [/]
+            [# th:each="entry : ${config.csvOptions.userInputForQuote}"]
+                settingInputs.quote[[# th:text="${entry.key}" /]] = { control: [[${entry.value}]] }
+            [/]
+            configure({
+                externalArtifactFileLabel: [[${config.label.optionContentFile}]],
+                externalArtifactURILabel: [[${config.label.optionContentURI}]],
+                externalArtifactSettings: {
+                    default: {
+                        filePlaceholder: [[${config.label.externalSchemaPlaceholder}]],
+                        maxCount: 1
+                    }
+                },
+                codeTypeObj: "mathematica",
+                isMinimalUI: [[${minimalUI}]],
+                artifactTypes: ['default'],
+                externalArtifacts: externalArtifacts
+            });
+        </script>
+        </script>
+    </head>
+    <body th:class="${not minimalUI} ? body-ui : ''">
+        <div th:classappend="${not minimalUI} ? view-section-ui : ''" class="container view-section">
+            <div class="view-section-input" th:if="${!minimalUI || report == null}">
+                <div th:replace="fragments/input :: pageHeader(${config}, ${minimalUI})"/>
+                <form method="POST" enctype="multipart/form-data" th:action="@{${not minimalUI ? 'upload' : 'uploadm'}}" class="form-horizontal" novalidate="novalidate">
+                    <div th:class="${minimalUI} ? panel-default : ''" th:classappend="${minimalUI} ? panel : ''">
+                        <div th:replace="fragments/input :: formHeader(${config}, ${minimalUI})"/>
+                        <div th:class="${minimalUI} ? panel-body : ''">
+                            <div th:replace="fragments/input :: mainForm(${config})"/>
+                            <div th:replace="fragments/input :: externalArtifactCheck(${config.label.includeExternalArtefacts}, ${config.label.externalArtefactsTooltip})"/>
+                            <div th:replace="fragments/input :: externalArtifactControl('default', ${config.label.externalSchemaLabel})"/>
+                            <div id="csvSettingsDiv">
+                                <div id="csvSettingsCheckDiv" class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="csvSettingsCheck" name="csvSettingsCheck" onclick="toggleCsvSettings()"> <span th:text="${config.label.includeCsvSyntax}">Specify CSV syntax settings</span>
+                                            </label>
+                                            <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${config.label.includeCsvSyntaxTooltip}"><i class="far fa-question-circle"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="csvSettingsForm" class="form-group">
+                                    <label class="col-sm-2 control-label" th:text="${config.label.csvSyntax}">CSV syntax</label>
+                                    <div class="col-sm-10">
+                                        <div class="row setting-input-container">
+                                            <div id="csvSettingsFormDelimiter" class="col-sm-2 setting-input">
+                                                <div class="setting-control">
+                                                    <input type="text" th:placeholder="${config.label.csvSyntaxDelimiterPlaceholder}" class="form-control" id="inputDelimiter" name="inputDelimiter" maxlength="1" onchange="syntaxInputChanged()"/>
+                                                </div>
+                                                <div class="setting-tooltip">
+                                                    <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${config.label.csvSyntaxDelimiterTooltip}"><i class="far fa-question-circle"></i></span>
+                                                </div>
+                                            </div>
+                                            <div id="csvSettingsFormQuote" class="col-sm-2 setting-input">
+                                                <div class="setting-control">
+                                                    <input type="text" th:placeholder="${config.label.csvSyntaxQuotePlaceholder}" class="form-control" id="inputQuote" name="inputQuote" maxlength="1" onchange="syntaxInputChanged()"/>
+                                                </div>
+                                                <div class="setting-tooltip">
+                                                    <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${config.label.csvSyntaxQuoteTooltip}"><i class="far fa-question-circle"></i></span>
+                                                </div>
+                                            </div>
+                                            <div id="csvSettingsFormHeaders" class="col-sm-6">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="inputHeaders"> <span th:text="${config.label.csvSyntaxHeaders}">Content has header</span>
+                                                    </label>
+                                                    <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${config.label.csvSyntaxHeadersTooltip}"><i class="far fa-question-circle"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div th:replace="fragments/input :: submit(${config}, ${minimalUI})"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div th:if="${report}" th:class="${not minimalUI} ? view-section-result : ''">
+                <div th:replace="fragments/output :: reportTitle(${config}, ${minimalUI})"/>
+                <div class="panel panel-default">
+                    <div th:replace="fragments/output :: reportHeader(${config}, ${minimalUI})"/>
+                    <div th:replace="fragments/output :: reportSummary(${config}, true)"/>
+                </div>
+                <div th:replace="fragments/output :: reportDetails(${config}, ${minimalUI}, true)"/>
+            </div>
+            <div th:replace="fragments/common :: footer(${config}, ${minimalUI})"/>
+        </div>
+        <div th:replace="fragments/common :: about">About</div>
+        <div th:replace="fragments/common :: buildInfo">Build info</div>
+    </body>
+</html>

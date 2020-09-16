@@ -1,0 +1,11 @@
+.setting-input-container > .setting-input {
+    display: flex;
+}
+.setting-input-container > .setting-input > .setting-control {
+    display: inline-flex;
+    padding-right:10px;
+}
+.setting-input-container > .setting-input > .setting-tooltip {
+    display: inline-flex;
+    align-items:center;
+}

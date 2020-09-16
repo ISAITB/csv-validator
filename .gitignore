@@ -1,0 +1,6 @@
+# IntelliJ IDEA
+*.iml
+*.log
+.idea
+target
+application-dev.properties
