@@ -30,7 +30,7 @@ function setupSettingInputs(eventType, eventData) {
     $("#csvSettingsCheck").prop('checked', false);
     $('#inputDelimiter').val('');
     $('#inputQuote').val('');
-    var validationType = eventData.validationType,
+    var validationType = $('#validationType').val(),
         hasOptional = false, hasRequired = false,
         showHeaders = false, showDelimiter = false, showQuote = false,
         delimiterRequired = false, quoteRequired = false;

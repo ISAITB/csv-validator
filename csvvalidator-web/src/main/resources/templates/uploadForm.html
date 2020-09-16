@@ -118,5 +118,6 @@
         </div>
         <div th:replace="fragments/common :: about">About</div>
         <div th:replace="fragments/common :: buildInfo">Build info</div>
+        <input id="validationType" th:if="${!config.hasMultipleValidationTypes()}" type="hidden" th:value="${config.type.get(0)}"/>
     </body>
 </html>
