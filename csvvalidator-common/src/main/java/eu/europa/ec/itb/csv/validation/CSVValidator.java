@@ -206,6 +206,11 @@ public class CSVValidator {
             for (int i=0; i < fields.length; i++) {
                 try {
                     Object value = fields[i].castValue(rowValues[i], false, castOptions);
+                    // Check format.
+                    if (!fields[i].valueHasValidFormat(rowValues[i])) {
+                        aggregatedErrors.add(new ReportItem(String.format("Value '%s' provided for field '%s' is invalid for format '%s'.", rowValues[i], fields[i].getName(), fields[i].getFormat()), fields[i].getName(), lineNumber, rowValues[i]));
+                    }
+                    // Check constraints.
                     if (fields[i].getConstraints() != null && !fields[i].getConstraints().isEmpty()) {
                         Map<String, Object> violations = fields[i].checkConstraintViolations(value);
                         for (Map.Entry<String, Object> entry: violations.entrySet()) {
