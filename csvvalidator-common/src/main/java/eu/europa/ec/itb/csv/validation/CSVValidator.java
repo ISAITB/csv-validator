@@ -160,7 +160,7 @@ public class CSVValidator {
         }
         Field<?>[] fields = schema.getFields().toArray(new Field[] {});
         Map<String, Object> castOptions = Collections.emptyMap();
-        int lineCounter = 0;
+        int lineCounter = 1;
         if (csvSettings.isHasHeaders()) {
             lineCounter += 1;
         }
