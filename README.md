@@ -19,6 +19,13 @@ The application is built using Spring-Boot. The project includes a sample defini
 the box (under the `etc` folder). This however should be replaced with the actual implementation depending on the 
 installation. 
 
+# Validation core
+
+The validation of CSV content is done using Table Schema (see https://specs.frictionlessdata.io/schemas/table-schema.json).
+The validation library used internally is the Java version (see https://github.com/frictionlessdata/tableschema-java), however
+as this was found to be significantly lacking in terms of implementation and specification coverage, the library actually
+used is a fork that is maintained by the Test Bed team at https://citnet.tech.ec.europa.eu/CITnet/stash/projects/ITB/repos/tableschema-java-fork. 
+
 # Building
 
 Issue `mvn clean install`
