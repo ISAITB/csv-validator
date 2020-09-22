@@ -159,7 +159,6 @@ public class CSVValidator {
             throw new ValidatorException("The provided schema could not be parsed [" + getRootCause(e).getMessage()+ "]", e);
         }
         Field<?>[] fields = schema.getFields().toArray(new Field[] {});
-        Map<String, Object> castOptions = Collections.emptyMap();
         int lineCounter = 1;
         if (csvSettings.isHasHeaders()) {
             lineCounter += 1;
@@ -173,7 +172,7 @@ public class CSVValidator {
                 for (int i=0; i < record.size(); i++) {
                     rowValues[i] = record.get(i);
                 }
-                validateRow(rowValues, lineCounter, fields, castOptions, errors);
+                validateRow(rowValues, lineCounter, fields, errors);
                 lineCounter += 1;
             }
         } catch (ValidatorException e) {
@@ -201,11 +200,11 @@ public class CSVValidator {
         }
     }
 
-    private void validateRow(String[] rowValues, int lineNumber, Field<?>[] fields, Map<String, Object> castOptions, List<ReportItem> aggregatedErrors) {
+    private void validateRow(String[] rowValues, int lineNumber, Field<?>[] fields, List<ReportItem> aggregatedErrors) {
         if (rowValues.length == fields.length) {
             for (int i=0; i < fields.length; i++) {
                 try {
-                    Object value = fields[i].castValue(rowValues[i], false, castOptions);
+                    Object value = fields[i].castValue(rowValues[i], false, fields[i].getOptions());
                     // Check format.
                     if (!fields[i].valueHasValidFormat(rowValues[i])) {
                         aggregatedErrors.add(new ReportItem(String.format("Value '%s' provided for field '%s' is invalid for format '%s'.", rowValues[i], fields[i].getName(), fields[i].getFormat()), fields[i].getName(), lineNumber, rowValues[i]));
