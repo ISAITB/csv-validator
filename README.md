@@ -146,7 +146,7 @@ The properties here define how a specific validation domain is configured. They 
 | `validator.hasHeaders.XYZ` | Whether the input has a header row. | boolean | `true` |
 | `validator.delimiter.XYZ` | The delimiter character to use. | character | `,` |
 | `validator.quote.XYZ` | The quote character to use. | character | `"` |
-| `validator.input.hasHeader.XYZ` | Whether users may/must specify if the content has headers. | `required`, `optional`, `none` | `none` |
+| `validator.input.hasHeaders.XYZ` | Whether users may/must specify if the content has headers. | `required`, `optional`, `none` | `none` |
 | `validator.input.delimiter.XYZ` | Whether users may/must specify the delimiter character. | `required`, `optional`, `none` | `none` |
 | `validator.input.quote.XYZ` | Whether users may/must specify the quote character. | `required`, `optional`, `none` | `none` |
 

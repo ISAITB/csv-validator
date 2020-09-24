@@ -39,7 +39,7 @@ public class DomainConfigCache extends WebDomainConfigCache<DomainConfig> {
         domainConfig.getCsvOptions().setDelimiter(parseCharacterMap("validator.delimiter", config, domainConfig.getType(), ','));
         domainConfig.getCsvOptions().setQuote(parseCharacterMap("validator.quote", config, domainConfig.getType(), '"'));
         // CSV option input settings.
-        domainConfig.getCsvOptions().setUserInputForHeader(parseEnumMap("validator.input.hasHeader", ExternalArtifactSupport.NONE, config, domainConfig.getType(), ExternalArtifactSupport::byName));
+        domainConfig.getCsvOptions().setUserInputForHeader(parseEnumMap("validator.input.hasHeaders", ExternalArtifactSupport.NONE, config, domainConfig.getType(), ExternalArtifactSupport::byName));
         domainConfig.getCsvOptions().setUserInputForDelimiter(parseEnumMap("validator.input.delimiter", ExternalArtifactSupport.NONE, config, domainConfig.getType(), ExternalArtifactSupport::byName));
         domainConfig.getCsvOptions().setUserInputForQuote(parseEnumMap("validator.input.quote", ExternalArtifactSupport.NONE, config, domainConfig.getType(), ExternalArtifactSupport::byName));
         // Labels.

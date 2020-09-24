@@ -176,6 +176,29 @@ public class UploadController {
         return new ModelAndView("uploadForm", attributes);
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/{domain}/uploadm")
+    public ModelAndView uploadm(@PathVariable("domain") String domain, Model model, HttpServletRequest request) {
+        setMinimalUIFlag(request, true);
+
+        DomainConfig config = domainConfigs.getConfigForDomainName(domain);
+        if (config == null || !config.getChannels().contains(ValidatorChannel.FORM)) {
+            throw new NotFoundException();
+        }
+
+        if(!config.isSupportMinimalUserInterface()) {
+            LOG.error("Minimal user interface is not supported in this domain [" + domain + "].");
+            throw new NotFoundException();
+        }
+
+        MDC.put("domain", domain);
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("config", config);
+        attributes.put("appConfig", appConfig);
+        attributes.put("minimalUI", true);
+        attributes.put("externalArtifactInfo", config.getExternalArtifactInfoMap());
+        return new ModelAndView("uploadForm", attributes);
+    }
+
     @RequestMapping(method = RequestMethod.POST, value = "/{domain}/uploadm")
     public ModelAndView handleUploadM(@PathVariable("domain") String domain,
                                       @RequestParam("file") MultipartFile file,
@@ -186,8 +209,8 @@ public class UploadController {
                                       @RequestParam(value = "contentType-external_default", required = false) String[] externalSchema,
                                       @RequestParam(value = "inputFile-external_default", required= false) MultipartFile[] externalSchemaFiles,
                                       @RequestParam(value = "uriToValidate-external_default", required = false) String[] externalSchemaUri,
-                                      @RequestParam(value = "csvSettingsCheck", required = false) Boolean csvSettingsCheck,
-                                      @RequestParam(value = "inputHeaders", required = false) Boolean inputHeaders,
+                                      @RequestParam(value = "csvSettingsCheck", required = false, defaultValue = "false") Boolean csvSettingsCheck,
+                                      @RequestParam(value = "inputHeaders", required = false, defaultValue = "false") Boolean inputHeaders,
                                       @RequestParam(value = "inputDelimiter", required = false) String inputDelimiter,
                                       @RequestParam(value = "inputQuote", required = false) String inputQuote,
                                       RedirectAttributes redirectAttributes,
