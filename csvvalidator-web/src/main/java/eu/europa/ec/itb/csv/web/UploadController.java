@@ -106,15 +106,17 @@ public class UploadController {
             attributes.put("validationTypeLabel", domainConfig.getTypeLabel().get(validationType));
         }
         attributes.put("appConfig", appConfig);
-        try (InputStream fis = getInputStream(contentType, file.getInputStream(), uri, string)) {
-            if (fileManager.checkFileType(fis)) {
-                stream = getInputStream(contentType, file.getInputStream(), uri, string);
-            } else {
-                attributes.put("message", "Provided input is not a CSV file");
+        try {
+            try (InputStream fis = getInputStream(contentType, file.getInputStream(), uri, string)) {
+                if (fileManager.checkFileType(fis)) {
+                    stream = getInputStream(contentType, file.getInputStream(), uri, string);
+                } else {
+                    attributes.put("message", "Provided input is not a CSV file");
+                }
             }
-        } catch (IOException e) {
-            LOG.error("Error while reading uploaded file [" + e.getMessage() + "]", e);
-            attributes.put("message", "Error in upload [" + e.getMessage() + "]");
+        } catch (Exception e) {
+            LOG.error("Error while reading provided content [" + e.getMessage() + "]", e);
+            attributes.put("message", "Error while reading provided content [" + e.getMessage() + "]");
         }
         if (StringUtils.isBlank(validationType)) {
             validationType = domainConfig.getType().get(0);
