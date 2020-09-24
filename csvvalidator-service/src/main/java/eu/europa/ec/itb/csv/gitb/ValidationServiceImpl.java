@@ -114,7 +114,7 @@ public class ValidationServiceImpl implements ValidationService {
                 throw new ValidatorException("Required input ["+inputName+"] was missing");
             } else if (inputValues.size() > 1) {
                 throw new ValidatorException("Multiple values provided for input ["+inputName+"]");
-            } else {
+            } else if (!inputValues.isEmpty()) {
                 String value = inputValues.get(0).getValue();
                 if (value.trim().equals("")) {
                     throw new ValidatorException("An empty value was provided for input ["+inputName+"]");
