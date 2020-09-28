@@ -12,8 +12,8 @@ function toggleCsvSettings() {
     }
 }
 function syntaxInputChanged() {
-    var validationType = $('#validationType').val();
-    if (validationType && validationType.trim() != '') {
+    var validationType = getCompleteValidationType();
+    if (validationType) {
         var delimiter = $('#inputDelimiter').val(),
             quote = $('#inputQuote').val(),
             delimiterRequired = settingInputs.delimiter[validationType].control == 'REQUIRED',
@@ -30,7 +30,7 @@ function setupSettingInputs(eventType, eventData) {
     $("#csvSettingsCheck").prop('checked', false);
     $('#inputDelimiter').val('');
     $('#inputQuote').val('');
-    var validationType = $('#validationType').val(),
+    var validationType = getCompleteValidationType(),
         hasOptional = false, hasRequired = false,
         showHeaders = false, showDelimiter = false, showQuote = false,
         delimiterRequired = false, quoteRequired = false;
