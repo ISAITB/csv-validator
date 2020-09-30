@@ -5,13 +5,19 @@ public class ReportItem {
     private String message;
     private String fieldName;
     private String value;
-    private int lineNumber;
+    private long lineNumber;
+    private ViolationLevel violationLevel;
 
-    public ReportItem(String message, String fieldName, int lineNumber, String value) {
+    public ReportItem(String message, String fieldName, long lineNumber, String value) {
+        this(message, fieldName, lineNumber, value, ViolationLevel.ERROR);
+    }
+
+    public ReportItem(String message, String fieldName, long lineNumber, String value, ViolationLevel violationLevel) {
         this.message = message;
         this.fieldName = fieldName;
         this.lineNumber = lineNumber;
         this.value = value;
+        this.violationLevel = violationLevel;
     }
 
     public String getReportMessage() {
@@ -30,11 +36,15 @@ public class ReportItem {
         return fieldName;
     }
 
-    public int getLineNumber() {
+    public long getLineNumber() {
         return lineNumber;
     }
 
     public String getValue() {
         return value;
+    }
+
+    public ViolationLevel getViolationLevel() {
+        return violationLevel;
     }
 }

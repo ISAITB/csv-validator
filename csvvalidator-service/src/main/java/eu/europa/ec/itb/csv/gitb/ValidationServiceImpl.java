@@ -149,7 +149,12 @@ public class ValidationServiceImpl implements ValidationService {
             String inputQuote = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_QUOTE, domainConfig.getCsvOptions().getUserInputForQuote().get(validationType), (s) -> s);
             ValidationResponse result = new ValidationResponse();
             // Execute validation
-            CSVValidator validator = ctx.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputHeaders, inputDelimiter, inputQuote));
+            // TODO process additional inputs
+            InputHelper.Inputs inputs = InputHelper.Inputs.newInstance()
+                    .withInputHeaders(inputHeaders)
+                    .withInputDelimiter(inputDelimiter)
+                    .withInputQuote(inputQuote);
+            CSVValidator validator = ctx.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs));
             TAR report = validator.validate();
             addContext(report, contentToValidate);
             result.setReport(report);
