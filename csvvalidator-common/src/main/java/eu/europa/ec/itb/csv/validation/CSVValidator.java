@@ -19,17 +19,18 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.parser.txt.CharsetDetector;
+import org.apache.tika.parser.txt.CharsetMatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -52,6 +53,7 @@ public class CSVValidator {
     private final List<FileInfo> externalSchemaFileInfo;
     private final CSVSettings csvSettings;
     private final ObjectFactory objectFactory = new ObjectFactory();
+    private Set<String> charsetsToNotConvert = Set.of(StandardCharsets.UTF_16.name(), StandardCharsets.UTF_16BE.name(), StandardCharsets.UTF_16LE.name());
 
     public CSVValidator(File inputFileToValidate, String validationType, List<FileInfo> externalSchemaFileInfo, DomainConfig domainConfig, CSVSettings csvSettings) {
         this.inputFileToValidate = inputFileToValidate;
@@ -177,6 +179,7 @@ public class CSVValidator {
         } catch (Exception e) {
             throw new ValidatorException("The provided schema could not be parsed [" + getRootCause(e).getMessage()+ "]", e);
         }
+        prepareInputFile(inputFile);
         try (
                 Reader inputReader = new BomStrippingReader(toStream(inputFile, true));
                 CSVParser parser = new CSVParser(inputReader, format)
@@ -281,6 +284,46 @@ public class CSVValidator {
             throw new ValidatorException("The provided input could not be parsed ["+ getRootCause(e).getMessage()+"]", e);
         }
         return toTAR(errors);
+    }
+
+    private void prepareInputFile(File inputFile) {
+        String charsetToUse = getCharsetToUse(inputFile);
+        if (!charsetToUse.equals(StandardCharsets.UTF_8.name()) && !charsetsToNotConvert.contains(charsetToUse)) {
+            File fileCopy = new File(inputFile.getParentFile(), "_"+inputFile.getName());
+            try {
+                try (
+                    Reader in = new InputStreamReader(new FileInputStream(inputFile), charsetToUse);
+                    Writer out = new OutputStreamWriter(new FileOutputStream(fileCopy), StandardCharsets.UTF_8.name())
+                ) {
+                    char[] buffer = new char[1024];
+                    int len;
+                    while ((len = in.read(buffer, 0, buffer.length)) != -1) {
+                        out.write(buffer, 0, len);
+                    }
+                }
+                FileUtils.deleteQuietly(inputFile);
+                FileUtils.moveFile(fileCopy, inputFile);
+                LOG.info("Converted input file from ["+charsetToUse+"] to [UTF-8].");
+            } catch (Exception e) {
+                throw new ValidatorException("Unable to parse input file", e);
+            }
+        }
+    }
+
+    private String getCharsetToUse(File inputFile) {
+        String charset = null;
+        try (InputStream in = TikaInputStream.get(toStream(inputFile, true))) {
+            CharsetDetector detector = new CharsetDetector();
+            detector.setText(in);
+            CharsetMatch match = detector.detect();
+            charset = match.getName();
+        } catch (Exception e) {
+            LOG.warn("Error while detecting charset", e);
+        }
+        if (charset == null) {
+            charset = StandardCharsets.UTF_8.name();
+        }
+        return charset;
     }
 
     private void validateRow(CSVRecord record, long lineNumber, Map<Integer, Field<?>> inputFieldIndexToSchemaFieldMap, int schemaFieldCount, CSVSettings csvSettings, List<ReportItem> aggregatedErrors) {
