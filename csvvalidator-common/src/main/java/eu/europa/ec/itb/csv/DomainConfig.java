@@ -1,5 +1,6 @@
 package eu.europa.ec.itb.csv;
 
+import eu.europa.ec.itb.csv.validation.ViolationLevel;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
 import eu.europa.ec.itb.validation.commons.artifact.ValidationArtifactInfo;
 import eu.europa.ec.itb.validation.commons.config.LabelConfig;
@@ -8,6 +9,9 @@ import eu.europa.ec.itb.validation.commons.config.WebDomainConfig;
 import java.util.Map;
 
 public class DomainConfig extends WebDomainConfig<DomainConfig.Label> {
+
+    private Map<String, Boolean> javaBasedDateFormats;
+    private Map<String, Boolean> displayEnumValuesInMessages;
 
     private CsvOptions csvOptions = new CsvOptions();
 
@@ -24,15 +28,157 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> {
         return getArtifactInfo().get(validationType).get();
     }
 
-    public static class CsvOptions {
+    public Map<String, Boolean> getDisplayEnumValuesInMessages() {
+        return displayEnumValuesInMessages;
+    }
 
-        private Map<String, ExternalArtifactSupport> userInputForHeader;
-        private Map<String, ExternalArtifactSupport> userInputForDelimiter;
-        private Map<String, ExternalArtifactSupport> userInputForQuote;
+    public void setDisplayEnumValuesInMessages(Map<String, Boolean> displayEnumValuesInMessages) {
+        this.displayEnumValuesInMessages = displayEnumValuesInMessages;
+    }
+
+    public Map<String, Boolean> getJavaBasedDateFormats() {
+        return javaBasedDateFormats;
+    }
+
+    public void setJavaBasedDateFormats(Map<String, Boolean> javaBasedDateFormats) {
+        this.javaBasedDateFormats = javaBasedDateFormats;
+    }
+
+    public static class CsvOptions {
 
         private Map<String, Boolean> inputHasHeader;
         private Map<String, Character> delimiter;
         private Map<String, Character> quote;
+        private Map<String, ViolationLevel> differentInputFieldCount;
+        private Map<String, ViolationLevel> differentInputFieldSequence;
+        private Map<String, ViolationLevel> unknownInputField;
+        private Map<String, ViolationLevel> unspecifiedSchemaField;
+        private Map<String, ViolationLevel> inputFieldCaseMismatch;
+        private Map<String, ViolationLevel> duplicateInputFields;
+        private Map<String, ViolationLevel> multipleInputFieldsForSchemaField;
+
+        private Map<String, ExternalArtifactSupport> userInputForHeader;
+        private Map<String, ExternalArtifactSupport> userInputForDelimiter;
+        private Map<String, ExternalArtifactSupport> userInputForQuote;
+        private Map<String, ExternalArtifactSupport> userInputForDifferentInputFieldCount;
+        private Map<String, ExternalArtifactSupport> userInputForDifferentInputFieldSequence;
+        private Map<String, ExternalArtifactSupport> userInputForUnknownInputField;
+        private Map<String, ExternalArtifactSupport> userInputForUnspecifiedSchemaField;
+        private Map<String, ExternalArtifactSupport> userInputForInputFieldCaseMismatch;
+        private Map<String, ExternalArtifactSupport> userInputForDuplicateInputFields;
+        private Map<String, ExternalArtifactSupport> userInputForMultipleInputFieldsForSchemaField;
+
+        public Map<String, ViolationLevel> getDuplicateInputFields() {
+            return duplicateInputFields;
+        }
+
+        public void setDuplicateInputFields(Map<String, ViolationLevel> duplicateInputFields) {
+            this.duplicateInputFields = duplicateInputFields;
+        }
+
+        public Map<String, ViolationLevel> getMultipleInputFieldsForSchemaField() {
+            return multipleInputFieldsForSchemaField;
+        }
+
+        public void setMultipleInputFieldsForSchemaField(Map<String, ViolationLevel> multipleInputFieldsForSchemaField) {
+            this.multipleInputFieldsForSchemaField = multipleInputFieldsForSchemaField;
+        }
+
+        public Map<String, ExternalArtifactSupport> getUserInputForDuplicateInputFields() {
+            return userInputForDuplicateInputFields;
+        }
+
+        public void setUserInputForDuplicateInputFields(Map<String, ExternalArtifactSupport> userInputForDuplicateInputFields) {
+            this.userInputForDuplicateInputFields = userInputForDuplicateInputFields;
+        }
+
+        public Map<String, ExternalArtifactSupport> getUserInputForMultipleInputFieldsForSchemaField() {
+            return userInputForMultipleInputFieldsForSchemaField;
+        }
+
+        public void setUserInputForMultipleInputFieldsForSchemaField(Map<String, ExternalArtifactSupport> userInputForMultipleInputFieldsForSchemaField) {
+            this.userInputForMultipleInputFieldsForSchemaField = userInputForMultipleInputFieldsForSchemaField;
+        }
+
+        public Map<String, ExternalArtifactSupport> getUserInputForDifferentInputFieldCount() {
+            return userInputForDifferentInputFieldCount;
+        }
+
+        public void setUserInputForDifferentInputFieldCount(Map<String, ExternalArtifactSupport> userInputForDifferentInputFieldCount) {
+            this.userInputForDifferentInputFieldCount = userInputForDifferentInputFieldCount;
+        }
+
+        public Map<String, ExternalArtifactSupport> getUserInputForDifferentInputFieldSequence() {
+            return userInputForDifferentInputFieldSequence;
+        }
+
+        public void setUserInputForDifferentInputFieldSequence(Map<String, ExternalArtifactSupport> userInputForDifferentInputFieldSequence) {
+            this.userInputForDifferentInputFieldSequence = userInputForDifferentInputFieldSequence;
+        }
+
+        public Map<String, ExternalArtifactSupport> getUserInputForUnknownInputField() {
+            return userInputForUnknownInputField;
+        }
+
+        public void setUserInputForUnknownInputField(Map<String, ExternalArtifactSupport> userInputForUnknownInputField) {
+            this.userInputForUnknownInputField = userInputForUnknownInputField;
+        }
+
+        public Map<String, ExternalArtifactSupport> getUserInputForUnspecifiedSchemaField() {
+            return userInputForUnspecifiedSchemaField;
+        }
+
+        public void setUserInputForUnspecifiedSchemaField(Map<String, ExternalArtifactSupport> userInputForUnspecifiedSchemaField) {
+            this.userInputForUnspecifiedSchemaField = userInputForUnspecifiedSchemaField;
+        }
+
+        public Map<String, ExternalArtifactSupport> getUserInputForInputFieldCaseMismatch() {
+            return userInputForInputFieldCaseMismatch;
+        }
+
+        public void setUserInputForInputFieldCaseMismatch(Map<String, ExternalArtifactSupport> userInputForInputFieldCaseMismatch) {
+            this.userInputForInputFieldCaseMismatch = userInputForInputFieldCaseMismatch;
+        }
+
+        public Map<String, ViolationLevel> getDifferentInputFieldCount() {
+            return differentInputFieldCount;
+        }
+
+        public void setDifferentInputFieldCount(Map<String, ViolationLevel> differentInputFieldCount) {
+            this.differentInputFieldCount = differentInputFieldCount;
+        }
+
+        public Map<String, ViolationLevel> getDifferentInputFieldSequence() {
+            return differentInputFieldSequence;
+        }
+
+        public void setDifferentInputFieldSequence(Map<String, ViolationLevel> differentInputFieldSequence) {
+            this.differentInputFieldSequence = differentInputFieldSequence;
+        }
+
+        public Map<String, ViolationLevel> getUnknownInputField() {
+            return unknownInputField;
+        }
+
+        public void setUnknownInputField(Map<String, ViolationLevel> unknownInputField) {
+            this.unknownInputField = unknownInputField;
+        }
+
+        public Map<String, ViolationLevel> getUnspecifiedSchemaField() {
+            return unspecifiedSchemaField;
+        }
+
+        public void setUnspecifiedSchemaField(Map<String, ViolationLevel> unspecifiedSchemaField) {
+            this.unspecifiedSchemaField = unspecifiedSchemaField;
+        }
+
+        public Map<String, ViolationLevel> getInputFieldCaseMismatch() {
+            return inputFieldCaseMismatch;
+        }
+
+        public void setInputFieldCaseMismatch(Map<String, ViolationLevel> inputFieldCaseMismatch) {
+            this.inputFieldCaseMismatch = inputFieldCaseMismatch;
+        }
 
         public Map<String, ExternalArtifactSupport> getUserInputForHeader() {
             return userInputForHeader;

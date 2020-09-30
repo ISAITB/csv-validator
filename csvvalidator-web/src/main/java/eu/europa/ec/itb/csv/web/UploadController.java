@@ -144,7 +144,12 @@ public class UploadController {
                         inputDelimiter = null;
                         inputQuote = null;
                     }
-                    CSVValidator validator = beans.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputHeaders, inputDelimiter, inputQuote));
+                    // TODO process additional inputs
+                    InputHelper.Inputs inputs = InputHelper.Inputs.newInstance()
+                            .withInputHeaders(inputHeaders)
+                            .withInputDelimiter(inputDelimiter)
+                            .withInputQuote(inputQuote);
+                    CSVValidator validator = beans.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs));
                     TAR report = validator.validate();
                     attributes.put("report", report);
                     attributes.put("date", report.getDate().toString());

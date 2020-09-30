@@ -140,49 +140,6 @@ public class CSVValidator {
         }
     }
 
-    private TAR validateAgaintSchema(File inputFile, File schemaFile) {
-        List<ReportItem> errors = new ArrayList<>();
-        CSVFormat format = CSVFormat.RFC4180
-                .withIgnoreSurroundingSpaces(true)
-                .withRecordSeparator("\n")
-                .withDelimiter(csvSettings.getDelimiter())
-                .withQuote(csvSettings.getQuote());
-        if (csvSettings.isHasHeaders()) {
-            format = format.withHeader();
-        }
-        Schema schema;
-        try (InputStream schemaStream = toStream(schemaFile, false)) {
-            schema = Schema.fromJson(schemaStream, false);
-        } catch (ValidatorException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ValidatorException("The provided schema could not be parsed [" + getRootCause(e).getMessage()+ "]", e);
-        }
-        Field<?>[] fields = schema.getFields().toArray(new Field[] {});
-        int lineCounter = 1;
-        if (csvSettings.isHasHeaders()) {
-            lineCounter += 1;
-        }
-        try (
-            Reader inputReader = new BomStrippingReader(toStream(inputFile, true));
-            CSVParser parser = new CSVParser(inputReader, format)
-        ) {
-            for (CSVRecord record: parser) {
-                String[] rowValues = new String[record.size()];
-                for (int i=0; i < record.size(); i++) {
-                    rowValues[i] = record.get(i);
-                }
-                validateRow(rowValues, lineCounter, fields, errors);
-                lineCounter += 1;
-            }
-        } catch (ValidatorException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ValidatorException("The provided input could not be parsed ["+ getRootCause(e).getMessage()+"]", e);
-        }
-        return toTAR(errors);
-    }
-
     private Throwable getRootCause(Throwable e) {
         return getRootCauseInternal(e, new HashSet<>());
     }
@@ -200,30 +157,188 @@ public class CSVValidator {
         }
     }
 
-    private void validateRow(String[] rowValues, int lineNumber, Field<?>[] fields, List<ReportItem> aggregatedErrors) {
-        if (rowValues.length == fields.length) {
-            for (int i=0; i < fields.length; i++) {
-                try {
-                    Object value = fields[i].castValue(rowValues[i], false, fields[i].getOptions());
-                    // Check format.
-                    if (!fields[i].valueHasValidFormat(rowValues[i])) {
-                        aggregatedErrors.add(new ReportItem(String.format("Value '%s' provided for field '%s' is invalid for format '%s'.", rowValues[i], fields[i].getName(), fields[i].getFormat()), fields[i].getName(), lineNumber, rowValues[i]));
+    private TAR validateAgaintSchema(File inputFile, File schemaFile) {
+        List<ReportItem> errors = new ArrayList<>();
+        CSVFormat format = CSVFormat.RFC4180
+                .withIgnoreHeaderCase(false)
+                .withAllowDuplicateHeaderNames(true)
+                .withIgnoreSurroundingSpaces(true)
+                .withRecordSeparator("\n")
+                .withDelimiter(csvSettings.getDelimiter())
+                .withQuote(csvSettings.getQuote());
+        if (csvSettings.isHasHeaders()) {
+            format = format.withHeader();
+        }
+        Schema schema;
+        try (InputStream schemaStream = toStream(schemaFile, false)) {
+            schema = Schema.fromJsonWithOptions(schemaStream, false, Map.of(Schema.SCHEMA_OPTION_JAVA_BASED_DATE_FORMATS, String.valueOf(domainConfig.getJavaBasedDateFormats().get(validationType))));
+        } catch (ValidatorException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ValidatorException("The provided schema could not be parsed [" + getRootCause(e).getMessage()+ "]", e);
+        }
+        try (
+                Reader inputReader = new BomStrippingReader(toStream(inputFile, true));
+                CSVParser parser = new CSVParser(inputReader, format)
+        ) {
+            Map<Integer, Field<?>> inputFieldIndexToSchemaFieldMap = new HashMap<>();
+            if (csvSettings.isHasHeaders()) {
+                Map<String, FieldInfo> fieldMap = new HashMap<>();
+                Map<String, Set<String>> lowerCaseFieldNameMap = new HashMap<>();
+                int index = 0;
+                for (Field<?> field: schema.getFields()) {
+                    if (fieldMap.containsKey(field.getName())) {
+                        throw new ValidatorException("The schema defines two fields with the same name ["+field.getName()+"].");
+                    } else {
+                        fieldMap.put(field.getName(), new FieldInfo(field, index));
+                        lowerCaseFieldNameMap.computeIfAbsent(field.getName().toLowerCase(), n -> new HashSet<>()).add(field.getName());
                     }
-                    // Check constraints.
-                    if (fields[i].getConstraints() != null && !fields[i].getConstraints().isEmpty()) {
-                        Map<String, Object> violations = fields[i].checkConstraintViolations(value);
-                        for (Map.Entry<String, Object> entry: violations.entrySet()) {
-                            aggregatedErrors.add(new ReportItem(prettifyConstraintFailure(entry.getKey(), entry.getValue(), fields[i], rowValues[i]), fields[i].getName(), lineNumber, rowValues[i]));
+                }
+                short headerLine = 1;
+                int headerIndex = 0;
+                Set<String> matchedSchemaFields = new HashSet<>();
+                Set<String> processedHeaders = new HashSet<>();
+                Set<String> duplicateHeaders = new HashSet<>();
+                Map<String, List<Integer>> fieldNameToHeaderIndexes = new HashMap<>();
+                for (String headerName: parser.getHeaderNames()) {
+                    FieldInfo fieldInfo = fieldMap.get(headerName);
+                    if (fieldInfo == null) {
+                        // No matching field with the same exact name.
+                        String lowerCaseHeaderName = headerName.toLowerCase();
+                        if (!lowerCaseHeaderName.equals(headerName)) {
+                            Set<String> otherNames = lowerCaseFieldNameMap.get(headerName.toLowerCase());
+                            if (otherNames != null && !otherNames.isEmpty()) {
+                                if (otherNames.size() > 1) {
+                                    // Header name is ambiguous - matched multiple schema fields.
+                                    handleSyntaxViolation(ViolationLevel.ERROR, headerName, String.format("Header '%s' is ambiguous as it may refer to multiple schema fields '%s'.", headerName, otherNames.toString()), headerLine, errors);
+                                } else {
+                                    // Matched header in schema fields but with different casing.
+                                    String schemaFieldName = otherNames.iterator().next();
+                                    handleSyntaxViolation(csvSettings.getInputFieldCaseMismatchViolationLevel(), headerName, String.format("Header '%s' has different casing that the expected '%s'.", headerName, schemaFieldName), headerLine, errors);
+                                    fieldInfo = fieldMap.get(schemaFieldName);
+                                }
+                            }
                         }
                     }
-                } catch (InvalidCastException e) {
-                    aggregatedErrors.add(new ReportItem(String.format("Value '%s' provided for field '%s' could not be parsed. Expected type was '%s'.", rowValues[i], fields[i].getName(), fields[i].getType()), fields[i].getName(), lineNumber, rowValues[i]));
-                } catch (Exception e) {
-                    throw new ValidatorException("Unexpected error while validating row ["+getRootCause(e).getMessage()+"]", e);
+                    if (fieldInfo == null) {
+                        // Could not match header in schema fields.
+                        handleSyntaxViolation(csvSettings.getUnknownInputFieldViolationLevel(), headerName, String.format("Found unexpected header '%s'.", headerName), headerLine, errors);
+                    } else  {
+                        if (fieldInfo.getIndex() != headerIndex) {
+                            // Header appears in unexpected position.
+                            handleSyntaxViolation(csvSettings.getDifferentInputFieldSequenceViolationLevel(), headerName, String.format("Header '%s' is defined at position [%s] which is not the expected position [%s].", headerName, headerIndex, fieldInfo.getIndex()), headerLine, errors);
+                        }
+                        matchedSchemaFields.add(fieldInfo.getField().getName());
+                        fieldNameToHeaderIndexes.computeIfAbsent(fieldInfo.getField().getName(), n -> new ArrayList<>()).add(headerIndex);
+                        inputFieldIndexToSchemaFieldMap.put(headerIndex, fieldInfo.getField());
+                    }
+                    if (processedHeaders.contains(headerName)) {
+                        duplicateHeaders.add(headerName);
+                    } else {
+                        processedHeaders.add(headerName);
+                    }
+                    headerIndex += 1;
+                }
+                schema.getFields().forEach((f) -> {
+                    if (!matchedSchemaFields.contains(f.getName())) {
+                        // Schema field not found in input.
+                        handleSyntaxViolation(csvSettings.getUnspecifiedSchemaFieldViolationLevel(), null, String.format("The defined header fields do not include the expected field '%s'.", f.getName()), headerLine, errors);
+                    }
+                });
+                if (schema.getFields().size() != parser.getHeaderNames().size()) {
+                    // Different field counts.
+                    handleSyntaxViolation(csvSettings.getDifferentInputFieldCountViolationLevel(), null, String.format("The header field count [%s] does not match the expected count [%s].", parser.getHeaderNames().size(), schema.getFields().size()), headerLine, errors);
+                }
+                duplicateHeaders.forEach((headerName) -> {
+                    // Header appears multiple times in exactly the same way.
+                    handleSyntaxViolation(csvSettings.getDuplicateInputFieldViolationLevel(), headerName, String.format("Header '%s' is defined multiple times.", headerName), headerLine, errors);
+                });
+                for (Map.Entry<String, List<Integer>> nameToIndexEntry: fieldNameToHeaderIndexes.entrySet()) {
+                    if (nameToIndexEntry.getValue().size() > 1) {
+                        // Multiple headers map to the same schema field.
+                        List<String> headers = new ArrayList<>(nameToIndexEntry.getValue().size());
+                        for (Integer pos: nameToIndexEntry.getValue()) {
+                            headers.add(parser.getHeaderNames().get(pos));
+                        }
+                        handleSyntaxViolation(csvSettings.getMultipleInputFieldsForSchemaFieldViolationLevel(), null, String.format("Multiple headers %s map to the same schema field '%s'.", headers, nameToIndexEntry.getKey()), headerLine, errors);
+                    }
+                }
+            } else {
+                // Add simply the schema fields in their defined sequence.
+                int fieldIndex = 0;
+                for (Field<?> schemaField: schema.getFields()) {
+                    inputFieldIndexToSchemaFieldMap.put(fieldIndex, schemaField);
+                    fieldIndex += 1;
+                }
+            }
+            // Validation per row.
+            for (CSVRecord record: parser) {
+                validateRow(record, parser.getCurrentLineNumber(), inputFieldIndexToSchemaFieldMap, schema.getFields().size(), csvSettings, errors);
+            }
+        } catch (ValidatorException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ValidatorException("The provided input could not be parsed ["+ getRootCause(e).getMessage()+"]", e);
+        }
+        return toTAR(errors);
+    }
+
+    private void validateRow(CSVRecord record, long lineNumber, Map<Integer, Field<?>> inputFieldIndexToSchemaFieldMap, int schemaFieldCount, CSVSettings csvSettings, List<ReportItem> aggregatedErrors) {
+        if (csvSettings.isHasHeaders()) {
+            // Parser based on headers.
+            if (record.size() != record.getParser().getHeaderNames().size()) {
+                // Record has wrong number of fields.
+                aggregatedErrors.add(new ReportItem("The row field count ["+record.size()+"] does not match the number of defined headers ["+record.getParser().getHeaderNames().size()+"].", null, lineNumber, null));
+            } else {
+                int fieldIndex = 0;
+                for (String fieldValue: record) {
+                    Field<?> schemaField = inputFieldIndexToSchemaFieldMap.get(fieldIndex);
+                    if (schemaField != null) {
+                        // Ignore fields not part of the schema. If this is to be an error this is reported as part of the header checks.
+                        validateField(fieldValue, record.getParser().getHeaderNames().get(fieldIndex), schemaField, lineNumber, aggregatedErrors);
+                    }
+                    fieldIndex += 1;
                 }
             }
         } else {
-            aggregatedErrors.add(new ReportItem("The row field count ["+rowValues.length+"] does not match the expected count ["+fields.length+"].", null, lineNumber, null));
+            // Parse based on index.
+            if (record.size() == schemaFieldCount) {
+                int fieldIndex = 0;
+                for (String fieldValue: record) {
+                    Field<?> schemaField = inputFieldIndexToSchemaFieldMap.get(fieldIndex);
+                    validateField(fieldValue, schemaField.getName(), schemaField, lineNumber, aggregatedErrors);
+                    fieldIndex += 1;
+                }
+            } else {
+                aggregatedErrors.add(new ReportItem("The row field count ["+record.size()+"] does not match the expected count ["+schemaFieldCount+"]. This is required when no headers are defined in the input.", null, lineNumber, null));
+            }
+        }
+    }
+
+    private void validateField(String textValue, String fieldNameToUse, Field<?> field, long lineNumber, List<ReportItem> aggregatedErrors) {
+        try {
+            Object fieldValue = field.castValue(textValue, false, field.getOptions());
+            // Check format.
+            if (!field.valueHasValidFormat(textValue)) {
+                aggregatedErrors.add(new ReportItem(String.format("Value '%s' provided for field '%s' is invalid for format '%s'.", textValue, fieldNameToUse, field.getFormat()), fieldNameToUse, lineNumber, textValue));
+            }
+            // Check constraints.
+            if (field.getConstraints() != null && !field.getConstraints().isEmpty()) {
+                Map<String, Object> violations = field.checkConstraintViolations(fieldValue);
+                for (Map.Entry<String, Object> entry: violations.entrySet()) {
+                    aggregatedErrors.add(new ReportItem(prettifyConstraintFailure(entry.getKey(), entry.getValue(), field, fieldNameToUse, textValue), fieldNameToUse, lineNumber, textValue));
+                }
+            }
+        } catch (InvalidCastException e) {
+            aggregatedErrors.add(new ReportItem(String.format("Value '%s' provided for field '%s' could not be parsed. Expected type was '%s'.", textValue, fieldNameToUse, field.getType()), fieldNameToUse, lineNumber, textValue));
+        } catch (Exception e) {
+            throw new ValidatorException("Unexpected error while validating row ["+getRootCause(e).getMessage()+"]", e);
+        }
+    }
+
+    private void handleSyntaxViolation(ViolationLevel violationLevel, String fieldName, String message, long lineNumber, List<ReportItem> aggregatedErrors) {
+        if (violationLevel != null && violationLevel != ViolationLevel.NONE) {
+            aggregatedErrors.add(new ReportItem(message, fieldName, lineNumber, null, violationLevel));
         }
     }
 
@@ -235,43 +350,71 @@ public class CSVValidator {
         report.getCounters().setNrOfAssertions(BigInteger.ZERO);
         report.setReports(new TestAssertionGroupReportsType());
         report.setContext(new AnyContent());
-        if (errorMessages == null || errorMessages.isEmpty()) {
-            report.setResult(TestResultType.SUCCESS);
-            report.getCounters().setNrOfErrors(BigInteger.ZERO);
-        } else {
-            report.setResult(TestResultType.FAILURE);
-            report.getCounters().setNrOfErrors(BigInteger.valueOf(errorMessages.size()));
-            for (ReportItem errorMessage: errorMessages) {
+        long errors = 0;
+        long warnings = 0;
+        long infos = 0;
+        if (errorMessages != null) {
+            for (ReportItem errorMessage : errorMessages) {
                 BAR error = new BAR();
                 error.setDescription(errorMessage.getReportMessage());
-                error.setLocation(ValidationConstants.INPUT_CONTENT+":"+errorMessage.getLineNumber()+":0");
+                error.setLocation(ValidationConstants.INPUT_CONTENT + ":" + errorMessage.getLineNumber() + ":0");
                 error.setValue(errorMessage.getValue());
-                report.getReports().getInfoOrWarningOrError().add(objectFactory.createTestAssertionGroupReportsTypeError(error));
+                switch (errorMessage.getViolationLevel()) {
+                    case ERROR:
+                        report.getReports().getInfoOrWarningOrError().add(objectFactory.createTestAssertionGroupReportsTypeError(error));
+                        errors += 1;
+                        break;
+                    case WARNING:
+                        report.getReports().getInfoOrWarningOrError().add(objectFactory.createTestAssertionGroupReportsTypeWarning(error));
+                        warnings += 1;
+                        break;
+                    case INFO:
+                        report.getReports().getInfoOrWarningOrError().add(objectFactory.createTestAssertionGroupReportsTypeInfo(error));
+                        infos += 1;
+                        break;
+                    case NONE:
+                        // Nothing.
+                        break;
+                }
             }
         }
+        if (errors > 0) {
+            report.setResult(TestResultType.FAILURE);
+        } else if (warnings > 0) {
+            report.setResult(TestResultType.WARNING);
+        } else {
+            report.setResult(TestResultType.SUCCESS);
+        }
+        report.getCounters().setNrOfErrors(BigInteger.valueOf(errors));
+        report.getCounters().setNrOfWarnings(BigInteger.valueOf(warnings));
+        report.getCounters().setNrOfAssertions(BigInteger.valueOf(infos));
         return report;
     }
 
-    private String prettifyConstraintFailure(String constraintKey, Object constraintValue, Field<?> field, String rowValue) {
+    private String prettifyConstraintFailure(String constraintKey, Object constraintValue, Field<?> field, String fieldNameToUse, String rowValue) {
         String message;
         if (Field.CONSTRAINT_KEY_ENUM.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' is not in the list of expected values %s.", rowValue, field.getName(), Field.formatValueAsString(constraintValue, field));
+            if (domainConfig.getDisplayEnumValuesInMessages().get(validationType)) {
+                message = String.format("Value '%s' for field '%s' is not in the list of expected values %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            } else {
+                message = String.format("Value '%s' for field '%s' is not in the list of expected values.", rowValue, fieldNameToUse);
+            }
         } else if (Field.CONSTRAINT_KEY_MAX_LENGTH.equals(constraintKey)) {
-            message = String.format("The length of value '%s' for field '%s' exceeds the maximum allowed length of %s.", rowValue, field.getName(), Field.formatValueAsString(constraintValue, field));
+            message = String.format("The length of value '%s' for field '%s' exceeds the maximum allowed length of %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_MIN_LENGTH.equals(constraintKey)) {
-            message = String.format("The length of value '%s' for field '%s' is less than the minimum allowed length of %s.", rowValue, field.getName(), Field.formatValueAsString(constraintValue, field));
+            message = String.format("The length of value '%s' for field '%s' is less than the minimum allowed length of %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_MAXIMUM.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' exceeds the allowed maximum of %s.", rowValue, field.getName(), Field.formatValueAsString(constraintValue, field));
+            message = String.format("Value '%s' for field '%s' exceeds the allowed maximum of %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_MINIMUM.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' is less than the minimum of %s.", rowValue, field.getName(), Field.formatValueAsString(constraintValue, field));
+            message = String.format("Value '%s' for field '%s' is less than the minimum of %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_PATTERN.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' does not match the expected pattern '%s'.", rowValue, field.getName(), Field.formatValueAsString(constraintValue, field));
+            message = String.format("Value '%s' for field '%s' does not match the expected pattern '%s'.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_REQUIRED.equals(constraintKey)) {
-            message = String.format("No value was provided for required field '%s'.", field.getName());
+            message = String.format("No value was provided for required field '%s'.", fieldNameToUse);
         } else if (Field.CONSTRAINT_KEY_UNIQUE.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' must be unique.", rowValue, field.getName());
+            message = String.format("Value '%s' for field '%s' must be unique.", rowValue, fieldNameToUse);
         } else {
-            message = String.format("Violation of constraint [%s] for field '%s'. Provided value was '%s'.", constraintKey, field.getName(), rowValue);
+            message = String.format("Violation of constraint [%s] for field '%s'. Provided value was '%s'.", constraintKey, fieldNameToUse, rowValue);
         }
         return message;
     }
