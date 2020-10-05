@@ -275,9 +275,16 @@ public class CSVValidator {
                     fieldIndex += 1;
                 }
             }
+            long previousLineNumber = -1;
             // Validation per row.
             for (CSVRecord record: parser) {
-                validateRow(record, parser.getCurrentLineNumber(), inputFieldIndexToSchemaFieldMap, schema.getFields().size(), csvSettings, errors);
+                long reportedLineNumber = parser.getCurrentLineNumber();
+                if (reportedLineNumber == previousLineNumber) {
+                    // This can come up in the last record if there is no EOL at the end of the file.
+                    reportedLineNumber += 1;
+                }
+                validateRow(record, reportedLineNumber, inputFieldIndexToSchemaFieldMap, schema.getFields().size(), csvSettings, errors);
+                previousLineNumber = reportedLineNumber;
             }
         } catch (ValidatorException e) {
             throw e;
@@ -331,8 +338,8 @@ public class CSVValidator {
         if (csvSettings.isHasHeaders()) {
             // Parser based on headers.
             if (record.size() != record.getParser().getHeaderNames().size()) {
-                // Record has wrong number of fields - add 1 to the line number because it has not actually been parsed.
-                aggregatedErrors.add(new ReportItem("The row field count ["+record.size()+"] does not match the number of defined headers ["+record.getParser().getHeaderNames().size()+"].", null, lineNumber+1, null));
+                // Record has wrong number of fields.
+                aggregatedErrors.add(new ReportItem("The row field count ["+record.size()+"] does not match the number of defined headers ["+record.getParser().getHeaderNames().size()+"].", null, lineNumber, null));
             } else {
                 int fieldIndex = 0;
                 for (String fieldValue: record) {

@@ -78,7 +78,7 @@
                             <div th:replace="fragments/input :: mainForm(${config})"/>
                             <div th:replace="fragments/input :: externalArtifactCheck(${config.label.includeExternalArtefacts}, ${config.label.externalArtefactsTooltip})"/>
                             <div th:replace="fragments/input :: externalArtifactControl('default', ${config.label.externalSchemaLabel})"/>
-                            <div id="csvSettingsDiv">
+                            <div id="csvSettingsDiv" class="hidden">
                                 <div id="csvSettingsCheckDiv" class="form-group">
                                     <div class="col-sm-offset-2 col-sm-10">
                                         <div class="checkbox">
