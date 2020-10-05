@@ -77,6 +77,7 @@ public class DomainConfigCache extends WebDomainConfigCache<DomainConfig> {
         domainConfig.getLabel().setCsvSyntaxHeaders(config.getString("validator.label.csvSyntaxHeaders", "Content has header"));
         domainConfig.getLabel().setCsvSyntaxHeadersTooltip(config.getString("validator.label.csvSyntaxHeadersTooltip", "Whether or not the first line of the content defines the field headers"));
         // Violation level inputs
+        domainConfig.getLabel().setViolationLevelHeader(config.getString("validator.label.violationLevelHeader", "Violation levels for findings on input field headers"));
         domainConfig.getLabel().setDifferentInputFieldCountViolationLevel(config.getString("validator.label.differentInputFieldCountViolationLevel", "Number of input fields different from number of schema fields"));
         domainConfig.getLabel().setDifferentInputFieldSequenceViolationLevel(config.getString("validator.label.differentInputFieldSequenceViolationLevel", "Sequence of input fields different from sequence of schema fields"));
         domainConfig.getLabel().setFieldCaseMismatchViolationLevel(config.getString("validator.label.fieldCaseMismatchViolationLevel", "Names of input fields with different casing compared to schema fields"));
