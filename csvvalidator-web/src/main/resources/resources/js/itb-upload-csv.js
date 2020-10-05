@@ -26,6 +26,26 @@ function syntaxInputChanged() {
         }
     }
 }
+function headerCheckChanged() {
+    var checked = $("#inputHeaders").is(":checked")
+    var validationType = getCompleteValidationType();
+    if (checked && (anyViolationInputAtLevel(validationType, 'REQUIRED') || anyViolationInputAtLevel(validationType, 'OPTIONAL'))) {
+        $('#violationDiv').removeClass('hidden');
+    } else {
+        $('#violationDiv').addClass('hidden');
+    }
+}
+
+function anyViolationInputAtLevel(validationType, level) {
+    return settingInputs.differentInputFieldCount[validationType].control == level
+            || settingInputs.differentInputFieldSequence[validationType].control == level
+            || settingInputs.unknownInputField[validationType].control == level
+            || settingInputs.unspecifiedSchemaField[validationType].control == level
+            || settingInputs.inputFieldCaseMismatch[validationType].control == level
+            || settingInputs.duplicateInputFields[validationType].control == level
+            || settingInputs.multipleInputFieldsForSchemaField[validationType].control == level
+}
+
 function setupSettingInputs(eventType, eventData) {
     $("#csvSettingsCheck").prop('checked', false);
     $('#inputDelimiter').val('');
@@ -33,20 +53,37 @@ function setupSettingInputs(eventType, eventData) {
     var validationType = getCompleteValidationType(),
         hasOptional = false, hasRequired = false,
         showHeaders = false, showDelimiter = false, showQuote = false,
+        showDifferentInputFieldCount = false,
+        showDifferentInputFieldSequence = false,
+        showUnknownInputField = false,
+        showUnspecifiedSchemaField = false,
+        showInputFieldCaseMismatch = false,
+        showDuplicateInputFields = false,
+        showMultipleInputFieldsForSchemaField = false,
         delimiterRequired = false, quoteRequired = false;
     if (validationType && validationType.trim() != '') {
         delimiterRequired = settingInputs.delimiter[validationType].control == 'REQUIRED';
         quoteRequired = settingInputs.quote[validationType].control == 'REQUIRED';
         if (settingInputs.headers[validationType].control == 'REQUIRED'
+            || anyViolationInputAtLevel(validationType, 'REQUIRED')
             || delimiterRequired
             || quoteRequired) {
             hasRequired = true;
         } else if (settingInputs.headers[validationType].control == 'OPTIONAL'
-           || settingInputs.delimiter[validationType].control == 'OPTIONAL'
-           || settingInputs.quote[validationType].control == 'OPTIONAL') {
+            || anyViolationInputAtLevel(validationType, 'OPTIONAL')
+            || settingInputs.delimiter[validationType].control == 'OPTIONAL'
+            || settingInputs.quote[validationType].control == 'OPTIONAL'
+           ) {
            hasOptional = true;
         }
         showHeaders = settingInputs.headers[validationType].control != 'NONE';
+        showDifferentInputFieldCount = settingInputs.differentInputFieldCount[validationType].control != 'NONE';
+        showDifferentInputFieldSequence = settingInputs.differentInputFieldSequence[validationType].control != 'NONE';
+        showUnknownInputField = settingInputs.unknownInputField[validationType].control != 'NONE';
+        showUnspecifiedSchemaField = settingInputs.unspecifiedSchemaField[validationType].control != 'NONE';
+        showInputFieldCaseMismatch = settingInputs.inputFieldCaseMismatch[validationType].control != 'NONE';
+        showDuplicateInputFields = settingInputs.duplicateInputFields[validationType].control != 'NONE';
+        showMultipleInputFieldsForSchemaField = settingInputs.multipleInputFieldsForSchemaField[validationType].control != 'NONE';
         showDelimiter = settingInputs.delimiter[validationType].control != 'NONE';
         showQuote = settingInputs.quote[validationType].control != 'NONE';
     }
@@ -64,8 +101,51 @@ function setupSettingInputs(eventType, eventData) {
         }
         if (showHeaders) {
             $('#csvSettingsFormHeaders').removeClass('hidden');
+            $("#inputHeaders").prop('checked', settingInputs.headers[validationType].defaultValue);
         } else {
             $('#csvSettingsFormHeaders').addClass('hidden');
+        }
+        if (showDifferentInputFieldCount) {
+            $('#csvSettingsFormDifferentInputFieldCount').removeClass('hidden');
+            $('#csvSettingsFormDifferentInputFieldCountControl').val(settingInputs.differentInputFieldCount[validationType].defaultValue);
+        } else {
+            $('#csvSettingsFormDifferentInputFieldCount').addClass('hidden');
+        }
+        if (showDifferentInputFieldSequence) {
+            $('#csvSettingsFormDifferentInputFieldSequence').removeClass('hidden');
+            $('#csvSettingsFormDifferentInputFieldSequenceControl').val(settingInputs.differentInputFieldSequence[validationType].defaultValue);
+        } else {
+            $('#csvSettingsFormDifferentInputFieldSequence').addClass('hidden');
+        }
+        if (showUnknownInputField) {
+            $('#csvSettingsFormUnknownInputField').removeClass('hidden');
+            $('#csvSettingsFormUnknownInputFieldControl').val(settingInputs.unknownInputField[validationType].defaultValue);
+        } else {
+            $('#csvSettingsFormUnknownInputField').addClass('hidden');
+        }
+        if (showUnspecifiedSchemaField) {
+            $('#csvSettingsFormUnspecifiedSchemaField').removeClass('hidden');
+            $('#csvSettingsFormUnspecifiedSchemaFieldControl').val(settingInputs.unspecifiedSchemaField[validationType].defaultValue);
+        } else {
+            $('#csvSettingsFormUnspecifiedSchemaField').addClass('hidden');
+        }
+        if (showInputFieldCaseMismatch) {
+            $('#csvSettingsFormInputFieldCaseMismatch').removeClass('hidden');
+            $('#csvSettingsFormInputFieldCaseMismatchControl').val(settingInputs.inputFieldCaseMismatch[validationType].defaultValue);
+        } else {
+            $('#csvSettingsFormInputFieldCaseMismatch').addClass('hidden');
+        }
+        if (showDuplicateInputFields) {
+            $('#csvSettingsFormDuplicateInputFields').removeClass('hidden');
+            $('#csvSettingsFormDuplicateInputFieldsControl').val(settingInputs.duplicateInputFields[validationType].defaultValue);
+        } else {
+            $('#csvSettingsFormDuplicateInputFields').addClass('hidden');
+        }
+        if (showMultipleInputFieldsForSchemaField) {
+            $('#csvSettingsFormMultipleInputFieldsForSchemaField').removeClass('hidden');
+            $('#csvSettingsFormMultipleInputFieldsForSchemaFieldControl').val(settingInputs.multipleInputFieldsForSchemaField[validationType].defaultValue);
+        } else {
+            $('#csvSettingsFormMultipleInputFieldsForSchemaField').addClass('hidden');
         }
         if (showDelimiter) {
             toggleRequiredPlaceholderText('inputDelimiter', delimiterRequired)
@@ -79,8 +159,32 @@ function setupSettingInputs(eventType, eventData) {
         } else {
             $('#csvSettingsFormQuote').addClass('hidden');
         }
+
+        if (showDifferentInputFieldCount
+            || showDifferentInputFieldSequence
+            || showUnknownInputField
+            || showUnspecifiedSchemaField
+            || showInputFieldCaseMismatch
+            || showDuplicateInputFields
+            || showMultipleInputFieldsForSchemaField) {
+            if (!showDelimiter && !showQuote && !showHeaders) {
+                $('#settingsDiv').addClass('hidden');
+                $('#violationDivContainer').removeClass('with-top-margin');
+            } else {
+                $('#settingsDiv').removeClass('hidden');
+                $('#violationDivContainer').addClass('with-top-margin');
+            }
+            if ((showHeaders && $('#inputHeaders').is(":checked")) || (!showHeaders && settingInputs.headers[validationType].defaultValue)) {
+                $('#violationDiv').removeClass('hidden');
+            } else {
+                $('#violationDiv').addClass('hidden');
+            }
+        } else {
+            $('#violationDiv').addClass('hidden');
+        }
     }
 }
+
 function toggleRequiredPlaceholderText(inputId, required) {
     var placeholder = $('#'+inputId).attr('placeholder');
     var hasRequiredMark = endsWith(placeholder, ' *');

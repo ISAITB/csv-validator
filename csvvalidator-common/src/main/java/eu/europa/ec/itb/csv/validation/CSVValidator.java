@@ -196,6 +196,7 @@ public class CSVValidator {
                         fieldMap.put(field.getName(), new FieldInfo(field, index));
                         lowerCaseFieldNameMap.computeIfAbsent(field.getName().toLowerCase(), n -> new HashSet<>()).add(field.getName());
                     }
+                    index += 1;
                 }
                 short headerLine = 1;
                 int headerIndex = 0;

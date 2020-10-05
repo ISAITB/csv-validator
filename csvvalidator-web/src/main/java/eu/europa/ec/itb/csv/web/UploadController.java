@@ -5,9 +5,7 @@ import eu.europa.ec.itb.csv.ApplicationConfig;
 import eu.europa.ec.itb.csv.DomainConfig;
 import eu.europa.ec.itb.csv.DomainConfigCache;
 import eu.europa.ec.itb.csv.InputHelper;
-import eu.europa.ec.itb.csv.validation.CSVValidator;
-import eu.europa.ec.itb.csv.validation.FileManager;
-import eu.europa.ec.itb.csv.validation.ValidationConstants;
+import eu.europa.ec.itb.csv.validation.*;
 import eu.europa.ec.itb.validation.commons.FileInfo;
 import eu.europa.ec.itb.validation.commons.ValidatorChannel;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
@@ -88,6 +86,13 @@ public class UploadController {
                                      @RequestParam(value = "inputHeaders", required = false, defaultValue = "false") Boolean inputHeaders,
                                      @RequestParam(value = "inputDelimiter", required = false) String inputDelimiter,
                                      @RequestParam(value = "inputQuote", required = false) String inputQuote,
+                                     @RequestParam(value = "inputDifferentInputFieldCountViolationLevel", required = false) String inputDifferentInputFieldCountViolationLevel,
+                                     @RequestParam(value = "inputDifferentInputFieldSequenceViolationLevel", required = false) String inputDifferentInputFieldSequenceViolationLevel,
+                                     @RequestParam(value = "inputDuplicateInputFieldsViolationLevel", required = false) String inputDuplicateInputFieldsViolationLevel,
+                                     @RequestParam(value = "inputFieldCaseMismatchViolationLevel", required = false) String inputFieldCaseMismatchViolationLevel,
+                                     @RequestParam(value = "inputMultipleInputFieldsForSchemaFieldViolationLevel", required = false) String inputMultipleInputFieldsForSchemaFieldViolationLevel,
+                                     @RequestParam(value = "inputUnknownInputViolationLevel", required = false) String inputUnknownInputViolationLevel,
+                                     @RequestParam(value = "inputUnspecifiedSchemaFieldViolationLevel", required = false) String inputUnspecifiedSchemaFieldViolationLevel,
                                      RedirectAttributes redirectAttributes,
                                      HttpServletRequest request) {
         setMinimalUIFlag(request, false);
@@ -143,12 +148,25 @@ public class UploadController {
                         inputHeaders = null;
                         inputDelimiter = null;
                         inputQuote = null;
+                        inputDifferentInputFieldCountViolationLevel = null;
+                        inputDifferentInputFieldSequenceViolationLevel = null;
+                        inputDuplicateInputFieldsViolationLevel = null;
+                        inputFieldCaseMismatchViolationLevel = null;
+                        inputMultipleInputFieldsForSchemaFieldViolationLevel = null;
+                        inputUnknownInputViolationLevel = null;
+                        inputUnspecifiedSchemaFieldViolationLevel = null;
                     }
-                    // TODO process additional inputs
                     InputHelper.Inputs inputs = InputHelper.Inputs.newInstance()
                             .withInputHeaders(inputHeaders)
                             .withInputDelimiter(inputDelimiter)
-                            .withInputQuote(inputQuote);
+                            .withInputQuote(inputQuote)
+                            .withDifferentInputFieldCountViolationLevel(ViolationLevel.byName(inputDifferentInputFieldCountViolationLevel))
+                            .withDifferentInputFieldSequenceViolationLevel(ViolationLevel.byName(inputDifferentInputFieldSequenceViolationLevel))
+                            .withDuplicateInputFieldsViolationLevel(ViolationLevel.byName(inputDuplicateInputFieldsViolationLevel))
+                            .withInputFieldCaseMismatchViolationLevel(ViolationLevel.byName(inputFieldCaseMismatchViolationLevel))
+                            .withMultipleInputFieldsForSchemaFieldViolationLevel(ViolationLevel.byName(inputMultipleInputFieldsForSchemaFieldViolationLevel))
+                            .withUnknownInputFieldViolationLevel(ViolationLevel.byName(inputUnknownInputViolationLevel))
+                            .withUnspecifiedSchemaFieldViolationLevel(ViolationLevel.byName(inputUnspecifiedSchemaFieldViolationLevel));
                     CSVValidator validator = beans.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs));
                     TAR report = validator.validate();
                     attributes.put("report", report);
@@ -220,11 +238,26 @@ public class UploadController {
                                       @RequestParam(value = "inputHeaders", required = false, defaultValue = "false") Boolean inputHeaders,
                                       @RequestParam(value = "inputDelimiter", required = false) String inputDelimiter,
                                       @RequestParam(value = "inputQuote", required = false) String inputQuote,
+                                      @RequestParam(value = "inputDifferentInputFieldCountViolationLevel", required = false) String inputDifferentInputFieldCountViolationLevel,
+                                      @RequestParam(value = "inputDifferentInputFieldSequenceViolationLevel", required = false) String inputDifferentInputFieldSequenceViolationLevel,
+                                      @RequestParam(value = "inputDuplicateInputFieldsViolationLevel", required = false) String inputDuplicateInputFieldsViolationLevel,
+                                      @RequestParam(value = "inputFieldCaseMismatchViolationLevel", required = false) String inputFieldCaseMismatchViolationLevel,
+                                      @RequestParam(value = "inputMultipleInputFieldsForSchemaFieldViolationLevel", required = false) String inputMultipleInputFieldsForSchemaFieldViolationLevel,
+                                      @RequestParam(value = "inputUnknownInputViolationLevel", required = false) String inputUnknownInputViolationLevel,
+                                      @RequestParam(value = "inputUnspecifiedSchemaFieldViolationLevel", required = false) String inputUnspecifiedSchemaFieldViolationLevel,
                                       RedirectAttributes redirectAttributes,
                                       HttpServletRequest request) {
 
         setMinimalUIFlag(request, true);
-        ModelAndView mv = handleUpload(domain, file, uri, string, validationType, contentType, externalSchema, externalSchemaFiles, externalSchemaUri, csvSettingsCheck, inputHeaders, inputDelimiter, inputQuote, redirectAttributes, request);
+        ModelAndView mv = handleUpload(
+                domain, file, uri, string, validationType, contentType,
+                externalSchema, externalSchemaFiles, externalSchemaUri,
+                csvSettingsCheck, inputHeaders, inputDelimiter, inputQuote,
+                inputDifferentInputFieldCountViolationLevel, inputDifferentInputFieldSequenceViolationLevel,
+                inputDuplicateInputFieldsViolationLevel, inputFieldCaseMismatchViolationLevel,
+                inputMultipleInputFieldsForSchemaFieldViolationLevel, inputUnknownInputViolationLevel,
+                inputUnspecifiedSchemaFieldViolationLevel,
+                redirectAttributes, request);
         Map<String, Object> attributes = mv.getModel();
         attributes.put("minimalUI", true);
         return new ModelAndView("uploadForm", attributes);

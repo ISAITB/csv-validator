@@ -241,6 +241,168 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> {
         private String csvSyntaxDelimiterTooltip;
         private String csvSyntaxHeaders;
         private String csvSyntaxHeadersTooltip;
+        private String differentInputFieldCountViolationLevel;
+        private String differentInputFieldSequenceViolationLevel;
+        private String duplicateInputFieldsViolationLevel;
+        private String fieldCaseMismatchViolationLevel;
+        private String multipleInputFieldsForSchemaFieldViolationLevel;
+        private String unknownInputViolationLevel;
+        private String unspecifiedSchemaFieldViolationLevel;
+        private String differentInputFieldCountViolationLevelTooltip;
+        private String differentInputFieldSequenceViolationLevelTooltip;
+        private String duplicateInputFieldsViolationLevelTooltip;
+        private String fieldCaseMismatchViolationLevelTooltip;
+        private String multipleInputFieldsForSchemaFieldViolationLevelTooltip;
+        private String unknownInputViolationLevelTooltip;
+        private String unspecifiedSchemaFieldViolationLevelTooltip;
+        private String violationLevelError;
+        private String violationLevelWarning;
+        private String violationLevelInfo;
+        private String violationLevelNone;
+
+        public String getDifferentInputFieldCountViolationLevel() {
+            return differentInputFieldCountViolationLevel;
+        }
+
+        public void setDifferentInputFieldCountViolationLevel(String differentInputFieldCountViolationLevel) {
+            this.differentInputFieldCountViolationLevel = differentInputFieldCountViolationLevel;
+        }
+
+        public String getDifferentInputFieldSequenceViolationLevel() {
+            return differentInputFieldSequenceViolationLevel;
+        }
+
+        public void setDifferentInputFieldSequenceViolationLevel(String differentInputFieldSequenceViolationLevel) {
+            this.differentInputFieldSequenceViolationLevel = differentInputFieldSequenceViolationLevel;
+        }
+
+        public String getDuplicateInputFieldsViolationLevel() {
+            return duplicateInputFieldsViolationLevel;
+        }
+
+        public void setDuplicateInputFieldsViolationLevel(String duplicateInputFieldsViolationLevel) {
+            this.duplicateInputFieldsViolationLevel = duplicateInputFieldsViolationLevel;
+        }
+
+        public String getFieldCaseMismatchViolationLevel() {
+            return fieldCaseMismatchViolationLevel;
+        }
+
+        public void setFieldCaseMismatchViolationLevel(String fieldCaseMismatchViolationLevel) {
+            this.fieldCaseMismatchViolationLevel = fieldCaseMismatchViolationLevel;
+        }
+
+        public String getMultipleInputFieldsForSchemaFieldViolationLevel() {
+            return multipleInputFieldsForSchemaFieldViolationLevel;
+        }
+
+        public void setMultipleInputFieldsForSchemaFieldViolationLevel(String multipleInputFieldsForSchemaFieldViolationLevel) {
+            this.multipleInputFieldsForSchemaFieldViolationLevel = multipleInputFieldsForSchemaFieldViolationLevel;
+        }
+
+        public String getUnknownInputViolationLevel() {
+            return unknownInputViolationLevel;
+        }
+
+        public void setUnknownInputViolationLevel(String unknownInputViolationLevel) {
+            this.unknownInputViolationLevel = unknownInputViolationLevel;
+        }
+
+        public String getUnspecifiedSchemaFieldViolationLevel() {
+            return unspecifiedSchemaFieldViolationLevel;
+        }
+
+        public void setUnspecifiedSchemaFieldViolationLevel(String unspecifiedSchemaFieldViolationLevel) {
+            this.unspecifiedSchemaFieldViolationLevel = unspecifiedSchemaFieldViolationLevel;
+        }
+
+        public String getDifferentInputFieldCountViolationLevelTooltip() {
+            return differentInputFieldCountViolationLevelTooltip;
+        }
+
+        public void setDifferentInputFieldCountViolationLevelTooltip(String differentInputFieldCountViolationLevelTooltip) {
+            this.differentInputFieldCountViolationLevelTooltip = differentInputFieldCountViolationLevelTooltip;
+        }
+
+        public String getDifferentInputFieldSequenceViolationLevelTooltip() {
+            return differentInputFieldSequenceViolationLevelTooltip;
+        }
+
+        public void setDifferentInputFieldSequenceViolationLevelTooltip(String differentInputFieldSequenceViolationLevelTooltip) {
+            this.differentInputFieldSequenceViolationLevelTooltip = differentInputFieldSequenceViolationLevelTooltip;
+        }
+
+        public String getDuplicateInputFieldsViolationLevelTooltip() {
+            return duplicateInputFieldsViolationLevelTooltip;
+        }
+
+        public void setDuplicateInputFieldsViolationLevelTooltip(String duplicateInputFieldsViolationLevelTooltip) {
+            this.duplicateInputFieldsViolationLevelTooltip = duplicateInputFieldsViolationLevelTooltip;
+        }
+
+        public String getFieldCaseMismatchViolationLevelTooltip() {
+            return fieldCaseMismatchViolationLevelTooltip;
+        }
+
+        public void setFieldCaseMismatchViolationLevelTooltip(String fieldCaseMismatchViolationLevelTooltip) {
+            this.fieldCaseMismatchViolationLevelTooltip = fieldCaseMismatchViolationLevelTooltip;
+        }
+
+        public String getMultipleInputFieldsForSchemaFieldViolationLevelTooltip() {
+            return multipleInputFieldsForSchemaFieldViolationLevelTooltip;
+        }
+
+        public void setMultipleInputFieldsForSchemaFieldViolationLevelTooltip(String multipleInputFieldsForSchemaFieldViolationLevelTooltip) {
+            this.multipleInputFieldsForSchemaFieldViolationLevelTooltip = multipleInputFieldsForSchemaFieldViolationLevelTooltip;
+        }
+
+        public String getUnknownInputViolationLevelTooltip() {
+            return unknownInputViolationLevelTooltip;
+        }
+
+        public void setUnknownInputViolationLevelTooltip(String unknownInputViolationLevelTooltip) {
+            this.unknownInputViolationLevelTooltip = unknownInputViolationLevelTooltip;
+        }
+
+        public String getUnspecifiedSchemaFieldViolationLevelTooltip() {
+            return unspecifiedSchemaFieldViolationLevelTooltip;
+        }
+
+        public void setUnspecifiedSchemaFieldViolationLevelTooltip(String unspecifiedSchemaFieldViolationLevelTooltip) {
+            this.unspecifiedSchemaFieldViolationLevelTooltip = unspecifiedSchemaFieldViolationLevelTooltip;
+        }
+
+        public String getViolationLevelError() {
+            return violationLevelError;
+        }
+
+        public void setViolationLevelError(String violationLevelError) {
+            this.violationLevelError = violationLevelError;
+        }
+
+        public String getViolationLevelWarning() {
+            return violationLevelWarning;
+        }
+
+        public void setViolationLevelWarning(String violationLevelWarning) {
+            this.violationLevelWarning = violationLevelWarning;
+        }
+
+        public String getViolationLevelInfo() {
+            return violationLevelInfo;
+        }
+
+        public void setViolationLevelInfo(String violationLevelInfo) {
+            this.violationLevelInfo = violationLevelInfo;
+        }
+
+        public String getViolationLevelNone() {
+            return violationLevelNone;
+        }
+
+        public void setViolationLevelNone(String violationLevelNone) {
+            this.violationLevelNone = violationLevelNone;
+        }
 
         public String getCsvSyntax() {
             return csvSyntax;

@@ -76,6 +76,26 @@ public class DomainConfigCache extends WebDomainConfigCache<DomainConfig> {
         domainConfig.getLabel().setCsvSyntaxDelimiterTooltip(config.getString("validator.label.csvSyntaxDelimiterTooltip", "The delimiter character used to separate field values"));
         domainConfig.getLabel().setCsvSyntaxHeaders(config.getString("validator.label.csvSyntaxHeaders", "Content has header"));
         domainConfig.getLabel().setCsvSyntaxHeadersTooltip(config.getString("validator.label.csvSyntaxHeadersTooltip", "Whether or not the first line of the content defines the field headers"));
+        // Violation level inputs
+        domainConfig.getLabel().setDifferentInputFieldCountViolationLevel(config.getString("validator.label.differentInputFieldCountViolationLevel", "Number of input fields different from number of schema fields"));
+        domainConfig.getLabel().setDifferentInputFieldSequenceViolationLevel(config.getString("validator.label.differentInputFieldSequenceViolationLevel", "Sequence of input fields different from sequence of schema fields"));
+        domainConfig.getLabel().setFieldCaseMismatchViolationLevel(config.getString("validator.label.fieldCaseMismatchViolationLevel", "Names of input fields with different casing compared to schema fields"));
+        domainConfig.getLabel().setDuplicateInputFieldsViolationLevel(config.getString("validator.label.duplicateInputFieldsViolationLevel", "Multiple input fields defined with the same name"));
+        domainConfig.getLabel().setMultipleInputFieldsForSchemaFieldViolationLevel(config.getString("validator.label.multipleInputFieldsForSchemaFieldViolationLevel", "Multiple input fields mapped to the same schema field"));
+        domainConfig.getLabel().setUnknownInputViolationLevel(config.getString("validator.label.unknownInputViolationLevel", "Input fields that are not defined in the schema"));
+        domainConfig.getLabel().setUnspecifiedSchemaFieldViolationLevel(config.getString("validator.label.unspecifiedSchemaFieldViolationLevel", "Schema fields for which no input fields are defined"));
+        domainConfig.getLabel().setDifferentInputFieldCountViolationLevelTooltip(config.getString("validator.label.differentInputFieldCountViolationLevelTooltip", "The violation level in case the input field count doesn't match the schema field count"));
+        domainConfig.getLabel().setDifferentInputFieldSequenceViolationLevelTooltip(config.getString("validator.label.differentInputFieldSequenceViolationLevelTooltip", "The violation level in case the input fields' sequence doesn't match the schema fields' sequence"));
+        domainConfig.getLabel().setFieldCaseMismatchViolationLevelTooltip(config.getString("validator.label.fieldCaseMismatchViolationLevelTooltip", "The violation level in case input fields match schema fields but with different casing"));
+        domainConfig.getLabel().setDuplicateInputFieldsViolationLevelTooltip(config.getString("validator.label.duplicateInputFieldsViolationLevelTooltip", "The violation level in case the duplicate input fields are found"));
+        domainConfig.getLabel().setMultipleInputFieldsForSchemaFieldViolationLevelTooltip(config.getString("validator.label.multipleInputFieldsForSchemaFieldViolationLevelTooltip", "The violation level in case multiple input fields map to the same schema field"));
+        domainConfig.getLabel().setUnknownInputViolationLevelTooltip(config.getString("validator.label.unknownInputViolationLevelTooltip", "The violation level in case of unknown input fields"));
+        domainConfig.getLabel().setUnspecifiedSchemaFieldViolationLevelTooltip(config.getString("validator.label.unspecifiedSchemaFieldViolationLevelTooltip", "The violation level in case schema fields are not defined"));
+        // Violation levels
+        domainConfig.getLabel().setViolationLevelError(config.getString("validator.label.violationLevelError", "Error"));
+        domainConfig.getLabel().setViolationLevelWarning(config.getString("validator.label.violationLevelWarning", "Warning"));
+        domainConfig.getLabel().setViolationLevelInfo(config.getString("validator.label.violationLevelInfo", "Information message"));
+        domainConfig.getLabel().setViolationLevelNone(config.getString("validator.label.violationLevelNone", "None"));
         addMissingDefaultValues(domainConfig.getWebServiceDescription(), appConfig.getDefaultLabels());
     }
 }
