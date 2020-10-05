@@ -146,9 +146,23 @@ The properties here define how a specific validation domain is configured. They 
 | `validator.hasHeaders.XYZ` | Whether the input has a header row. | boolean | `true` |
 | `validator.delimiter.XYZ` | The delimiter character to use. | character | `,` |
 | `validator.quote.XYZ` | The quote character to use. | character | `"` |
+| `validator.differentInputFieldCountViolation.XYZ` | The violation level when the number of input fields doesn't match the number of schema fields. | `error`, `warning`, `info`, `none` | `error` |
+| `validator.differentInputFieldSequenceViolation.XYZ` | The violation level when the sequence of input fields doesn't match the defined sequence in the schema. | `error`, `warning`, `info`, `none` | `error` |
+| `validator.unknownInputFieldViolation.XYZ` | The violation level when an input field is not found in the schema fields. | `error`, `warning`, `info`, `none` | `error` |
+| `validator.unspecifiedSchemaFieldViolation.XYZ` | The violation level when a schema field is not provided for in the input. | `error`, `warning`, `info`, `none` | `error` |
+| `validator.inputFieldCaseMismatchViolation.XYZ` | The violation level when the name of an input field does not match the casing defined in the schema. | `error`, `warning`, `info`, `none` | `error` |
+| `validator.duplicateInputFieldsViolation.XYZ` | The violation level when duplicate input fields are found. | `error`, `warning`, `info`, `none` | `error` |
+| `validator.multipleInputFieldsForSchemaFieldViolation.XYZ` | The violation level when multiple input fields map to the same schema field. | `error`, `warning`, `info`, `none` | `error` |
 | `validator.input.hasHeaders.XYZ` | Whether users may/must specify if the content has headers. | `required`, `optional`, `none` | `none` |
 | `validator.input.delimiter.XYZ` | Whether users may/must specify the delimiter character. | `required`, `optional`, `none` | `none` |
 | `validator.input.quote.XYZ` | Whether users may/must specify the quote character. | `required`, `optional`, `none` | `none` |
+| `validator.input.differentInputFieldCountViolation.XYZ` | Whether users may/must specify the violation level for a field count mismatch. | `required`, `optional`, `none` | `none` |
+| `validator.input.differentInputFieldSequenceViolation.XYZ` | Whether users may/must specify the violation level for a field sequence mismatch. | `required`, `optional`, `none` | `none` |
+| `validator.input.unknownInputFieldViolation.XYZ` | Whether users may/must specify the violation level for unknown fields. | `required`, `optional`, `none` | `none` |
+| `validator.input.unspecifiedSchemaFieldViolation.XYZ` | Whether users may/must specify the violation level for schema fields not covered in the input. | `required`, `optional`, `none` | `none` |
+| `validator.input.inputFieldCaseMismatchViolation.XYZ` | Whether users may/must specify the violation level for a case difference in field names. | `required`, `optional`, `none` | `none` |
+| `validator.input.duplicateInputFieldsViolation.XYZ` | Whether users may/must specify the violation level for duplicate input fields. | `required`, `optional`, `none` | `none` |
+| `validator.input.multipleInputFieldsForSchemaFieldViolation.XYZ` | Whether users may/must specify the violation level when multiple input fields map to the same schema field. | `required`, `optional`, `none` | `none` |
 
 # Plugin development
 
