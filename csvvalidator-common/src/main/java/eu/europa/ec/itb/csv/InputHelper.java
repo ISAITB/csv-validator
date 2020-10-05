@@ -79,8 +79,8 @@ public class InputHelper extends BaseInputHelper<FileManager, DomainConfig, Appl
                         domainConfig.getCsvOptions().getUserInputForDuplicateInputFields().get(validationType),
                         "You are required to define the violation level in case duplicate input fields are found."
                 ))
-                // Duplicate input fields
-                .setDuplicateInputFieldViolationLevel(getViolationLevelSetting(
+                // Multiple inputs for same schema field
+                .setMultipleInputFieldsForSchemaFieldViolationLevel(getViolationLevelSetting(
                         inputs.multipleInputFieldsForSchemaFieldViolationLevel,
                         domainConfig.getCsvOptions().getMultipleInputFieldsForSchemaField().get(validationType),
                         domainConfig.getCsvOptions().getUserInputForMultipleInputFieldsForSchemaField().get(validationType),
@@ -90,13 +90,16 @@ public class InputHelper extends BaseInputHelper<FileManager, DomainConfig, Appl
     }
 
     private ViolationLevel getViolationLevelSetting(ViolationLevel input, ViolationLevel configDefault, ExternalArtifactSupport inputSupportType, String errorMessageIfMissingAndRequired) {
+        ViolationLevel result = configDefault;
         if (inputSupportType != ExternalArtifactSupport.NONE) {
             if (inputSupportType == ExternalArtifactSupport.REQUIRED && input == null) {
                 throw new ValidatorException(errorMessageIfMissingAndRequired);
             }
-            return input;
+            if (input != null) {
+                result = input;
+            }
         }
-        return configDefault;
+        return result;
     }
 
     private Character getCharacterSetting(String input, Character configDefault, ExternalArtifactSupport inputSupportType, String settingName) {
@@ -143,6 +146,11 @@ public class InputHelper extends BaseInputHelper<FileManager, DomainConfig, Appl
 
         public Inputs withInputQuote(String inputQuote) {
             this.inputQuote = inputQuote;
+            return this;
+        }
+
+        public Inputs withInputFieldCaseMismatchViolationLevel(ViolationLevel inputFieldCaseMismatchViolationLevel) {
+            this.inputFieldCaseMismatchViolationLevel = inputFieldCaseMismatchViolationLevel;
             return this;
         }
 

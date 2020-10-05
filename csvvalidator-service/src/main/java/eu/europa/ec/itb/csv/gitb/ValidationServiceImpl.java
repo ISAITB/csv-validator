@@ -9,6 +9,7 @@ import eu.europa.ec.itb.csv.InputHelper;
 import eu.europa.ec.itb.csv.validation.CSVValidator;
 import eu.europa.ec.itb.csv.validation.FileManager;
 import eu.europa.ec.itb.csv.validation.ValidationConstants;
+import eu.europa.ec.itb.csv.validation.ViolationLevel;
 import eu.europa.ec.itb.validation.commons.FileInfo;
 import eu.europa.ec.itb.validation.commons.Utils;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
@@ -82,6 +83,28 @@ public class ValidationServiceImpl implements ValidationService {
         if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForQuote())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_QUOTE, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_QUOTE)));
         }
+
+        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount())) {
+            response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL)));
+        }
+        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDifferentInputFieldSequence())) {
+            response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL)));
+        }
+        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDuplicateInputFields())) {
+            response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL)));
+        }
+        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForInputFieldCaseMismatch())) {
+            response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_FIELD_CASE_MISMATCH_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_FIELD_CASE_MISMATCH_VIOLATION_LEVEL)));
+        }
+        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForMultipleInputFieldsForSchemaField())) {
+            response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL)));
+        }
+        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForUnknownInputField())) {
+            response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL)));
+        }
+        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForUnspecifiedSchemaField())) {
+            response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL)));
+        }
         if (definesTypeWithExternalSchemas()) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_EXTERNAL_SCHEMA, "map", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_EXTERNAL_SCHEMA)));
         }
@@ -147,13 +170,26 @@ public class ValidationServiceImpl implements ValidationService {
             Boolean inputHeaders = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_HAS_HEADERS, domainConfig.getCsvOptions().getUserInputForHeader().get(validationType), Boolean::valueOf);
             String inputDelimiter = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DELIMITER, domainConfig.getCsvOptions().getUserInputForDelimiter().get(validationType), (s) -> s);
             String inputQuote = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_QUOTE, domainConfig.getCsvOptions().getUserInputForQuote().get(validationType), (s) -> s);
+            ViolationLevel inputDifferentInputFieldCountViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);
+            ViolationLevel inputDifferentInputFieldSequenceViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);
+            ViolationLevel inputDuplicateInputFieldsViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);
+            ViolationLevel inputFieldCaseMismatchViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_FIELD_CASE_MISMATCH_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);
+            ViolationLevel inputMultipleInputFieldsForSchemaFieldViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);
+            ViolationLevel inputUnknownInputViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);
+            ViolationLevel inputUnspecifiedSchemaFieldViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);
             ValidationResponse result = new ValidationResponse();
             // Execute validation
-            // TODO process additional inputs
             InputHelper.Inputs inputs = InputHelper.Inputs.newInstance()
                     .withInputHeaders(inputHeaders)
                     .withInputDelimiter(inputDelimiter)
-                    .withInputQuote(inputQuote);
+                    .withInputQuote(inputQuote)
+                    .withDifferentInputFieldCountViolationLevel(inputDifferentInputFieldCountViolationLevel)
+                    .withDifferentInputFieldSequenceViolationLevel(inputDifferentInputFieldSequenceViolationLevel)
+                    .withDuplicateInputFieldsViolationLevel(inputDuplicateInputFieldsViolationLevel)
+                    .withInputFieldCaseMismatchViolationLevel(inputFieldCaseMismatchViolationLevel)
+                    .withMultipleInputFieldsForSchemaFieldViolationLevel(inputMultipleInputFieldsForSchemaFieldViolationLevel)
+                    .withUnknownInputFieldViolationLevel(inputUnknownInputViolationLevel)
+                    .withUnspecifiedSchemaFieldViolationLevel(inputUnspecifiedSchemaFieldViolationLevel);
             CSVValidator validator = ctx.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs));
             TAR report = validator.validate();
             addContext(report, contentToValidate);
