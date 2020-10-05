@@ -259,6 +259,15 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> {
         private String violationLevelWarning;
         private String violationLevelInfo;
         private String violationLevelNone;
+        private String violationLevelHeader;
+
+        public String getViolationLevelHeader() {
+            return violationLevelHeader;
+        }
+
+        public void setViolationLevelHeader(String violationLevelHeader) {
+            this.violationLevelHeader = violationLevelHeader;
+        }
 
         public String getDifferentInputFieldCountViolationLevel() {
             return differentInputFieldCountViolationLevel;
