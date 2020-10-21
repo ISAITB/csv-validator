@@ -246,7 +246,13 @@ public class CSVValidator {
                 schema.getFields().forEach((f) -> {
                     if (!matchedSchemaFields.contains(f.getName())) {
                         // Schema field not found in input.
-                        handleSyntaxViolation(csvSettings.getUnspecifiedSchemaFieldViolationLevel(), null, String.format("The defined header fields do not include the expected field '%s'.", f.getName()), headerLine, errors);
+                        if (f.getConstraints() != null && (Boolean)f.getConstraints().getOrDefault(Field.CONSTRAINT_KEY_REQUIRED, Boolean.FALSE)) {
+                            // Missing required field - always an error.
+                            handleSyntaxViolation(ViolationLevel.ERROR, null, String.format("The defined header fields do not include the required field '%s'.", f.getName()), headerLine, errors);
+                        } else {
+                            // Missing optional field - depends on configuration.
+                            handleSyntaxViolation(csvSettings.getUnspecifiedSchemaFieldViolationLevel(), null, String.format("The defined header fields do not include the optional field '%s'.", f.getName()), headerLine, errors);
+                        }
                     }
                 });
                 if (schema.getFields().size() != parser.getHeaderNames().size()) {
