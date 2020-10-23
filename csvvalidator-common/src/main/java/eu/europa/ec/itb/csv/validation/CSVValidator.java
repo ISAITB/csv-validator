@@ -180,6 +180,7 @@ public class CSVValidator {
             throw new ValidatorException("The provided schema could not be parsed [" + getRootCause(e).getMessage()+ "]", e);
         }
         prepareInputFile(inputFile);
+        short headerLine = 1;
         try (
                 Reader inputReader = new BomStrippingReader(toStream(inputFile, true));
                 CSVParser parser = new CSVParser(inputReader, format)
@@ -198,7 +199,6 @@ public class CSVValidator {
                     }
                     index += 1;
                 }
-                short headerLine = 1;
                 int headerIndex = 0;
                 Set<String> matchedSchemaFields = new HashSet<>();
                 Set<String> processedHeaders = new HashSet<>();
@@ -295,9 +295,24 @@ public class CSVValidator {
         } catch (ValidatorException e) {
             throw e;
         } catch (Exception e) {
-            throw new ValidatorException("The provided input could not be parsed ["+ getRootCause(e).getMessage()+"]", e);
+            if (!checkAndHandleKnownErrors(e, headerLine, errors)) {
+                throw new ValidatorException("The provided input could not be parsed ["+ getRootCause(e).getMessage()+"]", e);
+            }
         }
         return toTAR(errors);
+    }
+
+    private boolean checkAndHandleKnownErrors(Exception e, short headerLine, List<ReportItem> aggregatedErrors) {
+        boolean handled = false;
+        if (e != null && e.getMessage() != null && !e.getMessage().isBlank()) {
+            for (DomainConfig.ParserError parserError: domainConfig.getParserErrors().values()) {
+                if (parserError.getPattern().matcher(e.getMessage()).matches()) {
+                    handleSyntaxViolation(ViolationLevel.ERROR, null, parserError.getMessage(), headerLine, aggregatedErrors);
+                    handled = true;
+                }
+            }
+        }
+        return handled;
     }
 
     private void prepareInputFile(File inputFile) {
@@ -486,7 +501,13 @@ public class CSVValidator {
                 ValidateRequest pluginInput = preparePluginInput(pluginTmpFolder);
                 for (ValidationPlugin plugin: plugins) {
                     String pluginName = plugin.getName();
-                    ValidationResponse response = plugin.validate(pluginInput);
+                    ValidationResponse response = null;
+                    try {
+                        response = plugin.validate(pluginInput);
+                    } catch (Exception e) {
+                        // Do not propagate the failure as this will block all validation reporting.
+                        LOG.warn(String.format("Unable to correctly process plugin [%s]", e.getMessage()), e);
+                    }
                     if (response != null && response.getReport() != null && response.getReport().getReports() != null) {
                         LOG.info("Plugin [{}] produced [{}] report item(s).", pluginName, response.getReport().getReports().getInfoOrWarningOrError().size());
                         if (pluginReport == null) {

@@ -7,16 +7,26 @@ import eu.europa.ec.itb.validation.commons.config.LabelConfig;
 import eu.europa.ec.itb.validation.commons.config.WebDomainConfig;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class DomainConfig extends WebDomainConfig<DomainConfig.Label> {
 
     private Map<String, Boolean> javaBasedDateFormats;
     private Map<String, Boolean> displayEnumValuesInMessages;
+    private Map<String, ParserError> parserErrors;
 
     private CsvOptions csvOptions = new CsvOptions();
 
     public CsvOptions getCsvOptions() {
         return csvOptions;
+    }
+
+    public void setParserErrors(Map<String, ParserError> parserErrors) {
+        this.parserErrors = parserErrors;
+    }
+
+    public Map<String, ParserError> getParserErrors() {
+        return parserErrors;
     }
 
     @Override
@@ -42,6 +52,42 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> {
 
     public void setJavaBasedDateFormats(Map<String, Boolean> javaBasedDateFormats) {
         this.javaBasedDateFormats = javaBasedDateFormats;
+    }
+
+    public static class ParserError {
+
+        public static final ParserError MISSING_HEADER_NAME = new ParserError(
+                "missingHeader",
+                "^A header name is missing in \\[.+\\]",
+                "The header field names could not be parsed. You have either defined consecutive field delimiter characters (commas) with blank contents or defined a trailing one at the end of the header."
+        );
+        public static final ParserError WRONG_DELIMITER = new ParserError(
+                "wrongDelimiter",
+                "^\\(line .+\\) invalid char between encapsulated token and delimiter",
+                "The header field names could not be parsed. This is likely due to the field delimiter character (comma) used in the input not being the expected one."
+        );
+
+        private Pattern pattern;
+        private String message;
+        private String name;
+
+        public ParserError(String name, String expression, String message) {
+            pattern = Pattern.compile(expression);
+            this.message = message;
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Pattern getPattern() {
+            return pattern;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 
     public static class CsvOptions {

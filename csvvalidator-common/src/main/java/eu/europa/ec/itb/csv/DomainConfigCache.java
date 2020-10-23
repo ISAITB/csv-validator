@@ -98,5 +98,17 @@ public class DomainConfigCache extends WebDomainConfigCache<DomainConfig> {
         domainConfig.getLabel().setViolationLevelInfo(config.getString("validator.label.violationLevelInfo", "Information message"));
         domainConfig.getLabel().setViolationLevelNone(config.getString("validator.label.violationLevelNone", "None"));
         addMissingDefaultValues(domainConfig.getWebServiceDescription(), appConfig.getDefaultLabels());
+        // Known parser error mappings - start.
+        domainConfig.setParserErrors(parseObjectMap("validator.parserError", config, (name, data) -> {
+            if (data.containsKey("pattern") && data.containsKey("message")) {
+                return new DomainConfig.ParserError(name, data.get("pattern"), data.get("message"));
+            } else {
+                return null;
+            }
+        }));
+        // Apply defaults if missing.
+        domainConfig.getParserErrors().putIfAbsent(DomainConfig.ParserError.MISSING_HEADER_NAME.getName(), DomainConfig.ParserError.MISSING_HEADER_NAME);
+        domainConfig.getParserErrors().putIfAbsent(DomainConfig.ParserError.WRONG_DELIMITER.getName(), DomainConfig.ParserError.WRONG_DELIMITER);
+        // - end.
     }
 }
