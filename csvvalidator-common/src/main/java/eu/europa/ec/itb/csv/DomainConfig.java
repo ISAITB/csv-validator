@@ -9,7 +9,7 @@ import eu.europa.ec.itb.validation.commons.config.WebDomainConfig;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class DomainConfig extends WebDomainConfig<DomainConfig.Label> {
+public class DomainConfig extends WebDomainConfig<DomainConfig.Label> implements MessageFormatter {
 
     private Map<String, Boolean> javaBasedDateFormats;
     private Map<String, Boolean> displayEnumValuesInMessages;
@@ -52,6 +52,15 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> {
 
     public void setJavaBasedDateFormats(Map<String, Boolean> javaBasedDateFormats) {
         this.javaBasedDateFormats = javaBasedDateFormats;
+    }
+
+    @Override
+    public String formatMessage(long lineNumber, String fieldName, String message) {
+        if (fieldName == null) {
+            return String.format("[%s%s]: %s", getLabel().getLineMessagePrefix(), lineNumber, message);
+        } else {
+            return String.format("[%s%s][%s%s]: %s", getLabel().getLineMessagePrefix(), lineNumber, getLabel().getFieldMessagePrefix(), fieldName, message);
+        }
     }
 
     public static class ParserError {
@@ -306,6 +315,24 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> {
         private String violationLevelInfo;
         private String violationLevelNone;
         private String violationLevelHeader;
+        private String lineMessagePrefix;
+        private String fieldMessagePrefix;
+
+        public String getLineMessagePrefix() {
+            return lineMessagePrefix;
+        }
+
+        public void setLineMessagePrefix(String lineMessagePrefix) {
+            this.lineMessagePrefix = lineMessagePrefix;
+        }
+
+        public String getFieldMessagePrefix() {
+            return fieldMessagePrefix;
+        }
+
+        public void setFieldMessagePrefix(String fieldMessagePrefix) {
+            this.fieldMessagePrefix = fieldMessagePrefix;
+        }
 
         public String getViolationLevelHeader() {
             return violationLevelHeader;

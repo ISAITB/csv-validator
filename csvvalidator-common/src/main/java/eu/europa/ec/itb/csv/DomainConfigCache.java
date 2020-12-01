@@ -76,6 +76,14 @@ public class DomainConfigCache extends WebDomainConfigCache<DomainConfig> {
         domainConfig.getLabel().setCsvSyntaxDelimiterTooltip(config.getString("validator.label.csvSyntaxDelimiterTooltip", "The delimiter character used to separate field values"));
         domainConfig.getLabel().setCsvSyntaxHeaders(config.getString("validator.label.csvSyntaxHeaders", "Content has header"));
         domainConfig.getLabel().setCsvSyntaxHeadersTooltip(config.getString("validator.label.csvSyntaxHeadersTooltip", "Whether or not the first line of the content defines the field headers"));
+        domainConfig.getLabel().setLineMessagePrefix(config.getString("validator.label.lineMessagePrefix", "Row:").trim());
+        if (domainConfig.getLabel().getLineMessagePrefix().length() > 0) {
+            domainConfig.getLabel().setLineMessagePrefix(domainConfig.getLabel().getLineMessagePrefix().concat(" "));
+        }
+        domainConfig.getLabel().setFieldMessagePrefix(config.getString("validator.label.fieldMessagePrefix", "Field:").trim());
+        if (domainConfig.getLabel().getFieldMessagePrefix().length() > 0) {
+            domainConfig.getLabel().setFieldMessagePrefix(domainConfig.getLabel().getFieldMessagePrefix().concat(" "));
+        }
         // Violation level inputs
         domainConfig.getLabel().setViolationLevelHeader(config.getString("validator.label.violationLevelHeader", "Violation levels for findings on input field headers"));
         domainConfig.getLabel().setDifferentInputFieldCountViolationLevel(config.getString("validator.label.differentInputFieldCountViolationLevel", "Number of input fields different from number of schema fields"));
