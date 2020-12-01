@@ -360,7 +360,7 @@ public class CSVValidator {
             // Parser based on headers.
             if (record.size() != record.getParser().getHeaderNames().size()) {
                 // Record has wrong number of fields.
-                aggregatedErrors.add(new ReportItem("The row field count ["+record.size()+"] does not match the number of defined headers ["+record.getParser().getHeaderNames().size()+"].", null, lineNumber, null));
+                aggregatedErrors.add(new ReportItem(domainConfig, "The row field count ["+record.size()+"] does not match the number of defined headers ["+record.getParser().getHeaderNames().size()+"].", null, lineNumber, null));
             } else {
                 int fieldIndex = 0;
                 for (String fieldValue: record) {
@@ -382,7 +382,7 @@ public class CSVValidator {
                     fieldIndex += 1;
                 }
             } else {
-                aggregatedErrors.add(new ReportItem("The row field count ["+record.size()+"] does not match the expected count ["+schemaFieldCount+"]. This is required when no headers are defined in the input.", null, lineNumber, null));
+                aggregatedErrors.add(new ReportItem(domainConfig, "The row field count ["+record.size()+"] does not match the expected count ["+schemaFieldCount+"]. This is required when no headers are defined in the input.", null, lineNumber, null));
             }
         }
     }
@@ -392,17 +392,17 @@ public class CSVValidator {
             Object fieldValue = field.castValue(textValue, false, field.getOptions());
             // Check format.
             if (!field.valueHasValidFormat(textValue)) {
-                aggregatedErrors.add(new ReportItem(String.format("Value '%s' provided for field '%s' is invalid for format '%s'.", textValue, fieldNameToUse, field.getFormat()), fieldNameToUse, lineNumber, textValue));
+                aggregatedErrors.add(new ReportItem(domainConfig, String.format("Value '%s' provided for field '%s' is invalid for format '%s'.", textValue, fieldNameToUse, field.getFormat()), fieldNameToUse, lineNumber, textValue));
             }
             // Check constraints.
             if (field.getConstraints() != null && !field.getConstraints().isEmpty()) {
                 Map<String, Object> violations = field.checkConstraintViolations(fieldValue);
                 for (Map.Entry<String, Object> entry: violations.entrySet()) {
-                    aggregatedErrors.add(new ReportItem(prettifyConstraintFailure(entry.getKey(), entry.getValue(), field, fieldNameToUse, textValue), fieldNameToUse, lineNumber, textValue));
+                    aggregatedErrors.add(new ReportItem(domainConfig, prettifyConstraintFailure(entry.getKey(), entry.getValue(), field, fieldNameToUse, textValue), fieldNameToUse, lineNumber, textValue));
                 }
             }
         } catch (InvalidCastException e) {
-            aggregatedErrors.add(new ReportItem(String.format("Value '%s' provided for field '%s' could not be parsed. Expected type was '%s'.", textValue, fieldNameToUse, field.getType()), fieldNameToUse, lineNumber, textValue));
+            aggregatedErrors.add(new ReportItem(domainConfig, String.format("Value '%s' provided for field '%s' could not be parsed. Expected type was '%s'.", textValue, fieldNameToUse, field.getType()), fieldNameToUse, lineNumber, textValue));
         } catch (Exception e) {
             throw new ValidatorException("Unexpected error while validating row ["+getRootCause(e).getMessage()+"]", e);
         }
@@ -410,7 +410,7 @@ public class CSVValidator {
 
     private void handleSyntaxViolation(ViolationLevel violationLevel, String fieldName, String message, long lineNumber, List<ReportItem> aggregatedErrors) {
         if (violationLevel != null && violationLevel != ViolationLevel.NONE) {
-            aggregatedErrors.add(new ReportItem(message, fieldName, lineNumber, null, violationLevel));
+            aggregatedErrors.add(new ReportItem(domainConfig, message, fieldName, lineNumber, null, violationLevel));
         }
     }
 

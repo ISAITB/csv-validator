@@ -1,18 +1,22 @@
 package eu.europa.ec.itb.csv.validation;
 
+import eu.europa.ec.itb.csv.MessageFormatter;
+
 public class ReportItem {
 
-    private String message;
-    private String fieldName;
-    private String value;
-    private long lineNumber;
-    private ViolationLevel violationLevel;
+    private final MessageFormatter messageFormatter;
+    private final String message;
+    private final String fieldName;
+    private final String value;
+    private final long lineNumber;
+    private final ViolationLevel violationLevel;
 
-    public ReportItem(String message, String fieldName, long lineNumber, String value) {
-        this(message, fieldName, lineNumber, value, ViolationLevel.ERROR);
+    public ReportItem(MessageFormatter messageFormatter, String message, String fieldName, long lineNumber, String value) {
+        this(messageFormatter, message, fieldName, lineNumber, value, ViolationLevel.ERROR);
     }
 
-    public ReportItem(String message, String fieldName, long lineNumber, String value, ViolationLevel violationLevel) {
+    public ReportItem(MessageFormatter messageFormatter, String message, String fieldName, long lineNumber, String value, ViolationLevel violationLevel) {
+        this.messageFormatter = messageFormatter;
         this.message = message;
         this.fieldName = fieldName;
         this.lineNumber = lineNumber;
@@ -21,11 +25,7 @@ public class ReportItem {
     }
 
     public String getReportMessage() {
-        if (fieldName == null) {
-            return String.format("[%s]: %s", lineNumber, getMessage());
-        } else {
-            return String.format("[%s][%s]: %s", lineNumber, fieldName, getMessage());
-        }
+        return messageFormatter.formatMessage(lineNumber, fieldName, getMessage());
     }
 
     public String getMessage() {
