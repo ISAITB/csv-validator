@@ -3,7 +3,6 @@
     <head>
         <title th:replace="fragments/common :: header">Validator</title>
         <link rel="stylesheet" th:href="@{/css/style-csv.css}"/>
-        <script th:src="@{/webjars/codemirror/5.50.0/mode/mathematica/mathematica.js}"></script>
         <script th:src="@{/js/lib/FileSaver.min.js}"></script>
         <script th:src="@{/js/itb-upload-csv.js}"></script>
         <script th:if="${report}" th:inline="text">
@@ -59,7 +58,7 @@
                         maxCount: 1
                     }
                 },
-                codeTypeObj: "mathematica",
+                codeTypeObj: "null",
                 isMinimalUI: [[${minimalUI}]],
                 artifactTypes: ['default'],
                 externalArtifacts: externalArtifacts
