@@ -176,7 +176,7 @@ public class ValidationRunner {
                 summary.append("\n");
                 int i = 0;
                 for (ValidationInput input: inputs) {
-                    LOGGER_FEEDBACK.info(String.format("\nValidating %s of %s ...", i, inputs.size()));
+                    LOGGER_FEEDBACK.info(String.format("\nValidating %s of %s ...", i+1, inputs.size()));
                     try {
                         InputHelper.Inputs settingInputs = InputHelper.Inputs.newInstance()
                                 .withInputHeaders(inputHeaders)
@@ -191,25 +191,29 @@ public class ValidationRunner {
                                 .withUnspecifiedSchemaFieldViolationLevel(inputUnspecifiedSchemaFieldViolationLevel);
                         CSVValidator validator = ctx.getBean(CSVValidator.class, input.getInputFile(), validationType, externalSchemaFileInfo, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, settingInputs));
                         TAR report = validator.validate();
-                        int itemCount = 0;
-                        if (report.getReports() != null && report.getReports().getInfoOrWarningOrError() != null) {
-                            itemCount = report.getReports().getInfoOrWarningOrError().size();
-                        }
-                        FileReport reportData = new FileReport(input.getFileName(), report, typeRequired, validationType);
-                        summary.append("\n").append(reportData.toString()).append("\n");
-                        if (!noReports) {
-                            File xmlReportFile = new File(Path.of(System.getProperty("user.dir")).toFile(), "report."+i+".xml");
-                            Files.deleteIfExists(xmlReportFile.toPath());
-                            // Create XML report
-                            fileManager.saveReport(report, xmlReportFile);
-                            if (itemCount <= domainConfig.getMaximumReportsForDetailedOutput()) {
-                                // Create PDF report
-                                File pdfReportFile = new File(xmlReportFile.getParentFile(), "report."+i+".pdf");
-                                Files.deleteIfExists(pdfReportFile.toPath());
-                                reportGenerator.writeReport(domainConfig, xmlReportFile, pdfReportFile);
-                                summary.append("- Detailed reports in [").append(xmlReportFile.getAbsolutePath()).append("] and [").append(pdfReportFile.getAbsolutePath()).append("] \n");
-                            } else {
-                                summary.append("- Detailed report in [").append(xmlReportFile.getAbsolutePath()).append("] (PDF report skipped due to large number of report items) \n");
+                        if (report == null) {
+                            summary.append("\nNo validation report was produced.\n");
+                        } else {
+                            int itemCount = 0;
+                            if (report.getReports() != null && report.getReports().getInfoOrWarningOrError() != null) {
+                                itemCount = report.getReports().getInfoOrWarningOrError().size();
+                            }
+                            FileReport reportData = new FileReport(input.getFileName(), report, typeRequired, validationType);
+                            summary.append("\n").append(reportData.toString()).append("\n");
+                            if (!noReports) {
+                                File xmlReportFile = new File(Path.of(System.getProperty("user.dir")).toFile(), "report."+i+".xml");
+                                Files.deleteIfExists(xmlReportFile.toPath());
+                                // Create XML report
+                                fileManager.saveReport(report, xmlReportFile);
+                                if (itemCount <= domainConfig.getMaximumReportsForDetailedOutput()) {
+                                    // Create PDF report
+                                    File pdfReportFile = new File(xmlReportFile.getParentFile(), "report."+i+".pdf");
+                                    Files.deleteIfExists(pdfReportFile.toPath());
+                                    reportGenerator.writeReport(domainConfig, xmlReportFile, pdfReportFile);
+                                    summary.append("- Detailed reports in [").append(xmlReportFile.getAbsolutePath()).append("] and [").append(pdfReportFile.getAbsolutePath()).append("] \n");
+                                } else {
+                                    summary.append("- Detailed report in [").append(xmlReportFile.getAbsolutePath()).append("] (PDF report skipped due to large number of report items) \n");
+                                }
                             }
                         }
                     } catch (ValidatorException e) {
