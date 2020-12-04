@@ -74,59 +74,40 @@ public class ValidationServiceImpl implements ValidationService {
         response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_CONTENT, "binary", UsageEnumeration.R, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_CONTENT)));
         response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_EMBEDDING_METHOD, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_EMBEDDING_METHOD)));
         response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_VALIDATION_TYPE, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_VALIDATION_TYPE)));
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForHeader())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForHeader())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_HAS_HEADERS, "boolean", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_HAS_HEADERS)));
         }
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDelimiter())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDelimiter())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_DELIMITER, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_DELIMITER)));
         }
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForQuote())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForQuote())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_QUOTE, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_QUOTE)));
         }
-
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL)));
         }
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDifferentInputFieldSequence())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDifferentInputFieldSequence())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL)));
         }
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDuplicateInputFields())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDuplicateInputFields())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL)));
         }
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForInputFieldCaseMismatch())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForInputFieldCaseMismatch())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_FIELD_CASE_MISMATCH_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_FIELD_CASE_MISMATCH_VIOLATION_LEVEL)));
         }
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForMultipleInputFieldsForSchemaField())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForMultipleInputFieldsForSchemaField())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL)));
         }
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForUnknownInputField())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForUnknownInputField())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL)));
         }
-        if (definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForUnspecifiedSchemaField())) {
+        if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForUnspecifiedSchemaField())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL)));
         }
-        if (definesTypeWithExternalSchemas()) {
+        if (domainConfig.definesTypeWithExternalSchemas()) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_EXTERNAL_SCHEMA, "map", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_EXTERNAL_SCHEMA)));
         }
         return response;
-    }
-
-    private boolean definesTypesWithSettingInputs(Map<String, ExternalArtifactSupport> inputSupportMap) {
-        for (ExternalArtifactSupport support: inputSupportMap.values()) {
-            if (support != ExternalArtifactSupport.NONE) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean definesTypeWithExternalSchemas() {
-        for (TypedValidationArtifactInfo info : domainConfig.getArtifactInfo().values()) {
-            if (info.get().getExternalArtifactSupport() != ExternalArtifactSupport.NONE) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private <R> R validateAndGetSyntaxInput(ValidateRequest request, String inputName, ExternalArtifactSupport supportType, Function<String, R> fnValueProvider) {

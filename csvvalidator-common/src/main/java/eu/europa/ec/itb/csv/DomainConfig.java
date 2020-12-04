@@ -2,6 +2,7 @@ package eu.europa.ec.itb.csv;
 
 import eu.europa.ec.itb.csv.validation.ViolationLevel;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
+import eu.europa.ec.itb.validation.commons.artifact.TypedValidationArtifactInfo;
 import eu.europa.ec.itb.validation.commons.artifact.ValidationArtifactInfo;
 import eu.europa.ec.itb.validation.commons.config.LabelConfig;
 import eu.europa.ec.itb.validation.commons.config.WebDomainConfig;
@@ -27,6 +28,24 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> implements
 
     public Map<String, ParserError> getParserErrors() {
         return parserErrors;
+    }
+
+    public boolean definesTypesWithSettingInputs(Map<String, ExternalArtifactSupport> inputSupportMap) {
+        for (ExternalArtifactSupport support: inputSupportMap.values()) {
+            if (support != ExternalArtifactSupport.NONE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean definesTypeWithExternalSchemas() {
+        for (TypedValidationArtifactInfo info : getArtifactInfo().values()) {
+            if (info.get().getExternalArtifactSupport() != ExternalArtifactSupport.NONE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

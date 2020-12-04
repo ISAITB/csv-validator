@@ -19,9 +19,12 @@
         <module>csvvalidator-service</module>
         <module>csvvalidator-war</module>
         <module>csvvalidator-resources</module>
+        <module>csvvalidator-jar</module>
     </modules>
 
     <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <validatorTimestamp>${maven.build.timestamp}</validatorTimestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss (XXX)</maven.build.timestamp.format>
@@ -104,6 +107,11 @@
             <dependency>
                 <groupId>eu.europa.ec.itb.commons</groupId>
                 <artifactId>validation-commons</artifactId>
+                <version>${version.itbCommons}</version>
+            </dependency>
+            <dependency>
+                <groupId>eu.europa.ec.itb.commons</groupId>
+                <artifactId>validation-commons-report</artifactId>
                 <version>${version.itbCommons}</version>
             </dependency>
             <dependency>
