@@ -182,7 +182,7 @@ public class UploadController {
                     try {
                         String inputID = fileManager.writeCSV(domainConfig.getDomainName(), contentToValidate);
                         attributes.put("inputID", inputID);
-                        fileManager.saveReport(report, inputID);
+                        fileManager.saveReport(report, inputID, domainConfig);
                     } catch (IOException e) {
                         LOG.error("Error generating detailed report [" + e.getMessage() + "]", e);
                         attributes.put("message", "Error generating detailed report: " + e.getMessage());
