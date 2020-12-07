@@ -4,10 +4,7 @@ import com.gitb.tr.TAR;
 import eu.europa.ec.itb.csv.DomainConfig;
 import eu.europa.ec.itb.csv.DomainConfigCache;
 import eu.europa.ec.itb.csv.InputHelper;
-import eu.europa.ec.itb.csv.validation.CSVValidator;
-import eu.europa.ec.itb.csv.validation.FileManager;
-import eu.europa.ec.itb.csv.validation.ValidationConstants;
-import eu.europa.ec.itb.csv.validation.ViolationLevel;
+import eu.europa.ec.itb.csv.validation.*;
 import eu.europa.ec.itb.validation.commons.FileInfo;
 import eu.europa.ec.itb.validation.commons.error.ValidatorException;
 import eu.europa.ec.itb.validation.commons.report.ReportGeneratorBean;
@@ -33,7 +30,7 @@ import java.util.List;
 
 @Component
 @Scope("prototype")
-public class ValidationRunner {
+public class ValidationRunner implements ProgressListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidationRunner.class);
     private static final Logger LOGGER_FEEDBACK = LoggerFactory.getLogger("FEEDBACK");
@@ -189,7 +186,7 @@ public class ValidationRunner {
                                 .withMultipleInputFieldsForSchemaFieldViolationLevel(inputMultipleInputFieldsForSchemaFieldViolationLevel)
                                 .withUnknownInputFieldViolationLevel(inputUnknownInputViolationLevel)
                                 .withUnspecifiedSchemaFieldViolationLevel(inputUnspecifiedSchemaFieldViolationLevel);
-                        CSVValidator validator = ctx.getBean(CSVValidator.class, input.getInputFile(), validationType, externalSchemaFileInfo, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, settingInputs));
+                        CSVValidator validator = ctx.getBean(CSVValidator.class, input.getInputFile(), validationType, externalSchemaFileInfo, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, settingInputs), this);
                         TAR report = validator.validate();
                         if (report == null) {
                             summary.append("\nNo validation report was produced.\n");
@@ -347,4 +344,31 @@ public class ValidationRunner {
         System.out.println(usageMessage.toString());
     }
 
+    @Override
+    public void schemaValidationStart() {
+        LOGGER.info("Starting schema validation");
+    }
+
+    @Override
+    public void schemaValidationUpdate(long counter) {
+        if (counter % 50000 == 0) {
+            LOGGER.info(String.format("Validated %s records", counter));
+        }
+    }
+
+    @Override
+    public void schemaValidationEnd(long counter) {
+        LOGGER.info(String.format("Validated %s records", counter));
+        LOGGER.info("Finished schema validation");
+    }
+
+    @Override
+    public void pluginValidationStart() {
+        LOGGER.info("Starting plugin validation");
+    }
+
+    @Override
+    public void pluginValidationEnd() {
+        LOGGER.info("Finished plugin validation");
+    }
 }

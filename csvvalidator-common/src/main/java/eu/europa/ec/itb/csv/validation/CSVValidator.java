@@ -54,13 +54,25 @@ public class CSVValidator {
     private final CSVSettings csvSettings;
     private final ObjectFactory objectFactory = new ObjectFactory();
     private Set<String> charsetsToNotConvert = Set.of(StandardCharsets.UTF_16.name(), StandardCharsets.UTF_16BE.name(), StandardCharsets.UTF_16LE.name());
+    private final ProgressListener progressListener;
+    private long counterErrors = 0L;
+    private long counterWarnings = 0L;
+    private long counterInformationMessages = 0L;
+    private long counterTotalErrors = 0L;
+    private long counterTotalWarnings = 0L;
+    private long counterTotalInformationMessages = 0L;
 
     public CSVValidator(File inputFileToValidate, String validationType, List<FileInfo> externalSchemaFileInfo, DomainConfig domainConfig, CSVSettings csvSettings) {
+        this(inputFileToValidate, validationType, externalSchemaFileInfo, domainConfig, csvSettings, null);
+    }
+
+    public CSVValidator(File inputFileToValidate, String validationType, List<FileInfo> externalSchemaFileInfo, DomainConfig domainConfig, CSVSettings csvSettings, ProgressListener progressListener) {
         this.inputFileToValidate = inputFileToValidate;
         this.domainConfig = domainConfig;
         this.validationType = validationType;
         this.externalSchemaFileInfo = externalSchemaFileInfo;
         this.csvSettings = csvSettings;
+        this.progressListener = progressListener;
         if (validationType == null) {
             this.validationType = domainConfig.getType().get(0);
         }
@@ -124,6 +136,7 @@ public class CSVValidator {
             return null;
         } else {
             List<TAR> reports = new ArrayList<>();
+            prepareInputFile(inputFileToValidate);
             for (FileInfo aSchemaFile: schemaFiles) {
                 LOG.info("Validating against ["+aSchemaFile.getFile().getName()+"]");
                 TAR report = validateAgaintSchema(inputFileToValidate, aSchemaFile.getFile());
@@ -160,6 +173,12 @@ public class CSVValidator {
     }
 
     private TAR validateAgaintSchema(File inputFile, File schemaFile) {
+        if (progressListener != null) {
+            progressListener.schemaValidationStart();
+        }
+        counterErrors = 0L;
+        counterWarnings = 0L;
+        counterInformationMessages = 0L;
         List<ReportItem> errors = new ArrayList<>();
         CSVFormat format = CSVFormat.RFC4180
                 .withIgnoreHeaderCase(false)
@@ -179,7 +198,6 @@ public class CSVValidator {
         } catch (Exception e) {
             throw new ValidatorException("The provided schema could not be parsed [" + getRootCause(e).getMessage()+ "]", e);
         }
-        prepareInputFile(inputFile);
         short headerLine = 1;
         try (
                 Reader inputReader = new BomStrippingReader(toStream(inputFile, true));
@@ -283,6 +301,7 @@ public class CSVValidator {
             }
             long previousLineNumber = -1;
             // Validation per row.
+            long recordCounter = 0L;
             for (CSVRecord record: parser) {
                 long reportedLineNumber = parser.getCurrentLineNumber();
                 if (reportedLineNumber == previousLineNumber) {
@@ -291,6 +310,13 @@ public class CSVValidator {
                 }
                 validateRow(record, reportedLineNumber, inputFieldIndexToSchemaFieldMap, schema.getFields().size(), csvSettings, errors);
                 previousLineNumber = reportedLineNumber;
+                recordCounter += 1;
+                if (progressListener != null && recordCounter % 1000 == 0) {
+                    progressListener.schemaValidationUpdate(recordCounter);
+                }
+            }
+            if (progressListener != null) {
+                progressListener.schemaValidationEnd(recordCounter);
             }
         } catch (ValidatorException e) {
             throw e;
@@ -360,7 +386,7 @@ public class CSVValidator {
             // Parser based on headers.
             if (record.size() != record.getParser().getHeaderNames().size()) {
                 // Record has wrong number of fields.
-                aggregatedErrors.add(new ReportItem(domainConfig, "The row field count ["+record.size()+"] does not match the number of defined headers ["+record.getParser().getHeaderNames().size()+"].", null, lineNumber, null));
+                handleFieldViolation(null, "The row field count ["+record.size()+"] does not match the number of defined headers ["+record.getParser().getHeaderNames().size()+"].", lineNumber, null, aggregatedErrors);
             } else {
                 int fieldIndex = 0;
                 for (String fieldValue: record) {
@@ -382,7 +408,7 @@ public class CSVValidator {
                     fieldIndex += 1;
                 }
             } else {
-                aggregatedErrors.add(new ReportItem(domainConfig, "The row field count ["+record.size()+"] does not match the expected count ["+schemaFieldCount+"]. This is required when no headers are defined in the input.", null, lineNumber, null));
+                handleFieldViolation(null, "The row field count ["+record.size()+"] does not match the expected count ["+schemaFieldCount+"]. This is required when no headers are defined in the input.", lineNumber, null, aggregatedErrors);
             }
         }
     }
@@ -392,25 +418,45 @@ public class CSVValidator {
             Object fieldValue = field.castValue(textValue, false, field.getOptions());
             // Check format.
             if (!field.valueHasValidFormat(textValue)) {
-                aggregatedErrors.add(new ReportItem(domainConfig, String.format("Value '%s' provided for field '%s' is invalid for format '%s'.", textValue, fieldNameToUse, field.getFormat()), fieldNameToUse, lineNumber, textValue));
+                handleFieldViolation(fieldNameToUse, String.format("Value '%s' provided for field '%s' is invalid for format '%s'.", textValue, fieldNameToUse, field.getFormat()), lineNumber, textValue, aggregatedErrors);
             }
             // Check constraints.
             if (field.getConstraints() != null && !field.getConstraints().isEmpty()) {
                 Map<String, Object> violations = field.checkConstraintViolations(fieldValue);
                 for (Map.Entry<String, Object> entry: violations.entrySet()) {
-                    aggregatedErrors.add(new ReportItem(domainConfig, prettifyConstraintFailure(entry.getKey(), entry.getValue(), field, fieldNameToUse, textValue), fieldNameToUse, lineNumber, textValue));
+                    handleFieldViolation(fieldNameToUse, prettifyConstraintFailure(entry.getKey(), entry.getValue(), field, fieldNameToUse, textValue), lineNumber, textValue, aggregatedErrors);
                 }
             }
         } catch (InvalidCastException e) {
-            aggregatedErrors.add(new ReportItem(domainConfig, String.format("Value '%s' provided for field '%s' could not be parsed. Expected type was '%s'.", textValue, fieldNameToUse, field.getType()), fieldNameToUse, lineNumber, textValue));
+            handleFieldViolation(fieldNameToUse, String.format("Value '%s' provided for field '%s' could not be parsed. Expected type was '%s'.", textValue, fieldNameToUse, field.getType()), lineNumber, textValue, aggregatedErrors);
         } catch (Exception e) {
             throw new ValidatorException("Unexpected error while validating row ["+getRootCause(e).getMessage()+"]", e);
         }
     }
 
+    private void handleFieldViolation(String fieldName, String message, long lineNumber, String fieldValue, List<ReportItem> aggregatedErrors) {
+        counterErrors += 1;
+        counterTotalErrors += 1;
+        if (counterTotalErrors + counterTotalWarnings + counterTotalInformationMessages <= domainConfig.getMaximumReportsForXmlOutput()) {
+            aggregatedErrors.add(new ReportItem(domainConfig, message, fieldName, lineNumber, fieldValue));
+        }
+    }
+
     private void handleSyntaxViolation(ViolationLevel violationLevel, String fieldName, String message, long lineNumber, List<ReportItem> aggregatedErrors) {
         if (violationLevel != null && violationLevel != ViolationLevel.NONE) {
-            aggregatedErrors.add(new ReportItem(domainConfig, message, fieldName, lineNumber, null, violationLevel));
+            if (violationLevel == ViolationLevel.ERROR) {
+                counterErrors += 1;
+                counterTotalErrors += 1;
+            } else if (violationLevel == ViolationLevel.WARNING) {
+                counterWarnings += 1;
+                counterTotalWarnings += 1;
+            } else if (violationLevel == ViolationLevel.INFO) {
+                counterInformationMessages += 1;
+                counterTotalInformationMessages += 1;
+            }
+            if (counterTotalErrors + counterTotalWarnings + counterTotalInformationMessages <= domainConfig.getMaximumReportsForXmlOutput()) {
+                aggregatedErrors.add(new ReportItem(domainConfig, message, fieldName, lineNumber, null, violationLevel));
+            }
         }
     }
 
@@ -418,13 +464,11 @@ public class CSVValidator {
         TAR report = new TAR();
         report.setDate(Utils.getXMLGregorianCalendarDateTime());
         report.setCounters(new ValidationCounters());
-        report.getCounters().setNrOfWarnings(BigInteger.ZERO);
-        report.getCounters().setNrOfAssertions(BigInteger.ZERO);
+        report.getCounters().setNrOfErrors(BigInteger.valueOf(counterErrors));
+        report.getCounters().setNrOfWarnings(BigInteger.valueOf(counterWarnings));
+        report.getCounters().setNrOfAssertions(BigInteger.valueOf(counterInformationMessages));
         report.setReports(new TestAssertionGroupReportsType());
         report.setContext(new AnyContent());
-        long errors = 0;
-        long warnings = 0;
-        long infos = 0;
         if (errorMessages != null) {
             for (ReportItem errorMessage : errorMessages) {
                 BAR error = new BAR();
@@ -434,15 +478,12 @@ public class CSVValidator {
                 switch (errorMessage.getViolationLevel()) {
                     case ERROR:
                         report.getReports().getInfoOrWarningOrError().add(objectFactory.createTestAssertionGroupReportsTypeError(error));
-                        errors += 1;
                         break;
                     case WARNING:
                         report.getReports().getInfoOrWarningOrError().add(objectFactory.createTestAssertionGroupReportsTypeWarning(error));
-                        warnings += 1;
                         break;
                     case INFO:
                         report.getReports().getInfoOrWarningOrError().add(objectFactory.createTestAssertionGroupReportsTypeInfo(error));
-                        infos += 1;
                         break;
                     case NONE:
                         // Nothing.
@@ -450,16 +491,13 @@ public class CSVValidator {
                 }
             }
         }
-        if (errors > 0) {
+        if (counterErrors > 0) {
             report.setResult(TestResultType.FAILURE);
-        } else if (warnings > 0) {
+        } else if (counterWarnings > 0) {
             report.setResult(TestResultType.WARNING);
         } else {
             report.setResult(TestResultType.SUCCESS);
         }
-        report.getCounters().setNrOfErrors(BigInteger.valueOf(errors));
-        report.getCounters().setNrOfWarnings(BigInteger.valueOf(warnings));
-        report.getCounters().setNrOfAssertions(BigInteger.valueOf(infos));
         return report;
     }
 
@@ -495,6 +533,9 @@ public class CSVValidator {
         TAR pluginReport = null;
         ValidationPlugin[] plugins = pluginManager.getPlugins(pluginConfigProvider.getPluginClassifier(domainConfig, validationType));
         if (plugins != null && plugins.length > 0) {
+            if (progressListener != null) {
+                progressListener.pluginValidationStart();
+            }
             File pluginTmpFolder = new File(inputFileToValidate.getParentFile(), UUID.randomUUID().toString());
             try {
                 pluginTmpFolder.mkdirs();
@@ -508,18 +549,39 @@ public class CSVValidator {
                         // Do not propagate the failure as this will block all validation reporting.
                         LOG.warn(String.format("Unable to correctly process plugin [%s]", e.getMessage()), e);
                     }
-                    if (response != null && response.getReport() != null && response.getReport().getReports() != null) {
-                        LOG.info("Plugin [{}] produced [{}] report item(s).", pluginName, response.getReport().getReports().getInfoOrWarningOrError().size());
+                    if (response != null && response.getReport() != null && response.getReport().getCounters() != null) {
+                        long pluginErrors = response.getReport().getCounters().getNrOfErrors().longValue();
+                        long pluginWarnings = response.getReport().getCounters().getNrOfWarnings().longValue();
+                        long pluginInformationMessages = response.getReport().getCounters().getNrOfAssertions().longValue();
+                        long pluginTotalReports = pluginErrors + pluginWarnings + pluginInformationMessages;
+                        LOG.info("Plugin [{}] produced [{}] report item(s).", pluginName, pluginTotalReports);
+                        if (response.getReport().getReports() != null) {
+                            long overallTotalReports = counterTotalErrors + counterTotalWarnings + counterTotalInformationMessages;
+                            if (overallTotalReports < domainConfig.getMaximumReportsForXmlOutput()) {
+                                long reportsToKeep = domainConfig.getMaximumReportsForXmlOutput() - overallTotalReports;
+                                if (response.getReport().getReports().getInfoOrWarningOrError().size() > reportsToKeep) {
+                                    response.getReport().getReports().getInfoOrWarningOrError().subList((int)reportsToKeep, response.getReport().getReports().getInfoOrWarningOrError().size()).clear();
+                                }
+                            } else {
+                                response.getReport().getReports().getInfoOrWarningOrError().clear();
+                            }
+                        }
                         if (pluginReport == null) {
                             pluginReport = response.getReport();
                         } else {
                             pluginReport = Utils.mergeReports(new TAR[] {pluginReport, response.getReport()});
                         }
+                        counterTotalErrors += pluginErrors;
+                        counterTotalWarnings += pluginWarnings;
+                        counterTotalInformationMessages += pluginInformationMessages;
                     }
                 }
             } finally {
                 // Cleanup plugin tmp folder.
                 FileUtils.deleteQuietly(pluginTmpFolder);
+                if (progressListener != null) {
+                    progressListener.pluginValidationEnd();
+                }
             }
         }
         return pluginReport;
