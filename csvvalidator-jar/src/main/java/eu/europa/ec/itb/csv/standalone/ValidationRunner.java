@@ -204,15 +204,17 @@ public class ValidationRunner {
                                 File xmlReportFile = new File(Path.of(System.getProperty("user.dir")).toFile(), "report."+i+".xml");
                                 Files.deleteIfExists(xmlReportFile.toPath());
                                 // Create XML report
-                                fileManager.saveReport(report, xmlReportFile);
+                                fileManager.saveReport(report, xmlReportFile, domainConfig);
                                 if (itemCount <= domainConfig.getMaximumReportsForDetailedOutput()) {
                                     // Create PDF report
                                     File pdfReportFile = new File(xmlReportFile.getParentFile(), "report."+i+".pdf");
                                     Files.deleteIfExists(pdfReportFile.toPath());
                                     reportGenerator.writeReport(domainConfig, xmlReportFile, pdfReportFile);
                                     summary.append("- Detailed reports in [").append(xmlReportFile.getAbsolutePath()).append("] and [").append(pdfReportFile.getAbsolutePath()).append("] \n");
-                                } else {
+                                } else if (report.getCounters() != null && (report.getCounters().getNrOfAssertions().longValue() + report.getCounters().getNrOfErrors().longValue() + report.getCounters().getNrOfWarnings().longValue()) <= domainConfig.getMaximumReportsForXmlOutput()) {
                                     summary.append("- Detailed report in [").append(xmlReportFile.getAbsolutePath()).append("] (PDF report skipped due to large number of report items) \n");
+                                } else {
+                                    summary.append("- Detailed report in [").append(xmlReportFile.getAbsolutePath()).append("] (report limited to first ").append(domainConfig.getMaximumReportsForXmlOutput()).append(" items and PDF report skipped) \n");
                                 }
                             }
                         }
