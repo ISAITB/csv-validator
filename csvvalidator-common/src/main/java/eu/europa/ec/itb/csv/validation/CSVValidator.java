@@ -518,7 +518,7 @@ public class CSVValidator {
         } else if (Field.CONSTRAINT_KEY_MINIMUM.equals(constraintKey)) {
             message = String.format("Value '%s' for field '%s' is less than the minimum of %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_PATTERN.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' does not match the expected pattern '%s'.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            message = String.format("Value '%s' for field '%s' does not match the expected pattern.", rowValue, fieldNameToUse);
         } else if (Field.CONSTRAINT_KEY_REQUIRED.equals(constraintKey)) {
             message = String.format("No value was provided for required field '%s'.", fieldNameToUse);
         } else if (Field.CONSTRAINT_KEY_UNIQUE.equals(constraintKey)) {
