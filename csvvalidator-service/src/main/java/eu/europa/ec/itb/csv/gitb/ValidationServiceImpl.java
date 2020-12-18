@@ -73,7 +73,9 @@ public class ValidationServiceImpl implements ValidationService {
         response.getModule().setInputs(new TypedParameters());
         response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_CONTENT, "binary", UsageEnumeration.R, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_CONTENT)));
         response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_EMBEDDING_METHOD, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_EMBEDDING_METHOD)));
-        response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_VALIDATION_TYPE, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_VALIDATION_TYPE)));
+        if (domainConfig.hasMultipleValidationTypes()) {
+            response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_VALIDATION_TYPE, "string", UsageEnumeration.R, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_VALIDATION_TYPE)));
+        }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForHeader())) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_HAS_HEADERS, "boolean", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_HAS_HEADERS)));
         }
