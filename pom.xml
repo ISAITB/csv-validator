@@ -44,6 +44,7 @@
         <version.tika>1.24.1</version.tika>
         <version.hibernateValidator>5.0.2.Final</version.hibernateValidator>
         <version.frictionlessTableSchema>1.0-SNAPSHOT_ITB</version.frictionlessTableSchema>
+        <version.aspectjWeaver>1.9.6</version.aspectjWeaver>
     </properties>
 
     <repositories>
@@ -247,6 +248,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-csv</artifactId>
                 <version>${version.commonsCsv}</version>
+            </dependency>
+            <dependency>
+            	<groupId>org.aspectj</groupId>
+            	<artifactId>aspectjweaver</artifactId>
+            	<version>${version.aspectjWeaver}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

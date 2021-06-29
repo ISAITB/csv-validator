@@ -77,6 +77,14 @@ public class CSVValidator {
             this.validationType = domainConfig.getType().get(0);
         }
     }
+    
+    public String getDomain() {
+        return this.domainConfig.getDomain();
+    }
+
+    public String getValidationType() {
+        return this.validationType;
+    }
 
     public TAR validate() {
         TAR validationResult;
