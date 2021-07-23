@@ -24,7 +24,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.jws.WebParam;
+import javax.xml.ws.WebServiceContext;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -49,6 +52,8 @@ public class ValidationServiceImpl implements ValidationService {
     private FileManager fileManager = null;
     @Autowired
     private InputHelper inputHelper = null;
+    @Resource
+    private WebServiceContext wsContext;
 
     public ValidationServiceImpl(DomainConfig domainConfig) {
         this.domainConfig = domainConfig;
@@ -203,6 +208,10 @@ public class ValidationServiceImpl implements ValidationService {
                 LOG.warn("Error while adding the "+ValidationConstants.INPUT_CONTENT+" to the report's context", e);
             }
         }
+    }
+
+    public WebServiceContext getWebServiceContext(){
+        return this.wsContext;
     }
 
 }
