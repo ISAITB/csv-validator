@@ -13,7 +13,6 @@ import eu.europa.ec.itb.csv.validation.ViolationLevel;
 import eu.europa.ec.itb.validation.commons.FileInfo;
 import eu.europa.ec.itb.validation.commons.Utils;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
-import eu.europa.ec.itb.validation.commons.artifact.TypedValidationArtifactInfo;
 import eu.europa.ec.itb.validation.commons.error.ValidatorException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -27,16 +26,14 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import javax.jws.WebParam;
 import javax.xml.ws.WebServiceContext;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Spring component that realises the validation service.
+ * Spring component that realises the validation SOAP service.
  */
 @Component
 @Scope("prototype")
@@ -55,6 +52,11 @@ public class ValidationServiceImpl implements ValidationService {
     @Resource
     private WebServiceContext wsContext;
 
+    /**
+     * Constructor.
+     *
+     * @param domainConfig The domain configuration (each domain has its own instance).
+     */
     public ValidationServiceImpl(DomainConfig domainConfig) {
         this.domainConfig = domainConfig;
     }
@@ -117,6 +119,16 @@ public class ValidationServiceImpl implements ValidationService {
         return response;
     }
 
+    /**
+     * Validate and returned the provided input for a given CSV syntax setting.
+     *
+     * @param request The service input.
+     * @param inputName The name of the specific input to lookup.
+     * @param supportType The level of support for this to be provided as an input.
+     * @param fnValueProvider A function to return the value to use.
+     * @param <R> The class of the value to be returned.
+     * @return The value to consider.
+     */
     private <R> R validateAndGetSyntaxInput(ValidateRequest request, String inputName, ExternalArtifactSupport supportType, Function<String, R> fnValueProvider) {
         R result = null;
         if (supportType != ExternalArtifactSupport.NONE) {
@@ -138,7 +150,7 @@ public class ValidationServiceImpl implements ValidationService {
 
     /**
      * The validate operation is called to validate the input and produce a validation report.
-     * <p>
+     *
      * The expected input is described for the service's client through the getModuleDefinition call.
      *
      * @param validateRequest The input parameters and configuration for the validation.
@@ -197,6 +209,12 @@ public class ValidationServiceImpl implements ValidationService {
         }
     }
 
+    /**
+     * Add the context map to the provided validation report.
+     *
+     * @param report The report to add to.
+     * @param contentToValidate The input file.
+     */
     private void addContext(TAR report, File contentToValidate) {
         if (report != null) {
             if (report.getContext() == null) {
@@ -210,6 +228,9 @@ public class ValidationServiceImpl implements ValidationService {
         }
     }
 
+    /**
+     * @return The web service context.
+     */
     public WebServiceContext getWebServiceContext(){
         return this.wsContext;
     }

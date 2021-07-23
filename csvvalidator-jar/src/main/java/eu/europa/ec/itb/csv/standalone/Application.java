@@ -16,10 +16,19 @@ import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Application entry point when running the validator as a command-line tool.
+ */
 @SpringBootApplication
 @ComponentScan("eu.europa.ec.itb")
 public class Application {
 
+    /**
+     * Main method.
+     *
+     * @param args The command line arguments.
+     * @throws IOException If an error occurs reading inputs or writing reports.
+     */
     public static void main(String[] args) throws IOException {
         System.out.print("Starting validator ...");
         File tempFolder = Files.createTempDirectory("csvvalidator").toFile();
@@ -54,8 +63,14 @@ public class Application {
         }
     }
 
+    /**
+     * Adapt the validator's configuration so that it can be used as a command-line tool.
+     *
+     * @param tempFolder The temporary folder to use for the validator's work.
+     * @throws IOException If an IO error occurs.
+     */
     private static void prepareConfigForStandalone(File tempFolder) throws IOException {
-        // Explode invoice resources to temp folder
+        // Explode validation resources to temp folder
         File tempJarFile = new File(tempFolder, "validator-resources.jar");
         FileUtils.copyInputStreamToFile(Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("validator-resources.jar")), tempJarFile);
         JarFile resourcesJar = new JarFile(tempJarFile);
