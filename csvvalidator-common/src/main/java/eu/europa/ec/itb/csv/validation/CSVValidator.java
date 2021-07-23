@@ -34,6 +34,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
+/**
+ * Component used to carry out the validation of CSV content.
+ */
 @Component
 @Scope("prototype")
 public class CSVValidator {
@@ -53,7 +56,7 @@ public class CSVValidator {
     private final List<FileInfo> externalSchemaFileInfo;
     private final CSVSettings csvSettings;
     private final ObjectFactory objectFactory = new ObjectFactory();
-    private Set<String> charsetsToNotConvert = Set.of(StandardCharsets.UTF_16.name(), StandardCharsets.UTF_16BE.name(), StandardCharsets.UTF_16LE.name());
+    private final Set<String> charsetsToNotConvert = Set.of(StandardCharsets.UTF_16.name(), StandardCharsets.UTF_16BE.name(), StandardCharsets.UTF_16LE.name());
     private final ProgressListener progressListener;
     private long counterErrors = 0L;
     private long counterWarnings = 0L;
@@ -62,10 +65,29 @@ public class CSVValidator {
     private long counterTotalWarnings = 0L;
     private long counterTotalInformationMessages = 0L;
 
+    /**
+     * Constructor.
+     *
+     * @param inputFileToValidate The CSV content to validate.
+     * @param validationType The requested validation type.
+     * @param externalSchemaFileInfo The user-provided schemas to consider.
+     * @param domainConfig The current domain configuration.
+     * @param csvSettings The CSV syntax settings to consider.
+     */
     public CSVValidator(File inputFileToValidate, String validationType, List<FileInfo> externalSchemaFileInfo, DomainConfig domainConfig, CSVSettings csvSettings) {
         this(inputFileToValidate, validationType, externalSchemaFileInfo, domainConfig, csvSettings, null);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param inputFileToValidate The CSV content to validate.
+     * @param validationType The requested validation type.
+     * @param externalSchemaFileInfo The user-provided schemas to consider.
+     * @param domainConfig The current domain configuration.
+     * @param csvSettings The CSV syntax settings to consider.
+     * @param progressListener An observer to be notified of the validation progress.
+     */
     public CSVValidator(File inputFileToValidate, String validationType, List<FileInfo> externalSchemaFileInfo, DomainConfig domainConfig, CSVSettings csvSettings, ProgressListener progressListener) {
         this.inputFileToValidate = inputFileToValidate;
         this.domainConfig = domainConfig;
@@ -77,15 +99,26 @@ public class CSVValidator {
             this.validationType = domainConfig.getType().get(0);
         }
     }
-    
+
+    /**
+     * @return The identifier (folder name) of the current configuration domain.
+     */
     public String getDomain() {
         return this.domainConfig.getDomain();
     }
 
+    /**
+     * @return The requested validation type.
+     */
     public String getValidationType() {
         return this.validationType;
     }
 
+    /**
+     * Run the validation and return the validation report.
+     *
+     * @return The validation report.
+     */
     public TAR validate() {
         TAR validationResult;
         try {
@@ -104,6 +137,11 @@ public class CSVValidator {
         return validationResult;
     }
 
+    /**
+     * Sort the items included in the report by their relevant location in the input.
+     *
+     * @param report The validation report.
+     */
     private void sortReportItems(TAR report) {
         report.getReports().getInfoOrWarningOrError().sort((o1, o2) -> {
             String location1 = ((BAR) o1.getValue()).getLocation();
@@ -134,6 +172,11 @@ public class CSVValidator {
         });
     }
 
+    /**
+     * Internal method that drives the validation against configured and user-provided schemas.
+     *
+     * @return The validation report.
+     */
     private TAR validateInternal() {
         List<FileInfo> schemaFiles = fileManager.getPreconfiguredValidationArtifacts(domainConfig, validationType);
         if (externalSchemaFileInfo != null) {
@@ -147,7 +190,7 @@ public class CSVValidator {
             prepareInputFile(inputFileToValidate);
             for (FileInfo aSchemaFile: schemaFiles) {
                 LOG.info("Validating against ["+aSchemaFile.getFile().getName()+"]");
-                TAR report = validateAgaintSchema(inputFileToValidate, aSchemaFile.getFile());
+                TAR report = validateAgainstSchema(inputFileToValidate, aSchemaFile.getFile());
                 reports.add(report);
                 LOG.info("Validated against ["+aSchemaFile.getFile().getName()+"]");
             }
@@ -155,6 +198,13 @@ public class CSVValidator {
         }
     }
 
+    /**
+     * Create a stream for the file's contents.
+     *
+     * @param file The file to open.
+     * @param isInput True if this is the validator's input.
+     * @return The stream.
+     */
     private InputStream toStream(File file, boolean isInput) {
         try {
             return Files.newInputStream(file.toPath());
@@ -163,10 +213,23 @@ public class CSVValidator {
         }
     }
 
+    /**
+     * Get the root cause of the provided exception.
+     *
+     * @param e The exception.
+     * @return The root cause.
+     */
     private Throwable getRootCause(Throwable e) {
         return getRootCauseInternal(e, new HashSet<>());
     }
 
+    /**
+     * Recursive method to lookup the cause of an exception as far as possible.
+     *
+     * @param e The exception to process.
+     * @param alreadyProcessed The set of already processed exceptions to avoid potential infinite loops.
+     * @return The root cause.
+     */
     private Throwable getRootCauseInternal(Throwable e, Set<Throwable> alreadyProcessed) {
         if (e == null) {
             return null;
@@ -180,7 +243,14 @@ public class CSVValidator {
         }
     }
 
-    private TAR validateAgaintSchema(File inputFile, File schemaFile) {
+    /**
+     * Validate the provided input against a single schema file.
+     *
+     * @param inputFile The input to validate.
+     * @param schemaFile The schema.
+     * @return The validation report.
+     */
+    private TAR validateAgainstSchema(File inputFile, File schemaFile) {
         if (progressListener != null) {
             progressListener.schemaValidationStart();
         }
@@ -336,6 +406,14 @@ public class CSVValidator {
         return toTAR(errors);
     }
 
+    /**
+     * Check to see if the raised exception is a known error to be replaced with a user-friendly message.
+     *
+     * @param e The exception to check.
+     * @param headerLine The line number to attach to the error message.
+     * @param aggregatedErrors The already collected report messages to add to.
+     * @return True of the error was handled (otherwise it should be re-thrown).
+     */
     private boolean checkAndHandleKnownErrors(Exception e, short headerLine, List<ReportItem> aggregatedErrors) {
         boolean handled = false;
         if (e != null && e.getMessage() != null && !e.getMessage().isBlank()) {
@@ -349,6 +427,13 @@ public class CSVValidator {
         return handled;
     }
 
+    /**
+     * Prepare the input file for validation. This method attempts to detect the input file's character encoding to
+     * ensure it can be uniformly processed without resulting in bad outputs. If the file is converted then this
+     * replaces the provided file with the previous version being deleted.
+     *
+     * @param inputFile The input file to process.
+     */
     private void prepareInputFile(File inputFile) {
         String charsetToUse = getCharsetToUse(inputFile);
         if (!charsetToUse.equals(StandardCharsets.UTF_8.name()) && !charsetsToNotConvert.contains(charsetToUse)) {
@@ -373,6 +458,12 @@ public class CSVValidator {
         }
     }
 
+    /**
+     * Determine the character encoding to use when reading the provided file.
+     *
+     * @param inputFile The input file.
+     * @return The character encoding to use (default is UTF-8).
+     */
     private String getCharsetToUse(File inputFile) {
         String charset = null;
         try (InputStream in = TikaInputStream.get(toStream(inputFile, true))) {
@@ -389,6 +480,16 @@ public class CSVValidator {
         return charset;
     }
 
+    /**
+     * Validate the provided row.
+     *
+     * @param record The row to validate.
+     * @param lineNumber The current line number.
+     * @param inputFieldIndexToSchemaFieldMap The mapping of input fields to schema field definitions.
+     * @param schemaFieldCount The number of schema fields.
+     * @param csvSettings The CSV syntax settings being considered.
+     * @param aggregatedErrors The messages to add to.
+     */
     private void validateRow(CSVRecord record, long lineNumber, Map<Integer, Field<?>> inputFieldIndexToSchemaFieldMap, int schemaFieldCount, CSVSettings csvSettings, List<ReportItem> aggregatedErrors) {
         if (csvSettings.isHasHeaders()) {
             // Parser based on headers.
@@ -421,6 +522,15 @@ public class CSVValidator {
         }
     }
 
+    /**
+     * Validate a specific row's field.
+     *
+     * @param textValue The text value of the field.
+     * @param fieldNameToUse The name of the field.
+     * @param field The field object as provided by the parsing.
+     * @param lineNumber The current line number.
+     * @param aggregatedErrors The list of messages to add to.
+     */
     private void validateField(String textValue, String fieldNameToUse, Field<?> field, long lineNumber, List<ReportItem> aggregatedErrors) {
         try {
             Object fieldValue = field.castValue(textValue, false, field.getOptions());
@@ -442,6 +552,15 @@ public class CSVValidator {
         }
     }
 
+    /**
+     * Handle a specific field violation.
+     *
+     * @param fieldName The name of the field.
+     * @param message The error message.
+     * @param lineNumber The current line number.
+     * @param fieldValue The text value of the field.
+     * @param aggregatedErrors The list of messages to add to.
+     */
     private void handleFieldViolation(String fieldName, String message, long lineNumber, String fieldValue, List<ReportItem> aggregatedErrors) {
         counterErrors += 1;
         counterTotalErrors += 1;
@@ -450,6 +569,15 @@ public class CSVValidator {
         }
     }
 
+    /**
+     * Handle a detected syntax violation.
+     *
+     * @param violationLevel The violation level for this kind of problem.
+     * @param fieldName The name of the field.
+     * @param message The error message.
+     * @param lineNumber The current line number.
+     * @param aggregatedErrors The list of messages to add to.
+     */
     private void handleSyntaxViolation(ViolationLevel violationLevel, String fieldName, String message, long lineNumber, List<ReportItem> aggregatedErrors) {
         if (violationLevel != null && violationLevel != ViolationLevel.NONE) {
             if (violationLevel == ViolationLevel.ERROR) {
@@ -468,6 +596,12 @@ public class CSVValidator {
         }
     }
 
+    /**
+     * Convert the provided list of report items to a TAR validation report.
+     *
+     * @param errorMessages The messages to process.
+     * @return The validation report.
+     */
     private TAR toTAR(List<ReportItem> errorMessages) {
         TAR report = new TAR();
         report.setDate(Utils.getXMLGregorianCalendarDateTime());
@@ -509,6 +643,16 @@ public class CSVValidator {
         return report;
     }
 
+    /**
+     * If a schema field constraint has triggered a failure, return a user-friendly message for the report.
+     *
+     * @param constraintKey The identifier of the constraint.
+     * @param constraintValue The value of the constraint.
+     * @param field The field being processed.
+     * @param fieldNameToUse The name of the field.
+     * @param rowValue The text value of the field in the parsed row.
+     * @return The user-friendly error message.
+     */
     private String prettifyConstraintFailure(String constraintKey, Object constraintValue, Field<?> field, String fieldNameToUse, String rowValue) {
         String message;
         if (Field.CONSTRAINT_KEY_ENUM.equals(constraintKey)) {
@@ -537,6 +681,11 @@ public class CSVValidator {
         return message;
     }
 
+    /**
+     * Validate the input against any configured custom plugins.
+     *
+     * @return The resulting validation report.
+     */
     private TAR validateAgainstPlugins() {
         TAR pluginReport = null;
         ValidationPlugin[] plugins = pluginManager.getPlugins(pluginConfigProvider.getPluginClassifier(domainConfig, validationType));
@@ -595,6 +744,12 @@ public class CSVValidator {
         return pluginReport;
     }
 
+    /**
+     * Prepare the input to pass into the custom validator plugins.
+     *
+     * @param pluginTmpFolder A temporary folder to use for the plugin's processing.
+     * @return The request to pass to the plugin(s).
+     */
     private ValidateRequest preparePluginInput(File pluginTmpFolder) {
         File pluginInputFile = new File(pluginTmpFolder, UUID.randomUUID().toString()+".csv");
         try {

@@ -11,27 +11,51 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * Reads, stores and shares the configuration properties for the validator's domains.
+ */
 @Component
 public class DomainConfigCache extends WebDomainConfigCache<DomainConfig> {
 
     @Autowired
     private ApplicationConfig appConfig = null;
 
+    /**
+     * Create a new and empty domain configuration object.
+     *
+     * @return The object.
+     */
     @Override
     protected DomainConfig newDomainConfig() {
         return new DomainConfig();
     }
 
+    /**
+     * Get the channels supported by this validator.
+     *
+     * @return The channels.
+     */
     @Override
     protected ValidatorChannel[] getSupportedChannels() {
         return new ValidatorChannel[] {ValidatorChannel.FORM, ValidatorChannel.SOAP_API};
     }
 
+    /**
+     * Initialisation method.
+     *
+     * @see eu.europa.ec.itb.validation.commons.config.DomainConfigCache#init()
+     */
     @PostConstruct
     public void init() {
         super.init();
     }
 
+    /**
+     * Add to the provided domain configuration object the properties specific to the CSV validator.
+     *
+     * @param domainConfig The domain configuration to enrich.
+     * @param config The configuration properties.
+     */
     @Override
     protected void addDomainConfiguration(DomainConfig domainConfig, Configuration config) {
         super.addDomainConfiguration(domainConfig, config);
