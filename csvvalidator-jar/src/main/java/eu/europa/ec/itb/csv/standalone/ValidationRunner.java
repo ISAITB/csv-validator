@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Component
 @Scope("prototype")
-public class ValidationRunner extends BaseValidationRunner<ValidationInput, DomainConfig> implements ProgressListener {
+public class ValidationRunner extends BaseValidationRunner<DomainConfig> implements ProgressListener {
 
     private static final String FLAG__NO_REPORTS = "-noreports";
     private static final String FLAG__VALIDATION_TYPE = "-"+ValidationConstants.INPUT_VALIDATION_TYPE;
