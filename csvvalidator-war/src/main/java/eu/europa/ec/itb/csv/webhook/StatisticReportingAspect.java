@@ -1,14 +1,12 @@
 package eu.europa.ec.itb.csv.webhook;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.ws.handler.MessageContext;
-
 import com.gitb.tr.TAR;
 import com.gitb.tr.TestResultType;
-
+import eu.europa.ec.itb.csv.ApplicationConfig;
+import eu.europa.ec.itb.csv.gitb.ValidationServiceImpl;
+import eu.europa.ec.itb.csv.validation.CSVValidator;
+import eu.europa.ec.itb.validation.commons.war.webhook.StatisticReporting;
+import eu.europa.ec.itb.validation.commons.war.webhook.UsageData;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -21,11 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import eu.europa.ec.itb.commons.war.webhook.StatisticReporting;
-import eu.europa.ec.itb.commons.war.webhook.UsageData;
-import eu.europa.ec.itb.csv.ApplicationConfig;
-import eu.europa.ec.itb.csv.gitb.ValidationServiceImpl;
-import eu.europa.ec.itb.csv.validation.CSVValidator;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.handler.MessageContext;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Aspect that advises the application's entry points to extract and send usage statistics (if enabled).
