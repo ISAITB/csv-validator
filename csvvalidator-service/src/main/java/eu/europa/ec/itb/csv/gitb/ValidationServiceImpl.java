@@ -221,7 +221,9 @@ public class ValidationServiceImpl implements ValidationService {
                 report.setContext(new AnyContent());
             }
             try {
-                report.getContext().getItem().add(Utils.createInputItem(ValidationConstants.INPUT_CONTENT, FileUtils.readFileToString(contentToValidate, StandardCharsets.UTF_8)));
+                var content = Utils.createInputItem(ValidationConstants.INPUT_CONTENT, FileUtils.readFileToString(contentToValidate, StandardCharsets.UTF_8));
+                content.setMimeType("text/csv");
+                report.getContext().getItem().add(content);
             } catch (IOException e) {
                 LOG.warn("Error while adding the "+ValidationConstants.INPUT_CONTENT+" to the report's context", e);
             }
