@@ -116,6 +116,7 @@ public class ValidationServiceImpl implements ValidationService {
         if (domainConfig.definesTypeWithExternalSchemas()) {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_EXTERNAL_SCHEMA, "map", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_EXTERNAL_SCHEMA)));
         }
+        response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_ADD_INPUT_TO_REPORT, "boolean", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_ADD_INPUT_TO_REPORT)));
         return response;
     }
 
@@ -166,6 +167,7 @@ public class ValidationServiceImpl implements ValidationService {
             File contentToValidate = inputHelper.validateContentToValidate(validateRequest, ValidationConstants.INPUT_CONTENT, contentEmbeddingMethod, tempFolderPath);
             String validationType = inputHelper.validateValidationType(domainConfig, validateRequest, ValidationConstants.INPUT_VALIDATION_TYPE);
             List<FileInfo> externalSchemas = inputHelper.validateExternalArtifacts(domainConfig, validateRequest, ValidationConstants.INPUT_EXTERNAL_SCHEMA, ValidationConstants.INPUT_EXTERNAL_SCHEMA_CONTENT, ValidationConstants.INPUT_EMBEDDING_METHOD, validationType, null, tempFolderPath);
+            boolean addInputToReport = getInputAsBoolean(validateRequest, ValidationConstants.INPUT_ADD_INPUT_TO_REPORT, true);
             // CSV settings.
             Boolean inputHeaders = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_HAS_HEADERS, domainConfig.getCsvOptions().getUserInputForHeader().get(validationType), Boolean::valueOf);
             String inputDelimiter = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DELIMITER, domainConfig.getCsvOptions().getUserInputForDelimiter().get(validationType), (s) -> s);
@@ -192,7 +194,9 @@ public class ValidationServiceImpl implements ValidationService {
                     .withUnspecifiedSchemaFieldViolationLevel(inputUnspecifiedSchemaFieldViolationLevel);
             CSVValidator validator = ctx.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs));
             TAR report = validator.validate();
-            addContext(report, contentToValidate);
+            if (addInputToReport) {
+                addContext(report, contentToValidate);
+            }
             result.setReport(report);
             return result;
         } catch (ValidatorException e) {
@@ -221,11 +225,29 @@ public class ValidationServiceImpl implements ValidationService {
                 report.setContext(new AnyContent());
             }
             try {
-                report.getContext().getItem().add(Utils.createInputItem(ValidationConstants.INPUT_CONTENT, FileUtils.readFileToString(contentToValidate, StandardCharsets.UTF_8)));
+                var content = Utils.createInputItem(ValidationConstants.INPUT_CONTENT, FileUtils.readFileToString(contentToValidate, StandardCharsets.UTF_8));
+                content.setMimeType("text/csv");
+                report.getContext().getItem().add(content);
             } catch (IOException e) {
                 LOG.warn("Error while adding the "+ValidationConstants.INPUT_CONTENT+" to the report's context", e);
             }
         }
+    }
+
+    /**
+     * Get the provided (optional) input as a boolean value.
+     *
+     * @param validateRequest The input parameters.
+     * @param inputName The name of the input to look for.
+     * @param defaultIfMissing The default value to use if the input is not provided.
+     * @return The value to use.
+     */
+    private boolean getInputAsBoolean(ValidateRequest validateRequest, String inputName, boolean defaultIfMissing) {
+        List<AnyContent> input = Utils.getInputFor(validateRequest, inputName);
+        if (!input.isEmpty()) {
+            return Boolean.parseBoolean(input.get(0).getValue());
+        }
+        return defaultIfMissing;
     }
 
     /**

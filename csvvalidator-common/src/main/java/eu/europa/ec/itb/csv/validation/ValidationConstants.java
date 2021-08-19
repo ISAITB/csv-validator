@@ -35,5 +35,7 @@ public class ValidationConstants {
     public static final String INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL = "unknownInputFieldViolationLevel";
     /** The name of the web service input for the violation level for schema fields that are not covered by the input. */
     public static final String INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL = "unspecifiedSchemaField";
+    /** Whether the validated content should be added to the TAR report. */
+    public static String INPUT_ADD_INPUT_TO_REPORT = "addInputToReport";
 
 }
