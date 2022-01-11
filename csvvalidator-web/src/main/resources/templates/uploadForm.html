@@ -50,11 +50,11 @@
                 settingInputs.multipleInputFieldsForSchemaField[[# th:text="${entry.key}" /]] = { control: [[${entry.value}]], defaultValue: [[${config.csvOptions.multipleInputFieldsForSchemaField.get(entry.key).getName()}]] }
             [/]
             configure({
-                externalArtifactFileLabel: [[${config.label.optionContentFile}]],
-                externalArtifactURILabel: [[${config.label.optionContentURI}]],
+                externalArtifactFileLabel: [[${localiser.localise('validator.label.optionContentFile')}]],
+                externalArtifactURILabel: [[${localiser.localise('validator.label.optionContentURI')}]],
                 externalArtifactSettings: {
                     default: {
-                        filePlaceholder: [[${config.label.externalSchemaPlaceholder}]],
+                        filePlaceholder: [[${localiser.localise('validator.label.externalSchemaPlaceholder')}]],
                         maxCount: 1
                     }
                 },
@@ -75,46 +75,46 @@
                         <div th:replace="fragments/input :: formHeader(${config}, ${minimalUI})"/>
                         <div th:class="${minimalUI} ? panel-body : ''">
                             <div th:replace="fragments/input :: mainForm(${config})"/>
-                            <div th:replace="fragments/input :: externalArtifactCheck(${config.label.includeExternalArtefacts}, ${config.label.externalArtefactsTooltip})"/>
-                            <div th:replace="fragments/input :: externalArtifactControl('default', ${config.label.externalSchemaLabel})"/>
+                            <div th:replace="fragments/input :: externalArtifactCheck(${localiser.localise('validator.label.includeExternalArtefacts')}, ${localiser.localise('validator.label.externalArtefactsTooltip')})"/>
+                            <div th:replace="fragments/input :: externalArtifactControl('default', ${localiser.localise('validator.label.externalSchemaLabel')})"/>
                             <div id="csvSettingsDiv" class="hidden">
                                 <div id="csvSettingsCheckDiv" class="form-group">
                                     <div class="col-sm-offset-2 col-sm-10">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" id="csvSettingsCheck" name="csvSettingsCheck" onclick="toggleCsvSettings()"> <span th:text="${config.label.includeCsvSyntax}">Specify CSV syntax settings</span>
+                                                <input type="checkbox" id="csvSettingsCheck" name="csvSettingsCheck" onclick="toggleCsvSettings()"> <span th:text="${localiser.localise('validator.label.includeCsvSyntax')}">Specify CSV syntax settings</span>
                                             </label>
-                                            <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${config.label.includeCsvSyntaxTooltip}"><i class="far fa-question-circle"></i></span>
+                                            <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${localiser.localise('validator.label.includeCsvSyntaxTooltip')}"><i class="far fa-question-circle"></i></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div id="csvSettingsForm" class="form-group">
                                     <div id="settingsDiv">
-                                        <label class="col-sm-2 control-label" th:text="${config.label.csvSyntax}">CSV syntax</label>
+                                        <label class="col-sm-2 control-label" th:text="${localiser.localise('validator.label.csvSyntax')}">CSV syntax</label>
                                         <div class="col-sm-10">
                                             <div class="row setting-input-container">
                                                 <div id="csvSettingsFormDelimiter" class="col-sm-2 setting-input">
                                                     <div class="setting-control">
-                                                        <input type="text" th:placeholder="${config.label.csvSyntaxDelimiterPlaceholder}" class="form-control" id="inputDelimiter" name="inputDelimiter" maxlength="1" onchange="syntaxInputChanged()"/>
+                                                        <input type="text" th:placeholder="${localiser.localise('validator.label.csvSyntaxDelimiterPlaceholder')}" class="form-control" id="inputDelimiter" name="inputDelimiter" maxlength="1" onchange="syntaxInputChanged()"/>
                                                     </div>
                                                     <div class="setting-tooltip">
-                                                        <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${config.label.csvSyntaxDelimiterTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${localiser.localise('validator.label.csvSyntaxDelimiterTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
                                                 <div id="csvSettingsFormQuote" class="col-sm-2 setting-input">
                                                     <div class="setting-control">
-                                                        <input type="text" th:placeholder="${config.label.csvSyntaxQuotePlaceholder}" class="form-control" id="inputQuote" name="inputQuote" maxlength="1" onchange="syntaxInputChanged()"/>
+                                                        <input type="text" th:placeholder="${localiser.localise('validator.label.csvSyntaxQuotePlaceholder')}" class="form-control" id="inputQuote" name="inputQuote" maxlength="1" onchange="syntaxInputChanged()"/>
                                                     </div>
                                                     <div class="setting-tooltip">
-                                                        <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${config.label.csvSyntaxQuoteTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${localiser.localise('validator.label.csvSyntaxQuoteTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
                                                 <div id="csvSettingsFormHeaders" class="col-sm-6">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" id="inputHeaders" name="inputHeaders" onchange="headerCheckChanged()"> <span th:text="${config.label.csvSyntaxHeaders}">Content has header</span>
+                                                            <input type="checkbox" id="inputHeaders" name="inputHeaders" onchange="headerCheckChanged()"> <span th:text="${localiser.localise('validator.label.csvSyntaxHeaders')}">Content has header</span>
                                                         </label>
-                                                        <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${config.label.csvSyntaxHeadersTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${localiser.localise('validator.label.csvSyntaxHeadersTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -123,125 +123,125 @@
 
                                     <div id="violationDiv" class="col-sm-offset-2 col-sm-10">
                                         <div id="violationDivContainer" class="violation-table-container with-top-margin">
-                                            <div class="violation-table-header" th:text="${config.label.violationLevelHeader}">Violation levels for findings on input field headers</div>
+                                            <div class="violation-table-header" th:text="${localiser.localise('validator.label.violationLevelHeader')}">Violation levels for findings on input field headers</div>
                                             <div class="violation-table">
 
                                                 <div id="csvSettingsFormDifferentInputFieldCount" class="violation-table-row">
                                                     <div class="violation-table-label">
-                                                        <span class="form-control-static" th:text="${config.label.differentInputFieldCountViolationLevel}">differentInputFieldCountViolationLevel</span>
+                                                        <span class="form-control-static" th:text="${localiser.localise('validator.label.differentInputFieldCountViolationLevel')}">differentInputFieldCountViolationLevel</span>
                                                     </div>
                                                     <div class="violation-table-control">
                                                         <select id="csvSettingsFormDifferentInputFieldCountControl" name="inputDifferentInputFieldCountViolationLevel" class="form-control">
-                                                            <option value="error" th:text="${config.label.violationLevelError}">Error</option>
-                                                            <option value="warning" th:text="${config.label.violationLevelWarning}">Warning</option>
-                                                            <option value="info" th:text="${config.label.violationLevelInfo}">Information message</option>
-                                                            <option value="none" th:text="${config.label.violationLevelNone}">None</option>
+                                                            <option value="error" th:text="${localiser.localise('validator.label.violationLevelError')}">Error</option>
+                                                            <option value="warning" th:text="${localiser.localise('validator.label.violationLevelWarning')}">Warning</option>
+                                                            <option value="info" th:text="${localiser.localise('validator.label.violationLevelInfo')}">Information message</option>
+                                                            <option value="none" th:text="${localiser.localise('validator.label.violationLevelNone')}">None</option>
                                                         </select>
                                                     </div>
                                                     <div class="violation-table-tooltip">
-                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${config.label.differentInputFieldCountViolationLevelTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${localiser.localise('validator.label.differentInputFieldCountViolationLevelTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
 
                                                 <div id="csvSettingsFormDifferentInputFieldSequence" class="violation-table-row">
                                                     <div class="violation-table-label">
-                                                        <span class="form-control-static" th:text="${config.label.differentInputFieldSequenceViolationLevel}">csvSettingsFormDifferentInputFieldSequence</span>
+                                                        <span class="form-control-static" th:text="${localiser.localise('validator.label.differentInputFieldSequenceViolationLevel')}">csvSettingsFormDifferentInputFieldSequence</span>
                                                     </div>
                                                     <div class="violation-table-control">
                                                         <select id="csvSettingsFormDifferentInputFieldSequenceControl" name="inputDifferentInputFieldSequenceViolationLevel" class="form-control">
-                                                            <option value="error" th:text="${config.label.violationLevelError}">Error</option>
-                                                            <option value="warning" th:text="${config.label.violationLevelWarning}">Warning</option>
-                                                            <option value="info" th:text="${config.label.violationLevelInfo}">Information message</option>
-                                                            <option value="none" th:text="${config.label.violationLevelNone}">None</option>
+                                                            <option value="error" th:text="${localiser.localise('validator.label.violationLevelError')}">Error</option>
+                                                            <option value="warning" th:text="${localiser.localise('validator.label.violationLevelWarning')}">Warning</option>
+                                                            <option value="info" th:text="${localiser.localise('validator.label.violationLevelInfo')}">Information message</option>
+                                                            <option value="none" th:text="${localiser.localise('validator.label.violationLevelNone')}">None</option>
                                                         </select>
                                                     </div>
                                                     <div class="violation-table-tooltip">
-                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${config.label.differentInputFieldSequenceViolationLevelTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${localiser.localise('validator.label.differentInputFieldSequenceViolationLevelTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
 
                                                 <div id="csvSettingsFormUnknownInputField" class="violation-table-row">
                                                     <div class="violation-table-label">
-                                                        <span class="form-control-static" th:text="${config.label.unknownInputViolationLevel}">unknownInputViolationLevel</span>
+                                                        <span class="form-control-static" th:text="${localiser.localise('validator.label.unknownInputViolationLevel')}">unknownInputViolationLevel</span>
                                                     </div>
                                                     <div class="violation-table-control">
                                                         <select id="csvSettingsFormUnknownInputFieldControl" name="inputUnknownInputViolationLevel" class="form-control">
-                                                            <option value="error" th:text="${config.label.violationLevelError}">Error</option>
-                                                            <option value="warning" th:text="${config.label.violationLevelWarning}">Warning</option>
-                                                            <option value="info" th:text="${config.label.violationLevelInfo}">Information message</option>
-                                                            <option value="none" th:text="${config.label.violationLevelNone}">None</option>
+                                                            <option value="error" th:text="${localiser.localise('validator.label.violationLevelError')}">Error</option>
+                                                            <option value="warning" th:text="${localiser.localise('validator.label.violationLevelWarning')}">Warning</option>
+                                                            <option value="info" th:text="${localiser.localise('validator.label.violationLevelInfo')}">Information message</option>
+                                                            <option value="none" th:text="${localiser.localise('validator.label.violationLevelNone')}">None</option>
                                                         </select>
                                                     </div>
                                                     <div class="violation-table-tooltip">
-                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${config.label.unknownInputViolationLevelTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${localiser.localise('validator.label.unknownInputViolationLevelTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
 
                                                 <div id="csvSettingsFormUnspecifiedSchemaField" class="violation-table-row">
                                                     <div class="violation-table-label">
-                                                        <span class="form-control-static" th:text="${config.label.unspecifiedSchemaFieldViolationLevel}">unspecifiedSchemaField</span>
+                                                        <span class="form-control-static" th:text="${localiser.localise('validator.label.unspecifiedSchemaFieldViolationLevel')}">unspecifiedSchemaField</span>
                                                     </div>
                                                     <div class="violation-table-control">
                                                         <select id="csvSettingsFormUnspecifiedSchemaFieldControl" name="inputUnspecifiedSchemaFieldViolationLevel" class="form-control">
-                                                            <option value="error" th:text="${config.label.violationLevelError}">Error</option>
-                                                            <option value="warning" th:text="${config.label.violationLevelWarning}">Warning</option>
-                                                            <option value="info" th:text="${config.label.violationLevelInfo}">Information message</option>
-                                                            <option value="none" th:text="${config.label.violationLevelNone}">None</option>
+                                                            <option value="error" th:text="${localiser.localise('validator.label.violationLevelError')}">Error</option>
+                                                            <option value="warning" th:text="${localiser.localise('validator.label.violationLevelWarning')}">Warning</option>
+                                                            <option value="info" th:text="${localiser.localise('validator.label.violationLevelInfo')}">Information message</option>
+                                                            <option value="none" th:text="${localiser.localise('validator.label.violationLevelNone')}">None</option>
                                                         </select>
                                                     </div>
                                                     <div class="violation-table-tooltip">
-                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${config.label.unspecifiedSchemaFieldViolationLevelTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${localiser.localise('validator.label.unspecifiedSchemaFieldViolationLevelTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
 
                                                 <div id="csvSettingsFormInputFieldCaseMismatch" class="violation-table-row">
                                                     <div class="violation-table-label">
-                                                        <span class="form-control-static" th:text="${config.label.fieldCaseMismatchViolationLevel}">fieldCaseMismatchViolationLevel</span>
+                                                        <span class="form-control-static" th:text="${localiser.localise('validator.label.fieldCaseMismatchViolationLevel')}">fieldCaseMismatchViolationLevel</span>
                                                     </div>
                                                     <div class="violation-table-control">
                                                         <select id="csvSettingsFormInputFieldCaseMismatchControl" name="inputFieldCaseMismatchViolationLevel" class="form-control">
-                                                            <option value="error" th:text="${config.label.violationLevelError}">Error</option>
-                                                            <option value="warning" th:text="${config.label.violationLevelWarning}">Warning</option>
-                                                            <option value="info" th:text="${config.label.violationLevelInfo}">Information message</option>
-                                                            <option value="none" th:text="${config.label.violationLevelNone}">None</option>
+                                                            <option value="error" th:text="${localiser.localise('validator.label.violationLevelError')}">Error</option>
+                                                            <option value="warning" th:text="${localiser.localise('validator.label.violationLevelWarning')}">Warning</option>
+                                                            <option value="info" th:text="${localiser.localise('validator.label.violationLevelInfo')}">Information message</option>
+                                                            <option value="none" th:text="${localiser.localise('validator.label.violationLevelNone')}">None</option>
                                                         </select>
                                                     </div>
                                                     <div class="violation-table-tooltip">
-                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${config.label.fieldCaseMismatchViolationLevelTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${localiser.localise('validator.label.fieldCaseMismatchViolationLevelTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
 
                                                 <div id="csvSettingsFormDuplicateInputFields" class="violation-table-row">
                                                     <div class="violation-table-label">
-                                                        <span class="form-control-static" th:text="${config.label.duplicateInputFieldsViolationLevel}">duplicateInputFieldsViolationLevel</span>
+                                                        <span class="form-control-static" th:text="${localiser.localise('validator.label.duplicateInputFieldsViolationLevel')}">duplicateInputFieldsViolationLevel</span>
                                                     </div>
                                                     <div class="violation-table-control">
                                                         <select id="csvSettingsFormDuplicateInputFieldsControl" name="inputDuplicateInputFieldsViolationLevel" class="form-control">
-                                                            <option value="error" th:text="${config.label.violationLevelError}">Error</option>
-                                                            <option value="warning" th:text="${config.label.violationLevelWarning}">Warning</option>
-                                                            <option value="info" th:text="${config.label.violationLevelInfo}">Information message</option>
-                                                            <option value="none" th:text="${config.label.violationLevelNone}">None</option>
+                                                            <option value="error" th:text="${localiser.localise('validator.label.violationLevelError')}">Error</option>
+                                                            <option value="warning" th:text="${localiser.localise('validator.label.violationLevelWarning')}">Warning</option>
+                                                            <option value="info" th:text="${localiser.localise('validator.label.violationLevelInfo')}">Information message</option>
+                                                            <option value="none" th:text="${localiser.localise('validator.label.violationLevelNone')}">None</option>
                                                         </select>
                                                     </div>
                                                     <div class="violation-table-tooltip">
-                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${config.label.duplicateInputFieldsViolationLevelTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${localiser.localise('validator.label.duplicateInputFieldsViolationLevelTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
 
                                                 <div id="csvSettingsFormMultipleInputFieldsForSchemaField" class="violation-table-row">
                                                     <div class="violation-table-label">
-                                                        <span class="form-control-static" th:text="${config.label.multipleInputFieldsForSchemaFieldViolationLevel}">multipleInputFieldsForSchemaField</span>
+                                                        <span class="form-control-static" th:text="${localiser.localise('validator.label.multipleInputFieldsForSchemaFieldViolationLevel')}">multipleInputFieldsForSchemaField</span>
                                                     </div>
                                                     <div class="violation-table-control">
                                                         <select id="csvSettingsFormMultipleInputFieldsForSchemaFieldControl" name="inputMultipleInputFieldsForSchemaFieldViolationLevel" class="form-control">
-                                                            <option value="error" th:text="${config.label.violationLevelError}">Error</option>
-                                                            <option value="warning" th:text="${config.label.violationLevelWarning}">Warning</option>
-                                                            <option value="info" th:text="${config.label.violationLevelInfo}">Information message</option>
-                                                            <option value="none" th:text="${config.label.violationLevelNone}">None</option>
+                                                            <option value="error" th:text="${localiser.localise('validator.label.violationLevelError')}">Error</option>
+                                                            <option value="warning" th:text="${localiser.localise('validator.label.violationLevelWarning')}">Warning</option>
+                                                            <option value="info" th:text="${localiser.localise('validator.label.violationLevelInfo')}">Information message</option>
+                                                            <option value="none" th:text="${localiser.localise('validator.label.violationLevelNone')}">None</option>
                                                         </select>
                                                     </div>
                                                     <div class="violation-table-tooltip">
-                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${config.label.multipleInputFieldsForSchemaFieldViolationLevelTooltip}"><i class="far fa-question-circle"></i></span>
+                                                        <span data-toggle="tooltip" data-container="body" th:attr="title=${localiser.localise('validator.label.multipleInputFieldsForSchemaFieldViolationLevelTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
                                                 </div>
 
@@ -265,6 +265,7 @@
                 </div>
                 <div th:replace="fragments/output :: reportDetails(${config}, ${minimalUI}, true)"/>
             </div>
+            <div th:replace="fragments/common :: localeSelector(${config}, ${localiser.getLocale()})"/>
             <div th:replace="fragments/common :: footer(${config}, ${minimalUI})"/>
         </div>
         <div th:replace="fragments/common :: about">About</div>

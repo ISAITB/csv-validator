@@ -59,7 +59,7 @@
         <version.commonsCompress>1.21</version.commonsCompress>
         <version.commonsValidator>1.7</version.commonsValidator>
         <version.tika>2.1.0</version.tika>
-        <version.frictionlessTableSchema>1.0-SNAPSHOT_ITB</version.frictionlessTableSchema>
+        <version.frictionlessTableSchema>1.0.0</version.frictionlessTableSchema>
         <version.aspectjWeaver>1.9.6</version.aspectjWeaver>
     </properties>
 
@@ -255,8 +255,8 @@
                 <version>${version.slf4j}</version>
             </dependency>
             <dependency>
-                <groupId>io.frictionlessdata</groupId>
-                <artifactId>tableschema-java</artifactId>
+                <groupId>com.github.ISAITB</groupId>
+                <artifactId>tableschema-java-fork</artifactId>
                 <version>${version.frictionlessTableSchema}</version>
                 <exclusions>
                     <exclusion>

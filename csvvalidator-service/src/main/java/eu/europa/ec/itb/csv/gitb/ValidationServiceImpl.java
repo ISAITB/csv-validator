@@ -11,6 +11,7 @@ import eu.europa.ec.itb.csv.validation.FileManager;
 import eu.europa.ec.itb.csv.validation.ValidationConstants;
 import eu.europa.ec.itb.csv.validation.ViolationLevel;
 import eu.europa.ec.itb.validation.commons.FileInfo;
+import eu.europa.ec.itb.validation.commons.LocalisationHelper;
 import eu.europa.ec.itb.validation.commons.Utils;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
 import eu.europa.ec.itb.validation.commons.error.ValidatorException;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -135,13 +137,13 @@ public class ValidationServiceImpl implements ValidationService {
         if (supportType != ExternalArtifactSupport.NONE) {
             List<AnyContent> inputValues = Utils.getInputFor(request, inputName);
             if (supportType == ExternalArtifactSupport.REQUIRED && inputValues.isEmpty()) {
-                throw new ValidatorException("Required input ["+inputName+"] was missing");
+                throw new ValidatorException("validator.label.exception.requiredInputMissing", inputName);
             } else if (inputValues.size() > 1) {
-                throw new ValidatorException("Multiple values provided for input ["+inputName+"]");
+                throw new ValidatorException("validator.label.exception.multipleInputsProvided", inputName);
             } else if (!inputValues.isEmpty()) {
                 String value = inputValues.get(0).getValue();
                 if (value.trim().equals("")) {
-                    throw new ValidatorException("An empty value was provided for input ["+inputName+"]");
+                    throw new ValidatorException("validator.label.exception.emptyInputProvided", inputName);
                 }
                 result = fnValueProvider.apply(value);
             }
@@ -192,7 +194,7 @@ public class ValidationServiceImpl implements ValidationService {
                     .withMultipleInputFieldsForSchemaFieldViolationLevel(inputMultipleInputFieldsForSchemaFieldViolationLevel)
                     .withUnknownInputFieldViolationLevel(inputUnknownInputViolationLevel)
                     .withUnspecifiedSchemaFieldViolationLevel(inputUnspecifiedSchemaFieldViolationLevel);
-            CSVValidator validator = ctx.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs));
+            CSVValidator validator = ctx.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs), new LocalisationHelper(domainConfig, Locale.ENGLISH));
             TAR report = validator.validate();
             if (addInputToReport) {
                 addContext(report, contentToValidate);
@@ -200,11 +202,12 @@ public class ValidationServiceImpl implements ValidationService {
             result.setReport(report);
             return result;
         } catch (ValidatorException e) {
-            LOG.error("Validation error", e);
-            throw e;
+            LOG.error(e.getMessageForLog(), e);
+            throw new ValidatorException(e.getMessageForDisplay(new LocalisationHelper(Locale.ENGLISH)), true);
         } catch (Exception e) {
             LOG.error("Unexpected error", e);
-            throw new ValidatorException(e);
+            var message = new LocalisationHelper(Locale.ENGLISH).localise(ValidatorException.MESSAGE_DEFAULT);
+            throw new ValidatorException(message, e, true, (Object[]) null);
         } finally {
             // Cleanup.
             if (tempFolderPath.exists()) {
