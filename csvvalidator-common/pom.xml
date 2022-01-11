@@ -45,8 +45,8 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.frictionlessdata</groupId>
-            <artifactId>tableschema-java</artifactId>
+            <groupId>com.github.ISAITB</groupId>
+            <artifactId>tableschema-java-fork</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
