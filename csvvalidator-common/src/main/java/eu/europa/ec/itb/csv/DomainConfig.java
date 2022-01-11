@@ -4,7 +4,6 @@ import eu.europa.ec.itb.csv.validation.ViolationLevel;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
 import eu.europa.ec.itb.validation.commons.artifact.TypedValidationArtifactInfo;
 import eu.europa.ec.itb.validation.commons.artifact.ValidationArtifactInfo;
-import eu.europa.ec.itb.validation.commons.config.LabelConfig;
 import eu.europa.ec.itb.validation.commons.config.WebDomainConfig;
 
 import java.util.Map;
@@ -13,7 +12,7 @@ import java.util.regex.Pattern;
 /**
  * Class to hold and expose the configuration for a specific validation domain.
  */
-public class DomainConfig extends WebDomainConfig<DomainConfig.Label> implements MessageFormatter {
+public class DomainConfig extends WebDomainConfig {
 
     private Map<String, Boolean> javaBasedDateFormats;
     private Map<String, Boolean> displayEnumValuesInMessages;
@@ -72,16 +71,6 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> implements
     }
 
     /**
-     * Initialise a new and empty label configuration object.
-     *
-     * @return The label configuration instance.
-     */
-    @Override
-    protected Label newLabelConfig() {
-        return new Label();
-    }
-
-    /**
      * Get the schema configuration information for a given validation type.
      *
      * @param validationType The validation type.
@@ -128,23 +117,6 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> implements
     }
 
     /**
-     * Format a error message for inclusion in the validation report.
-     *
-     * @param lineNumber The line number to include as the location.
-     * @param fieldName The relevant field name (null is no header fields are defined).
-     * @param message The message.
-     * @return The formatted message.
-     */
-    @Override
-    public String formatMessage(long lineNumber, String fieldName, String message) {
-        if (fieldName == null) {
-            return String.format("[%s%s]: %s", getLabel().getLineMessagePrefix(), lineNumber, message);
-        } else {
-            return String.format("[%s%s][%s%s]: %s", getLabel().getLineMessagePrefix(), lineNumber, getLabel().getFieldMessagePrefix(), fieldName, message);
-        }
-    }
-
-    /**
      * Class holding configuration to provide user-friendly error messages for known parser errors.
      *
      * These are errors that are raised from the parsing itself before any validation rules can be executed.
@@ -154,18 +126,15 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> implements
         /** Header row with missing names. */
         public static final ParserError MISSING_HEADER_NAME = new ParserError(
                 "missingHeader",
-                "^A header name is missing in \\[.+\\]",
-                "The header field names could not be parsed. You have either defined consecutive field delimiter characters (commas) with blank contents or defined a trailing one at the end of the header."
+                "^A header name is missing in \\[.+\\]"
         );
         /** Use of the wrong field delimiter. */
         public static final ParserError WRONG_DELIMITER = new ParserError(
                 "wrongDelimiter",
-                "^\\(line .+\\) invalid char between encapsulated token and delimiter",
-                "The header field names could not be parsed. This is likely due to the field delimiter character (comma) used in the input not being the expected one."
+                "^\\(line .+\\) invalid char between encapsulated token and delimiter"
         );
 
         private final Pattern pattern;
-        private final String message;
         private final String name;
 
         /**
@@ -173,11 +142,9 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> implements
          *
          * @param name A unique name for this error.
          * @param expression The regular expression to use when determining if a provided error message is a match.
-         * @param message The user-friendly message to display.
          */
-        public ParserError(String name, String expression, String message) {
+        public ParserError(String name, String expression) {
             pattern = Pattern.compile(expression);
-            this.message = message;
             this.name = name;
         }
 
@@ -195,12 +162,6 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> implements
             return pattern;
         }
 
-        /**
-         * @return The user-friendly message to display.
-         */
-        public String getMessage() {
-            return message;
-        }
     }
 
     /**
@@ -543,496 +504,6 @@ public class DomainConfig extends WebDomainConfig<DomainConfig.Label> implements
          */
         public void setQuote(Map<String, Character> quote) {
             this.quote = quote;
-        }
-    }
-
-    /**
-     * Class holding the configuration for user interface labels.
-     */
-    public static class Label extends LabelConfig {
-        private String externalSchemaLabel;
-        private String externalSchemaPlaceholder;
-        private String csvSyntax;
-        private String includeCsvSyntax;
-        private String includeCsvSyntaxTooltip;
-        private String csvSyntaxQuotePlaceholder;
-        private String csvSyntaxQuoteTooltip;
-        private String csvSyntaxDelimiterPlaceholder;
-        private String csvSyntaxDelimiterTooltip;
-        private String csvSyntaxHeaders;
-        private String csvSyntaxHeadersTooltip;
-        private String differentInputFieldCountViolationLevel;
-        private String differentInputFieldSequenceViolationLevel;
-        private String duplicateInputFieldsViolationLevel;
-        private String fieldCaseMismatchViolationLevel;
-        private String multipleInputFieldsForSchemaFieldViolationLevel;
-        private String unknownInputViolationLevel;
-        private String unspecifiedSchemaFieldViolationLevel;
-        private String differentInputFieldCountViolationLevelTooltip;
-        private String differentInputFieldSequenceViolationLevelTooltip;
-        private String duplicateInputFieldsViolationLevelTooltip;
-        private String fieldCaseMismatchViolationLevelTooltip;
-        private String multipleInputFieldsForSchemaFieldViolationLevelTooltip;
-        private String unknownInputViolationLevelTooltip;
-        private String unspecifiedSchemaFieldViolationLevelTooltip;
-        private String violationLevelError;
-        private String violationLevelWarning;
-        private String violationLevelInfo;
-        private String violationLevelNone;
-        private String violationLevelHeader;
-        private String lineMessagePrefix;
-        private String fieldMessagePrefix;
-
-        /**
-         * @return The prefix for the line to include in report messages.
-         */
-        public String getLineMessagePrefix() {
-            return lineMessagePrefix;
-        }
-
-        /**
-         * @param lineMessagePrefix The prefix for the line to include in report messages.
-         */
-        public void setLineMessagePrefix(String lineMessagePrefix) {
-            this.lineMessagePrefix = lineMessagePrefix;
-        }
-
-        /**
-         * @return The prefix for the field to include in report messages.
-         */
-        public String getFieldMessagePrefix() {
-            return fieldMessagePrefix;
-        }
-
-        /**
-         * @param fieldMessagePrefix The prefix for the field to include in report messages.
-         */
-        public void setFieldMessagePrefix(String fieldMessagePrefix) {
-            this.fieldMessagePrefix = fieldMessagePrefix;
-        }
-
-        /**
-         * @return The header for the section configuring violation levels.
-         */
-        public String getViolationLevelHeader() {
-            return violationLevelHeader;
-        }
-
-        /**
-         * @param violationLevelHeader The header for the section configuring violation levels.
-         */
-        public void setViolationLevelHeader(String violationLevelHeader) {
-            this.violationLevelHeader = violationLevelHeader;
-        }
-
-        /**
-         * @return The label for the violation level of different input field counts.
-         */
-        public String getDifferentInputFieldCountViolationLevel() {
-            return differentInputFieldCountViolationLevel;
-        }
-
-        /**
-         * @param differentInputFieldCountViolationLevel The label for the violation level of different input field counts.
-         */
-        public void setDifferentInputFieldCountViolationLevel(String differentInputFieldCountViolationLevel) {
-            this.differentInputFieldCountViolationLevel = differentInputFieldCountViolationLevel;
-        }
-
-        /**
-         * @return The label for the violation level of different input field sequences.
-         */
-        public String getDifferentInputFieldSequenceViolationLevel() {
-            return differentInputFieldSequenceViolationLevel;
-        }
-
-        /**
-         * @param differentInputFieldSequenceViolationLevel The label for the violation level of different input field sequences.
-         */
-        public void setDifferentInputFieldSequenceViolationLevel(String differentInputFieldSequenceViolationLevel) {
-            this.differentInputFieldSequenceViolationLevel = differentInputFieldSequenceViolationLevel;
-        }
-
-        /**
-         * @return The label for the violation level of duplicate input fields.
-         */
-        public String getDuplicateInputFieldsViolationLevel() {
-            return duplicateInputFieldsViolationLevel;
-        }
-
-        /**
-         * @param duplicateInputFieldsViolationLevel The label for the violation level of duplicate input fields.
-         */
-        public void setDuplicateInputFieldsViolationLevel(String duplicateInputFieldsViolationLevel) {
-            this.duplicateInputFieldsViolationLevel = duplicateInputFieldsViolationLevel;
-        }
-
-        /**
-         * @return The label for the violation level of field name case mismatches.
-         */
-        public String getFieldCaseMismatchViolationLevel() {
-            return fieldCaseMismatchViolationLevel;
-        }
-
-        /**
-         * @param fieldCaseMismatchViolationLevel  The label for the violation level of field name case mismatches.
-         */
-        public void setFieldCaseMismatchViolationLevel(String fieldCaseMismatchViolationLevel) {
-            this.fieldCaseMismatchViolationLevel = fieldCaseMismatchViolationLevel;
-        }
-
-        /**
-         * @return The label for the violation level of multiple input fields for a single schema field.
-         */
-        public String getMultipleInputFieldsForSchemaFieldViolationLevel() {
-            return multipleInputFieldsForSchemaFieldViolationLevel;
-        }
-
-        /**
-         * @param multipleInputFieldsForSchemaFieldViolationLevel The label for the violation level of multiple input fields for a single schema field.
-         */
-        public void setMultipleInputFieldsForSchemaFieldViolationLevel(String multipleInputFieldsForSchemaFieldViolationLevel) {
-            this.multipleInputFieldsForSchemaFieldViolationLevel = multipleInputFieldsForSchemaFieldViolationLevel;
-        }
-
-        /**
-         * @return The label for the violation level of unknown inputs.
-         */
-        public String getUnknownInputViolationLevel() {
-            return unknownInputViolationLevel;
-        }
-
-        /**
-         * @param unknownInputViolationLevel The label for the violation level of unknown inputs.
-         */
-        public void setUnknownInputViolationLevel(String unknownInputViolationLevel) {
-            this.unknownInputViolationLevel = unknownInputViolationLevel;
-        }
-
-        /**
-         * @return The label for the violation level of non-covered schema fields.
-         */
-        public String getUnspecifiedSchemaFieldViolationLevel() {
-            return unspecifiedSchemaFieldViolationLevel;
-        }
-
-        /**
-         * @param unspecifiedSchemaFieldViolationLevel The label for the violation level of non-covered schema fields.
-         */
-        public void setUnspecifiedSchemaFieldViolationLevel(String unspecifiedSchemaFieldViolationLevel) {
-            this.unspecifiedSchemaFieldViolationLevel = unspecifiedSchemaFieldViolationLevel;
-        }
-
-        /**
-         * @return The tooltip for the violation level of different input field counts.
-         */
-        public String getDifferentInputFieldCountViolationLevelTooltip() {
-            return differentInputFieldCountViolationLevelTooltip;
-        }
-
-        /**
-         * @param differentInputFieldCountViolationLevelTooltip The tooltip for violation level of different input field
-         *                                                      counts.
-         */
-        public void setDifferentInputFieldCountViolationLevelTooltip(String differentInputFieldCountViolationLevelTooltip) {
-            this.differentInputFieldCountViolationLevelTooltip = differentInputFieldCountViolationLevelTooltip;
-        }
-
-        /**
-         * @return The tooltip for the violation level of different input field sequences.
-         */
-        public String getDifferentInputFieldSequenceViolationLevelTooltip() {
-            return differentInputFieldSequenceViolationLevelTooltip;
-        }
-
-        /**
-         * @param differentInputFieldSequenceViolationLevelTooltip The tooltip for the violation level of different input
-         *                                                         field sequences.
-         */
-        public void setDifferentInputFieldSequenceViolationLevelTooltip(String differentInputFieldSequenceViolationLevelTooltip) {
-            this.differentInputFieldSequenceViolationLevelTooltip = differentInputFieldSequenceViolationLevelTooltip;
-        }
-
-        /**
-         * @return The tooltip for the violation level of duplicate input fields.
-         */
-        public String getDuplicateInputFieldsViolationLevelTooltip() {
-            return duplicateInputFieldsViolationLevelTooltip;
-        }
-
-        /**
-         * @param duplicateInputFieldsViolationLevelTooltip The tooltip for the violation level of duplicate input fields.
-         */
-        public void setDuplicateInputFieldsViolationLevelTooltip(String duplicateInputFieldsViolationLevelTooltip) {
-            this.duplicateInputFieldsViolationLevelTooltip = duplicateInputFieldsViolationLevelTooltip;
-        }
-
-        /**
-         * @return The tooltip for the violation level of field name case mismatches.
-         */
-        public String getFieldCaseMismatchViolationLevelTooltip() {
-            return fieldCaseMismatchViolationLevelTooltip;
-        }
-
-        /**
-         * @param fieldCaseMismatchViolationLevelTooltip The tooltip for the violation level of field name case mismatches.
-         */
-        public void setFieldCaseMismatchViolationLevelTooltip(String fieldCaseMismatchViolationLevelTooltip) {
-            this.fieldCaseMismatchViolationLevelTooltip = fieldCaseMismatchViolationLevelTooltip;
-        }
-
-        /**
-         * @return The tooltip for the violation level of multiple input fields for a single schema field.
-         */
-        public String getMultipleInputFieldsForSchemaFieldViolationLevelTooltip() {
-            return multipleInputFieldsForSchemaFieldViolationLevelTooltip;
-        }
-
-        /**
-         * @param multipleInputFieldsForSchemaFieldViolationLevelTooltip The tooltip for the violation level of multiple
-         *                                                               input fields for a single schema field.
-         */
-        public void setMultipleInputFieldsForSchemaFieldViolationLevelTooltip(String multipleInputFieldsForSchemaFieldViolationLevelTooltip) {
-            this.multipleInputFieldsForSchemaFieldViolationLevelTooltip = multipleInputFieldsForSchemaFieldViolationLevelTooltip;
-        }
-
-        /**
-         * @return The tooltip for the violation level of unknown inputs.
-         */
-        public String getUnknownInputViolationLevelTooltip() {
-            return unknownInputViolationLevelTooltip;
-        }
-
-        /**
-         * @param unknownInputViolationLevelTooltip The tooltip for the violation level of unknown inputs.
-         */
-        public void setUnknownInputViolationLevelTooltip(String unknownInputViolationLevelTooltip) {
-            this.unknownInputViolationLevelTooltip = unknownInputViolationLevelTooltip;
-        }
-
-        /**
-         * @return The tooltip for the violation level of non-covered schema fields.
-         */
-        public String getUnspecifiedSchemaFieldViolationLevelTooltip() {
-            return unspecifiedSchemaFieldViolationLevelTooltip;
-        }
-
-        /**
-         * @param unspecifiedSchemaFieldViolationLevelTooltip The tooltip for the violation level of non-covered schema
-         *                                                    fields.
-         */
-        public void setUnspecifiedSchemaFieldViolationLevelTooltip(String unspecifiedSchemaFieldViolationLevelTooltip) {
-            this.unspecifiedSchemaFieldViolationLevelTooltip = unspecifiedSchemaFieldViolationLevelTooltip;
-        }
-
-        /**
-         * @return The text for the error violation level.
-         */
-        public String getViolationLevelError() {
-            return violationLevelError;
-        }
-
-        /**
-         * @param violationLevelError  The text for the error violation level.
-         */
-        public void setViolationLevelError(String violationLevelError) {
-            this.violationLevelError = violationLevelError;
-        }
-
-        /**
-         * @return The text for the warning violation level.
-         */
-        public String getViolationLevelWarning() {
-            return violationLevelWarning;
-        }
-
-        /**
-         * @param violationLevelWarning The text for the warning violation level.
-         */
-        public void setViolationLevelWarning(String violationLevelWarning) {
-            this.violationLevelWarning = violationLevelWarning;
-        }
-
-        /**
-         * @return The text for the info violation level.
-         */
-        public String getViolationLevelInfo() {
-            return violationLevelInfo;
-        }
-
-        /**
-         * @param violationLevelInfo The text for the info violation level.
-         */
-        public void setViolationLevelInfo(String violationLevelInfo) {
-            this.violationLevelInfo = violationLevelInfo;
-        }
-
-        /**
-         * @return The text for the "none" violation level.
-         */
-        public String getViolationLevelNone() {
-            return violationLevelNone;
-        }
-
-        /**
-         * @param violationLevelNone The text for the "none" violation level.
-         */
-        public void setViolationLevelNone(String violationLevelNone) {
-            this.violationLevelNone = violationLevelNone;
-        }
-
-        /**
-         * @return The CSV syntax label.
-         */
-        public String getCsvSyntax() {
-            return csvSyntax;
-        }
-
-        /**
-         * @param csvSyntax The CSV syntax label.
-         */
-        public void setCsvSyntax(String csvSyntax) {
-            this.csvSyntax = csvSyntax;
-        }
-
-        /**
-         * @return The include CSV syntax label.
-         */
-        public String getIncludeCsvSyntax() {
-            return includeCsvSyntax;
-        }
-
-        /**
-         * @param includeCsvSyntax The include CSV syntax label.
-         */
-        public void setIncludeCsvSyntax(String includeCsvSyntax) {
-            this.includeCsvSyntax = includeCsvSyntax;
-        }
-
-        /**
-         * @return The include CSV syntax tooltip.
-         */
-        public String getIncludeCsvSyntaxTooltip() {
-            return includeCsvSyntaxTooltip;
-        }
-
-        /**
-         * @param includeCsvSyntaxTooltip The include CSV syntax tooltip.
-         */
-        public void setIncludeCsvSyntaxTooltip(String includeCsvSyntaxTooltip) {
-            this.includeCsvSyntaxTooltip = includeCsvSyntaxTooltip;
-        }
-
-        /**
-         * @return The placeholder for the quote input.
-         */
-        public String getCsvSyntaxQuotePlaceholder() {
-            return csvSyntaxQuotePlaceholder;
-        }
-
-        /**
-         * @param csvSyntaxQuotePlaceholder The placeholder for the quote input.
-         */
-        public void setCsvSyntaxQuotePlaceholder(String csvSyntaxQuotePlaceholder) {
-            this.csvSyntaxQuotePlaceholder = csvSyntaxQuotePlaceholder;
-        }
-
-        /**
-         * @return The tooltip for the quote input.
-         */
-        public String getCsvSyntaxQuoteTooltip() {
-            return csvSyntaxQuoteTooltip;
-        }
-
-        /**
-         * @param csvSyntaxQuoteTooltip The tooltip for the quote input.
-         */
-        public void setCsvSyntaxQuoteTooltip(String csvSyntaxQuoteTooltip) {
-            this.csvSyntaxQuoteTooltip = csvSyntaxQuoteTooltip;
-        }
-
-        /**
-         * @return The placeholder for the delimiter input.
-         */
-        public String getCsvSyntaxDelimiterPlaceholder() {
-            return csvSyntaxDelimiterPlaceholder;
-        }
-
-        /**
-         * @param csvSyntaxDelimiterPlaceholder The placeholder for the delimiter input.
-         */
-        public void setCsvSyntaxDelimiterPlaceholder(String csvSyntaxDelimiterPlaceholder) {
-            this.csvSyntaxDelimiterPlaceholder = csvSyntaxDelimiterPlaceholder;
-        }
-
-        /**
-         * @return The tooltip for the delimiter input.
-         */
-        public String getCsvSyntaxDelimiterTooltip() {
-            return csvSyntaxDelimiterTooltip;
-        }
-
-        /**
-         * @param csvSyntaxDelimiterTooltip The tooltip for the delimiter input.
-         */
-        public void setCsvSyntaxDelimiterTooltip(String csvSyntaxDelimiterTooltip) {
-            this.csvSyntaxDelimiterTooltip = csvSyntaxDelimiterTooltip;
-        }
-
-        /**
-         * @return The headers' choice text.
-         */
-        public String getCsvSyntaxHeaders() {
-            return csvSyntaxHeaders;
-        }
-
-        /**
-         * @param csvSyntaxHeaders The headers' choice text.
-         */
-        public void setCsvSyntaxHeaders(String csvSyntaxHeaders) {
-            this.csvSyntaxHeaders = csvSyntaxHeaders;
-        }
-
-        /**
-         * @return The headers' choice tooltip.
-         */
-        public String getCsvSyntaxHeadersTooltip() {
-            return csvSyntaxHeadersTooltip;
-        }
-
-        /**
-         * @param csvSyntaxHeadersTooltip The headers' choice tooltip.
-         */
-        public void setCsvSyntaxHeadersTooltip(String csvSyntaxHeadersTooltip) {
-            this.csvSyntaxHeadersTooltip = csvSyntaxHeadersTooltip;
-        }
-
-        /**
-         * @return The label for user-provided schemas.
-         */
-        public String getExternalSchemaLabel() {
-            return externalSchemaLabel;
-        }
-
-        /**
-         * @param externalSchemaLabel The label for user-provided schemas.
-         */
-        public void setExternalSchemaLabel(String externalSchemaLabel) {
-            this.externalSchemaLabel = externalSchemaLabel;
-        }
-
-        /**
-         * @return The placeholder for user-provided schemas inputs.
-         */
-        public String getExternalSchemaPlaceholder() {
-            return externalSchemaPlaceholder;
-        }
-
-        /**
-         * @param externalSchemaPlaceholder The placeholder for user-provided schemas inputs.
-         */
-        public void setExternalSchemaPlaceholder(String externalSchemaPlaceholder) {
-            this.externalSchemaPlaceholder = externalSchemaPlaceholder;
         }
     }
 

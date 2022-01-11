@@ -18,28 +18,28 @@ public class ReportItem {
      * Constructor.
      *
      * @param messageFormatter Component responsible for the formatting of this report item's message.
-     * @param message The original message.
+     * @param localisedMessage The original message (must be already localised).
      * @param fieldName The name of the relevant field.
      * @param lineNumber The line number in the input.
      * @param value The value relevant to this report item.
      */
-    public ReportItem(MessageFormatter messageFormatter, String message, String fieldName, long lineNumber, String value) {
-        this(messageFormatter, message, fieldName, lineNumber, value, ViolationLevel.ERROR);
+    public ReportItem(MessageFormatter messageFormatter, String localisedMessage, String fieldName, long lineNumber, String value) {
+        this(messageFormatter, localisedMessage, fieldName, lineNumber, value, ViolationLevel.ERROR);
     }
 
     /**
      * Constructor.
      *
      * @param messageFormatter Component responsible for the formatting of this report item's message.
-     * @param message The original message.
+     * @param localisedMessage The original message (must be already localised).
      * @param fieldName The name of the relevant field.
      * @param lineNumber The line number in the input.
      * @param value The value relevant to this report item.
      * @param violationLevel The violation level linked to this report item.
      */
-    public ReportItem(MessageFormatter messageFormatter, String message, String fieldName, long lineNumber, String value, ViolationLevel violationLevel) {
+    public ReportItem(MessageFormatter messageFormatter, String localisedMessage, String fieldName, long lineNumber, String value, ViolationLevel violationLevel) {
         this.messageFormatter = messageFormatter;
-        this.message = message;
+        this.message = localisedMessage;
         this.fieldName = fieldName;
         this.lineNumber = lineNumber;
         this.value = value;

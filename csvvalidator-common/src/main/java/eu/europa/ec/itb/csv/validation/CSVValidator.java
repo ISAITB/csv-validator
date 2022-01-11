@@ -5,8 +5,11 @@ import com.gitb.tr.*;
 import com.gitb.vs.ValidateRequest;
 import com.gitb.vs.ValidationResponse;
 import eu.europa.ec.itb.csv.DomainConfig;
+import eu.europa.ec.itb.csv.LocalisedMessageFormatter;
+import eu.europa.ec.itb.csv.MessageFormatter;
 import eu.europa.ec.itb.validation.commons.BomStrippingReader;
 import eu.europa.ec.itb.validation.commons.FileInfo;
+import eu.europa.ec.itb.validation.commons.LocalisationHelper;
 import eu.europa.ec.itb.validation.commons.Utils;
 import eu.europa.ec.itb.validation.commons.config.DomainPluginConfigProvider;
 import eu.europa.ec.itb.validation.commons.error.ValidatorException;
@@ -50,6 +53,7 @@ public class CSVValidator {
     @Autowired
     private PluginManager pluginManager = null;
 
+    private final LocalisationHelper localiser;
     private final File inputFileToValidate;
     private final DomainConfig domainConfig;
     private String validationType;
@@ -58,6 +62,7 @@ public class CSVValidator {
     private final ObjectFactory objectFactory = new ObjectFactory();
     private final Set<String> charsetsToNotConvert = Set.of(StandardCharsets.UTF_16.name(), StandardCharsets.UTF_16BE.name(), StandardCharsets.UTF_16LE.name());
     private final ProgressListener progressListener;
+    private final MessageFormatter messageFormatter;
     private long counterErrors = 0L;
     private long counterWarnings = 0L;
     private long counterInformationMessages = 0L;
@@ -73,9 +78,10 @@ public class CSVValidator {
      * @param externalSchemaFileInfo The user-provided schemas to consider.
      * @param domainConfig The current domain configuration.
      * @param csvSettings The CSV syntax settings to consider.
+     * @param localiser Helper class to facilitate translation lookups.
      */
-    public CSVValidator(File inputFileToValidate, String validationType, List<FileInfo> externalSchemaFileInfo, DomainConfig domainConfig, CSVSettings csvSettings) {
-        this(inputFileToValidate, validationType, externalSchemaFileInfo, domainConfig, csvSettings, null);
+    public CSVValidator(File inputFileToValidate, String validationType, List<FileInfo> externalSchemaFileInfo, DomainConfig domainConfig, CSVSettings csvSettings, LocalisationHelper localiser) {
+        this(inputFileToValidate, validationType, externalSchemaFileInfo, domainConfig, csvSettings, null, localiser);
     }
 
     /**
@@ -87,14 +93,17 @@ public class CSVValidator {
      * @param domainConfig The current domain configuration.
      * @param csvSettings The CSV syntax settings to consider.
      * @param progressListener An observer to be notified of the validation progress.
+     * @param localiser Helper class to facilitate translation lookups.
      */
-    public CSVValidator(File inputFileToValidate, String validationType, List<FileInfo> externalSchemaFileInfo, DomainConfig domainConfig, CSVSettings csvSettings, ProgressListener progressListener) {
+    public CSVValidator(File inputFileToValidate, String validationType, List<FileInfo> externalSchemaFileInfo, DomainConfig domainConfig, CSVSettings csvSettings, ProgressListener progressListener, LocalisationHelper localiser) {
         this.inputFileToValidate = inputFileToValidate;
         this.domainConfig = domainConfig;
         this.validationType = validationType;
         this.externalSchemaFileInfo = externalSchemaFileInfo;
         this.csvSettings = csvSettings;
         this.progressListener = progressListener;
+        this.localiser = localiser;
+        this.messageFormatter = new LocalisedMessageFormatter(localiser);
         if (validationType == null) {
             this.validationType = domainConfig.getType().get(0);
         }
@@ -209,7 +218,7 @@ public class CSVValidator {
         try {
             return Files.newInputStream(file.toPath());
         } catch (IOException e) {
-            throw new ValidatorException("Unable to read the provided "+(isInput?"input":"schema")+" file", e);
+            throw new ValidatorException((isInput?"validator.label.exception.unableToReadInputFile":"validator.label.exception.unableToReadInputSchema"), e);
         }
     }
 
@@ -274,7 +283,7 @@ public class CSVValidator {
         } catch (ValidatorException e) {
             throw e;
         } catch (Exception e) {
-            throw new ValidatorException("The provided schema could not be parsed [" + getRootCause(e).getMessage()+ "]", e);
+            throw new ValidatorException("validator.label.exception.providedSchemaCouldNotBeParsed", e, getRootCause(e).getMessage());
         }
         short headerLine = 1;
         try (
@@ -288,7 +297,7 @@ public class CSVValidator {
                 int index = 0;
                 for (Field<?> field: schema.getFields()) {
                     if (fieldMap.containsKey(field.getName())) {
-                        throw new ValidatorException("The schema defines two fields with the same name ["+field.getName()+"].");
+                        throw new ValidatorException("validator.label.exception.schemaDefinesTwoFieldsWithSameName", field.getName());
                     } else {
                         fieldMap.put(field.getName(), new FieldInfo(field, index));
                         lowerCaseFieldNameMap.computeIfAbsent(field.getName().toLowerCase(), n -> new HashSet<>()).add(field.getName());
@@ -310,11 +319,11 @@ public class CSVValidator {
                             if (otherNames != null && !otherNames.isEmpty()) {
                                 if (otherNames.size() > 1) {
                                     // Header name is ambiguous - matched multiple schema fields.
-                                    handleSyntaxViolation(ViolationLevel.ERROR, headerName, String.format("Header '%s' is ambiguous as it may refer to multiple schema fields '%s'.", headerName, otherNames.toString()), headerLine, errors);
+                                    handleSyntaxViolation(ViolationLevel.ERROR, headerName, localiser.localise("validator.label.syntax.ambiguousHeader", headerName, otherNames), headerLine, errors);
                                 } else {
                                     // Matched header in schema fields but with different casing.
                                     String schemaFieldName = otherNames.iterator().next();
-                                    handleSyntaxViolation(csvSettings.getInputFieldCaseMismatchViolationLevel(), headerName, String.format("Header '%s' has different casing that the expected '%s'.", headerName, schemaFieldName), headerLine, errors);
+                                    handleSyntaxViolation(csvSettings.getInputFieldCaseMismatchViolationLevel(), headerName, localiser.localise("validator.label.syntax.inputFieldCaseMismatch", headerName, schemaFieldName), headerLine, errors);
                                     fieldInfo = fieldMap.get(schemaFieldName);
                                 }
                             }
@@ -322,11 +331,11 @@ public class CSVValidator {
                     }
                     if (fieldInfo == null) {
                         // Could not match header in schema fields.
-                        handleSyntaxViolation(csvSettings.getUnknownInputFieldViolationLevel(), headerName, String.format("Found unexpected header '%s'.", headerName), headerLine, errors);
+                        handleSyntaxViolation(csvSettings.getUnknownInputFieldViolationLevel(), headerName, localiser.localise("validator.label.syntax.unknownInputField", headerName), headerLine, errors);
                     } else  {
                         if (fieldInfo.getIndex() != headerIndex) {
                             // Header appears in unexpected position.
-                            handleSyntaxViolation(csvSettings.getDifferentInputFieldSequenceViolationLevel(), headerName, String.format("Header '%s' is defined at position [%s] which is not the expected position [%s].", headerName, headerIndex, fieldInfo.getIndex()), headerLine, errors);
+                            handleSyntaxViolation(csvSettings.getDifferentInputFieldSequenceViolationLevel(), headerName, localiser.localise("validator.label.syntax.differentInputFieldSequence", headerName, headerIndex, fieldInfo.getIndex()), headerLine, errors);
                         }
                         matchedSchemaFields.add(fieldInfo.getField().getName());
                         fieldNameToHeaderIndexes.computeIfAbsent(fieldInfo.getField().getName(), n -> new ArrayList<>()).add(headerIndex);
@@ -344,20 +353,20 @@ public class CSVValidator {
                         // Schema field not found in input.
                         if (f.getConstraints() != null && (Boolean)f.getConstraints().getOrDefault(Field.CONSTRAINT_KEY_REQUIRED, Boolean.FALSE)) {
                             // Missing required field - always an error.
-                            handleSyntaxViolation(ViolationLevel.ERROR, null, String.format("The defined header fields do not include the required field '%s'.", f.getName()), headerLine, errors);
+                            handleSyntaxViolation(ViolationLevel.ERROR, null, localiser.localise("validator.label.syntax.missingRequiredHeader", f.getName()), headerLine, errors);
                         } else {
                             // Missing optional field - depends on configuration.
-                            handleSyntaxViolation(csvSettings.getUnspecifiedSchemaFieldViolationLevel(), null, String.format("The defined header fields do not include the optional field '%s'.", f.getName()), headerLine, errors);
+                            handleSyntaxViolation(csvSettings.getUnspecifiedSchemaFieldViolationLevel(), null, localiser.localise("validator.label.syntax.unspecifiedSchemaField", f.getName()), headerLine, errors);
                         }
                     }
                 });
                 if (schema.getFields().size() != parser.getHeaderNames().size()) {
                     // Different field counts.
-                    handleSyntaxViolation(csvSettings.getDifferentInputFieldCountViolationLevel(), null, String.format("The header field count [%s] does not match the expected count [%s].", parser.getHeaderNames().size(), schema.getFields().size()), headerLine, errors);
+                    handleSyntaxViolation(csvSettings.getDifferentInputFieldCountViolationLevel(), null, localiser.localise("validator.label.syntax.differentInputFieldCount", parser.getHeaderNames().size(), schema.getFields().size()), headerLine, errors);
                 }
                 duplicateHeaders.forEach((headerName) -> {
                     // Header appears multiple times in exactly the same way.
-                    handleSyntaxViolation(csvSettings.getDuplicateInputFieldViolationLevel(), headerName, String.format("Header '%s' is defined multiple times.", headerName), headerLine, errors);
+                    handleSyntaxViolation(csvSettings.getDuplicateInputFieldViolationLevel(), headerName, localiser.localise("validator.label.syntax.duplicateInputField", headerName), headerLine, errors);
                 });
                 for (Map.Entry<String, List<Integer>> nameToIndexEntry: fieldNameToHeaderIndexes.entrySet()) {
                     if (nameToIndexEntry.getValue().size() > 1) {
@@ -366,7 +375,7 @@ public class CSVValidator {
                         for (Integer pos: nameToIndexEntry.getValue()) {
                             headers.add(parser.getHeaderNames().get(pos));
                         }
-                        handleSyntaxViolation(csvSettings.getMultipleInputFieldsForSchemaFieldViolationLevel(), null, String.format("Multiple headers %s map to the same schema field '%s'.", headers, nameToIndexEntry.getKey()), headerLine, errors);
+                        handleSyntaxViolation(csvSettings.getMultipleInputFieldsForSchemaFieldViolationLevel(), null, localiser.localise("validator.label.syntax.multipleInputFieldsForSchemaField", headers, nameToIndexEntry.getKey()), headerLine, errors);
                     }
                 }
             } else {
@@ -400,7 +409,7 @@ public class CSVValidator {
             throw e;
         } catch (Exception e) {
             if (!checkAndHandleKnownErrors(e, headerLine, errors)) {
-                throw new ValidatorException("The provided input could not be parsed ["+ getRootCause(e).getMessage()+"]", e);
+                throw new ValidatorException("validator.label.exception.providedInputCouldNotBeParsed", getRootCause(e).getMessage(), e);
             }
         }
         return toTAR(errors);
@@ -419,7 +428,7 @@ public class CSVValidator {
         if (e != null && e.getMessage() != null && !e.getMessage().isBlank()) {
             for (DomainConfig.ParserError parserError: domainConfig.getParserErrors().values()) {
                 if (parserError.getPattern().matcher(e.getMessage()).matches()) {
-                    handleSyntaxViolation(ViolationLevel.ERROR, null, parserError.getMessage(), headerLine, aggregatedErrors);
+                    handleSyntaxViolation(ViolationLevel.ERROR, null, localiser.localise(String.format("validator.parserError.%s.message", parserError.getName())), headerLine, aggregatedErrors);
                     handled = true;
                 }
             }
@@ -452,8 +461,8 @@ public class CSVValidator {
                 FileUtils.deleteQuietly(inputFile);
                 FileUtils.moveFile(fileCopy, inputFile);
                 LOG.info("Converted input file from ["+charsetToUse+"] to [UTF-8].");
-            } catch (Exception e) {
-                throw new ValidatorException("Unable to parse input file", e);
+            } catch (IOException e) {
+                throw new ValidatorException("validator.label.exception.unableToReadInputFile", e);
             }
         }
     }
@@ -471,7 +480,7 @@ public class CSVValidator {
             detector.setText(in);
             CharsetMatch match = detector.detect();
             charset = match.getName();
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOG.warn("Error while detecting charset", e);
         }
         if (charset == null) {
@@ -495,7 +504,7 @@ public class CSVValidator {
             // Parser based on headers.
             if (record.size() != record.getParser().getHeaderNames().size()) {
                 // Record has wrong number of fields.
-                handleFieldViolation(null, "The row field count ["+record.size()+"] does not match the number of defined headers ["+record.getParser().getHeaderNames().size()+"].", lineNumber, null, aggregatedErrors);
+                handleFieldViolation(null, localiser.localise("validator.label.field.rowFieldCountDoesNotMatchHeaderCount", record.size(), record.getParser().getHeaderNames().size()), lineNumber, null, aggregatedErrors);
             } else {
                 int fieldIndex = 0;
                 for (String fieldValue: record) {
@@ -517,7 +526,7 @@ public class CSVValidator {
                     fieldIndex += 1;
                 }
             } else {
-                handleFieldViolation(null, "The row field count ["+record.size()+"] does not match the expected count ["+schemaFieldCount+"]. This is required when no headers are defined in the input.", lineNumber, null, aggregatedErrors);
+                handleFieldViolation(null, localiser.localise("validator.label.field.rowFieldCountNotMatchingExpectedCount", record.size(), schemaFieldCount), lineNumber, null, aggregatedErrors);
             }
         }
     }
@@ -536,7 +545,7 @@ public class CSVValidator {
             Object fieldValue = field.castValue(textValue, false, field.getOptions());
             // Check format.
             if (!field.valueHasValidFormat(textValue)) {
-                handleFieldViolation(fieldNameToUse, String.format("Value '%s' provided for field '%s' is invalid for format '%s'.", textValue, fieldNameToUse, field.getFormat()), lineNumber, textValue, aggregatedErrors);
+                handleFieldViolation(fieldNameToUse, localiser.localise("validator.label.field.invalidFormat", textValue, fieldNameToUse, field.getFormat()), lineNumber, textValue, aggregatedErrors);
             }
             // Check constraints.
             if (field.getConstraints() != null && !field.getConstraints().isEmpty()) {
@@ -546,9 +555,11 @@ public class CSVValidator {
                 }
             }
         } catch (InvalidCastException e) {
-            handleFieldViolation(fieldNameToUse, String.format("Value '%s' provided for field '%s' could not be parsed. Expected type was '%s'.", textValue, fieldNameToUse, field.getType()), lineNumber, textValue, aggregatedErrors);
+            handleFieldViolation(fieldNameToUse, localiser.localise("validator.label.field.invalidType", textValue, fieldNameToUse, field.getType()), lineNumber, textValue, aggregatedErrors);
+        } catch (ValidatorException e) {
+            throw e;
         } catch (Exception e) {
-            throw new ValidatorException("Unexpected error while validating row ["+getRootCause(e).getMessage()+"]", e);
+            throw new ValidatorException("validator.label.exception.unexpectedErrorWhileValidatingRow", e, getRootCause(e).getMessage());
         }
     }
 
@@ -565,7 +576,7 @@ public class CSVValidator {
         counterErrors += 1;
         counterTotalErrors += 1;
         if (counterTotalErrors + counterTotalWarnings + counterTotalInformationMessages <= domainConfig.getMaximumReportsForXmlOutput()) {
-            aggregatedErrors.add(new ReportItem(domainConfig, message, fieldName, lineNumber, fieldValue));
+            aggregatedErrors.add(new ReportItem(messageFormatter, message, fieldName, lineNumber, fieldValue));
         }
     }
 
@@ -591,7 +602,7 @@ public class CSVValidator {
                 counterTotalInformationMessages += 1;
             }
             if (counterTotalErrors + counterTotalWarnings + counterTotalInformationMessages <= domainConfig.getMaximumReportsForXmlOutput()) {
-                aggregatedErrors.add(new ReportItem(domainConfig, message, fieldName, lineNumber, null, violationLevel));
+                aggregatedErrors.add(new ReportItem(messageFormatter, message, fieldName, lineNumber, null, violationLevel));
             }
         }
     }
@@ -657,26 +668,26 @@ public class CSVValidator {
         String message;
         if (Field.CONSTRAINT_KEY_ENUM.equals(constraintKey)) {
             if (domainConfig.getDisplayEnumValuesInMessages().get(validationType)) {
-                message = String.format("Value '%s' for field '%s' is not in the list of expected values %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+                message = localiser.localise("validator.label.field.notInExpectedValuesWithParam", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
             } else {
-                message = String.format("Value '%s' for field '%s' is not in the list of expected values.", rowValue, fieldNameToUse);
+                message = localiser.localise("validator.label.field.notInExpectedValues", rowValue, fieldNameToUse);
             }
         } else if (Field.CONSTRAINT_KEY_MAX_LENGTH.equals(constraintKey)) {
-            message = String.format("The length of value '%s' for field '%s' exceeds the maximum allowed length of %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            message = localiser.localise("validator.label.field.lengthExceedsMaximum", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_MIN_LENGTH.equals(constraintKey)) {
-            message = String.format("The length of value '%s' for field '%s' is less than the minimum allowed length of %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            message = localiser.localise("validator.label.field.lengthBelowMinimum", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_MAXIMUM.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' exceeds the allowed maximum of %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            message = localiser.localise("validator.label.field.valueExceedsMaximum", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_MINIMUM.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' is less than the minimum of %s.", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            message = localiser.localise("validator.label.field.valueBelowMinimum", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
         } else if (Field.CONSTRAINT_KEY_PATTERN.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' does not match the expected pattern.", rowValue, fieldNameToUse);
+            message = localiser.localise("validator.label.field.valueNotMatchingPattern", rowValue, fieldNameToUse);
         } else if (Field.CONSTRAINT_KEY_REQUIRED.equals(constraintKey)) {
-            message = String.format("No value was provided for required field '%s'.", fieldNameToUse);
+            message = localiser.localise("validator.label.field.missingValue", fieldNameToUse);
         } else if (Field.CONSTRAINT_KEY_UNIQUE.equals(constraintKey)) {
-            message = String.format("Value '%s' for field '%s' must be unique.", rowValue, fieldNameToUse);
+            message = localiser.localise("validator.label.field.expectedUniqueValue", rowValue, fieldNameToUse);
         } else {
-            message = String.format("Violation of constraint [%s] for field '%s'. Provided value was '%s'.", constraintKey, fieldNameToUse, rowValue);
+            message = localiser.localise("validator.label.field.constraintViolated", constraintKey, fieldNameToUse, rowValue);
         }
         return message;
     }
@@ -765,6 +776,7 @@ public class CSVValidator {
         request.getInput().add(Utils.createInputItem("hasHeaders", String.valueOf(csvSettings.isHasHeaders())));
         request.getInput().add(Utils.createInputItem("delimiter", String.valueOf(csvSettings.getDelimiter())));
         request.getInput().add(Utils.createInputItem("quote", String.valueOf(csvSettings.getQuote())));
+        request.getInput().add(Utils.createInputItem("locale", localiser.getLocale().toString()));
         return request;
     }
 

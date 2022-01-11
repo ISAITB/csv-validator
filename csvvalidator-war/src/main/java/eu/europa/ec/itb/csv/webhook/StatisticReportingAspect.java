@@ -114,9 +114,8 @@ public class StatisticReportingAspect extends StatisticReporting {
         } catch (Exception ex) {
             // Ensure unexpected errors never block validation processing
             logger.warn("Unexpected error during statistics reporting", ex);
-        } finally {
-            return report;
         }
+        return report;
     }
 
     /**
