@@ -33,6 +33,7 @@ public class ApplicationConfig extends eu.europa.ec.itb.validation.commons.confi
     private String defaultMultipleInputFieldsForSchemaFieldViolationLevelDescription;
     private String defaultUnknownInputFieldViolationLevelDescription;
     private String defaultUnspecifiedSchemaFieldDescription;
+    private String defaultLocaleDescription;
 
     /**
      * @return The default web service input description for the violation level linked to different field counts.
@@ -266,6 +267,20 @@ public class ApplicationConfig extends eu.europa.ec.itb.validation.commons.confi
     }
 
     /**
+     * @return The default web service input description for the locale to use.
+     */
+    public String getDefaultLocaleDescription() {
+        return defaultLocaleDescription;
+    }
+
+    /**
+     * @param defaultLocaleDescription The default web service input description for the locale to use.
+     */
+    public void setDefaultLocaleDescription(String defaultLocaleDescription) {
+        this.defaultLocaleDescription = defaultLocaleDescription;
+    }
+
+    /**
      * Initialisation method.
      *
      * @see eu.europa.ec.itb.validation.commons.config.ApplicationConfig#init()
@@ -288,5 +303,6 @@ public class ApplicationConfig extends eu.europa.ec.itb.validation.commons.confi
         defaultLabels.put(ValidationConstants.INPUT_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL, defaultMultipleInputFieldsForSchemaFieldViolationLevelDescription);
         defaultLabels.put(ValidationConstants.INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL, defaultUnknownInputFieldViolationLevelDescription);
         defaultLabels.put(ValidationConstants.INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL, defaultUnspecifiedSchemaFieldDescription);
+        defaultLabels.put(ValidationConstants.INPUT_LOCALE, defaultLocaleDescription);
     }
 }

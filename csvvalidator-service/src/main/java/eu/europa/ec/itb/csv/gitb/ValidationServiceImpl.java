@@ -16,6 +16,7 @@ import eu.europa.ec.itb.validation.commons.Utils;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
 import eu.europa.ec.itb.validation.commons.error.ValidatorException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -31,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -119,6 +119,7 @@ public class ValidationServiceImpl implements ValidationService {
             response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_EXTERNAL_SCHEMA, "map", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_EXTERNAL_SCHEMA)));
         }
         response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_ADD_INPUT_TO_REPORT, "boolean", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_ADD_INPUT_TO_REPORT)));
+        response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_LOCALE, "string", UsageEnumeration.O, ConfigurationType.SIMPLE, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_LOCALE)));
         return response;
     }
 
@@ -163,6 +164,7 @@ public class ValidationServiceImpl implements ValidationService {
     public ValidationResponse validate(@WebParam(name = "ValidateRequest", targetNamespace = "http://www.gitb.com/vs/v1/", partName = "parameters") ValidateRequest validateRequest) {
         MDC.put("domain", domainConfig.getDomain());
         File tempFolderPath = fileManager.createTemporaryFolderPath();
+        var localiser = new LocalisationHelper(domainConfig, Utils.getSupportedLocale(LocaleUtils.toLocale(getInputAsString(validateRequest, ValidationConstants.INPUT_LOCALE, null)), domainConfig));
         try {
             // Validation of the input data
             ValueEmbeddingEnumeration contentEmbeddingMethod = inputHelper.validateContentEmbeddingMethod(validateRequest, ValidationConstants.INPUT_EMBEDDING_METHOD);
@@ -194,7 +196,7 @@ public class ValidationServiceImpl implements ValidationService {
                     .withMultipleInputFieldsForSchemaFieldViolationLevel(inputMultipleInputFieldsForSchemaFieldViolationLevel)
                     .withUnknownInputFieldViolationLevel(inputUnknownInputViolationLevel)
                     .withUnspecifiedSchemaFieldViolationLevel(inputUnspecifiedSchemaFieldViolationLevel);
-            CSVValidator validator = ctx.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs), new LocalisationHelper(domainConfig, Locale.ENGLISH));
+            CSVValidator validator = ctx.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs), localiser);
             TAR report = validator.validate();
             if (addInputToReport) {
                 addContext(report, contentToValidate);
@@ -203,10 +205,10 @@ public class ValidationServiceImpl implements ValidationService {
             return result;
         } catch (ValidatorException e) {
             LOG.error(e.getMessageForLog(), e);
-            throw new ValidatorException(e.getMessageForDisplay(new LocalisationHelper(Locale.ENGLISH)), true);
+            throw new ValidatorException(e.getMessageForDisplay(localiser), true);
         } catch (Exception e) {
             LOG.error("Unexpected error", e);
-            var message = new LocalisationHelper(Locale.ENGLISH).localise(ValidatorException.MESSAGE_DEFAULT);
+            var message = localiser.localise(ValidatorException.MESSAGE_DEFAULT);
             throw new ValidatorException(message, e, true, (Object[]) null);
         } finally {
             // Cleanup.
@@ -249,6 +251,22 @@ public class ValidationServiceImpl implements ValidationService {
         List<AnyContent> input = Utils.getInputFor(validateRequest, inputName);
         if (!input.isEmpty()) {
             return Boolean.parseBoolean(input.get(0).getValue());
+        }
+        return defaultIfMissing;
+    }
+
+    /**
+     * Get the provided (optional) input as a string value.
+     *
+     * @param validateRequest The input parameters.
+     * @param inputName The name of the input to look for.
+     * @param defaultIfMissing The default value to use if the input is not provided.
+     * @return The value to use.
+     */
+    private String getInputAsString(ValidateRequest validateRequest, String inputName, String defaultIfMissing) {
+        List<AnyContent> input = Utils.getInputFor(validateRequest, inputName);
+        if (!input.isEmpty()) {
+            return input.get(0).getValue();
         }
         return defaultIfMissing;
     }
