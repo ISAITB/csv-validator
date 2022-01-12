@@ -116,15 +116,16 @@ applies. Note that plugin JAR files need to be built as "all-in-one" JARs.
 
 The JSON validator calls plugins in sequence passing in the following input:
 
-| Input name | Type | Description |
-| --- | --- | --- |
-| `contentToValidate` | `String` | The absolute and full path to the input provided to the validator. |
-| `domain` | `String` | The validation domain relevant to the specific validation call. |
-| `validationType` | `String` | The validation type of the domain that is selected for the specific validation call. |
-| `tempFolder` | `String` | The absolute and full path to a temporary folder for plugins. This will be automatically deleted after all plugins complete validation. |
-| `hasHeaders` | `String` | `true` or `false` depending on whether the input should be considered as having a header row. |
-| `delimiter` | `String` | The character to use as the field delimiter. |
-| `quote` | `String` | The character to use for the quote character. |
+| Input name          | Type     | Description                                                                                                                             |
+|---------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| `contentToValidate` | `String` | The absolute and full path to the input provided to the validator.                                                                      |
+| `domain`            | `String` | The validation domain relevant to the specific validation call.                                                                         |
+| `validationType`    | `String` | The validation type of the domain that is selected for the specific validation call.                                                    |
+| `tempFolder`        | `String` | The absolute and full path to a temporary folder for plugins. This will be automatically deleted after all plugins complete validation. |
+| `hasHeaders`        | `String` | `true` or `false` depending on whether the input should be considered as having a header row.                                           |
+| `delimiter`         | `String` | The character to use as the field delimiter.                                                                                            |
+| `quote`             | `String` | The character to use for the quote character.                                                                                           |
+| `locale`            | `String` | The locale (language code) to use for reporting of results (e.g. "fr", "fr_FR").                                                        |
 
 ## Output from plugins
 
