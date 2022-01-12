@@ -37,5 +37,7 @@ public class ValidationConstants {
     public static final String INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL = "unspecifiedSchemaField";
     /** Whether the validated content should be added to the TAR report. */
     public static String INPUT_ADD_INPUT_TO_REPORT = "addInputToReport";
+    /** The locale string to consider. */
+    public static String INPUT_LOCALE = "locale";
 
 }
