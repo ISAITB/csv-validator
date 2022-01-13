@@ -33,6 +33,7 @@ public class ApplicationConfig extends eu.europa.ec.itb.validation.commons.confi
     private String defaultMultipleInputFieldsForSchemaFieldViolationLevelDescription;
     private String defaultUnknownInputFieldViolationLevelDescription;
     private String defaultUnspecifiedSchemaFieldDescription;
+    private String defaultAddInputToReportDescription;
     private String defaultLocaleDescription;
 
     /**
@@ -281,6 +282,20 @@ public class ApplicationConfig extends eu.europa.ec.itb.validation.commons.confi
     }
 
     /**
+     * @return The default web service input description for the add input to report option.
+     */
+    public String getDefaultAddInputToReportDescription() {
+        return defaultAddInputToReportDescription;
+    }
+
+    /**
+     * @param defaultAddInputToReportDescription The default web service input description for the add input to report option.
+     */
+    public void setDefaultAddInputToReportDescription(String defaultAddInputToReportDescription) {
+        this.defaultAddInputToReportDescription = defaultAddInputToReportDescription;
+    }
+
+    /**
      * Initialisation method.
      *
      * @see eu.europa.ec.itb.validation.commons.config.ApplicationConfig#init()
@@ -303,6 +318,7 @@ public class ApplicationConfig extends eu.europa.ec.itb.validation.commons.confi
         defaultLabels.put(ValidationConstants.INPUT_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL, defaultMultipleInputFieldsForSchemaFieldViolationLevelDescription);
         defaultLabels.put(ValidationConstants.INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL, defaultUnknownInputFieldViolationLevelDescription);
         defaultLabels.put(ValidationConstants.INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL, defaultUnspecifiedSchemaFieldDescription);
+        defaultLabels.put(ValidationConstants.INPUT_ADD_INPUT_TO_REPORT, defaultAddInputToReportDescription);
         defaultLabels.put(ValidationConstants.INPUT_LOCALE, defaultLocaleDescription);
     }
 }
