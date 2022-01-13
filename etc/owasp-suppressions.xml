@@ -77,4 +77,32 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.james/apache\-mime4j\-core@.*$</packageUrl>
         <cve>CVE-2021-40525</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: apache-mime4j-dom-0.8.4.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.james/apache\-mime4j\-dom@.*$</packageUrl>
+        <cve>CVE-2021-38542</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: apache-mime4j-dom-0.8.4.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.james/apache\-mime4j\-dom@.*$</packageUrl>
+        <cve>CVE-2021-40110</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: apache-mime4j-dom-0.8.4.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.james/apache\-mime4j\-dom@.*$</packageUrl>
+        <cve>CVE-2021-40111</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: apache-mime4j-dom-0.8.4.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.james/apache\-mime4j\-dom@.*$</packageUrl>
+        <cve>CVE-2021-40525</cve>
+    </suppress>
 </suppressions>
