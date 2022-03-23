@@ -2,7 +2,6 @@ package eu.europa.ec.itb.csv.webhook;
 
 import com.gitb.tr.TAR;
 import com.gitb.tr.TestResultType;
-import eu.europa.ec.itb.csv.ApplicationConfig;
 import eu.europa.ec.itb.csv.gitb.ValidationServiceImpl;
 import eu.europa.ec.itb.csv.validation.CSVValidator;
 import eu.europa.ec.itb.validation.commons.war.webhook.StatisticReporting;
@@ -15,7 +14,6 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +32,6 @@ public class StatisticReportingAspect extends StatisticReporting {
 
     private static final Logger logger = LoggerFactory.getLogger(StatisticReportingAspect.class);
     private static final ThreadLocal<Map<String, String>> adviceContext = new ThreadLocal<>();
-
-    @Autowired
-    private ApplicationConfig config;
 
     /**
      * Pointcut for minimal WEB validation.
@@ -58,8 +53,8 @@ public class StatisticReportingAspect extends StatisticReporting {
      * @param joinPoint The original call's information.
      */
     @Before("minimalUploadValidation() || uploadValidation()")
-    public void getUploadContext(JoinPoint joinPoint) throws Throwable {
-        Map<String, String> contextParams = new HashMap<String, String>();
+    public void getUploadContext(JoinPoint joinPoint) {
+        Map<String, String> contextParams = new HashMap<>();
         contextParams.put("api", StatisticReportingConstants.WEB_API);
         if (config.getWebhook().isStatisticsEnableCountryDetection()) {
             HttpServletRequest request = getHttpRequest(joinPoint);
@@ -77,8 +72,8 @@ public class StatisticReportingAspect extends StatisticReporting {
      * @param joinPoint The original call's information.
      */
     @Before(value = "execution(public * eu.europa.ec.itb.csv.gitb.ValidationServiceImpl.validate(..))")
-    public void getSoapCallContext(JoinPoint joinPoint) throws Throwable {
-        Map<String, String> contextParams = new HashMap<String, String>();
+    public void getSoapCallContext(JoinPoint joinPoint) {
+        Map<String, String> contextParams = new HashMap<>();
         contextParams.put("api", StatisticReportingConstants.SOAP_API);
         if (config.getWebhook().isStatisticsEnableCountryDetection()) {
             ValidationServiceImpl validationService = (ValidationServiceImpl) joinPoint.getTarget();

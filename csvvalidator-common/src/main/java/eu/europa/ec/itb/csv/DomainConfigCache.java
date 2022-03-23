@@ -45,6 +45,7 @@ public class DomainConfigCache extends WebDomainConfigCache<DomainConfig> {
      *
      * @see eu.europa.ec.itb.validation.commons.config.DomainConfigCache#init()
      */
+    @Override
     @PostConstruct
     public void init() {
         super.init();
