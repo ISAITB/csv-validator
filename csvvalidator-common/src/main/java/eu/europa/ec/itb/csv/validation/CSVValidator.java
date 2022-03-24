@@ -198,10 +198,10 @@ public class CSVValidator {
             List<TAR> reports = new ArrayList<>();
             prepareInputFile(inputFileToValidate);
             for (FileInfo aSchemaFile: schemaFiles) {
-                LOG.info("Validating against ["+aSchemaFile.getFile().getName()+"]");
+                LOG.info("Validating against [{}]", aSchemaFile.getFile().getName());
                 TAR report = validateAgainstSchema(inputFileToValidate, aSchemaFile.getFile());
                 reports.add(report);
-                LOG.info("Validated against ["+aSchemaFile.getFile().getName()+"]");
+                LOG.info("Validated against [{}]", aSchemaFile.getFile().getName());
             }
             return Utils.mergeReports(reports);
         }
@@ -348,15 +348,15 @@ public class CSVValidator {
                     }
                     headerIndex += 1;
                 }
-                schema.getFields().forEach((f) -> {
-                    if (!matchedSchemaFields.contains(f.getName())) {
+                schema.getFields().forEach(field -> {
+                    if (!matchedSchemaFields.contains(field.getName())) {
                         // Schema field not found in input.
-                        if (f.getConstraints() != null && (Boolean)f.getConstraints().getOrDefault(Field.CONSTRAINT_KEY_REQUIRED, Boolean.FALSE)) {
+                        if (field.getConstraints() != null && (Boolean)field.getConstraints().getOrDefault(Field.CONSTRAINT_KEY_REQUIRED, Boolean.FALSE)) {
                             // Missing required field - always an error.
-                            handleSyntaxViolation(ViolationLevel.ERROR, null, localiser.localise("validator.label.syntax.missingRequiredHeader", f.getName()), headerLine, errors);
+                            handleSyntaxViolation(ViolationLevel.ERROR, null, localiser.localise("validator.label.syntax.missingRequiredHeader", field.getName()), headerLine, errors);
                         } else {
                             // Missing optional field - depends on configuration.
-                            handleSyntaxViolation(csvSettings.getUnspecifiedSchemaFieldViolationLevel(), null, localiser.localise("validator.label.syntax.unspecifiedSchemaField", f.getName()), headerLine, errors);
+                            handleSyntaxViolation(csvSettings.getUnspecifiedSchemaFieldViolationLevel(), null, localiser.localise("validator.label.syntax.unspecifiedSchemaField", field.getName()), headerLine, errors);
                         }
                     }
                 });
@@ -364,10 +364,8 @@ public class CSVValidator {
                     // Different field counts.
                     handleSyntaxViolation(csvSettings.getDifferentInputFieldCountViolationLevel(), null, localiser.localise("validator.label.syntax.differentInputFieldCount", parser.getHeaderNames().size(), schema.getFields().size()), headerLine, errors);
                 }
-                duplicateHeaders.forEach((headerName) -> {
-                    // Header appears multiple times in exactly the same way.
-                    handleSyntaxViolation(csvSettings.getDuplicateInputFieldViolationLevel(), headerName, localiser.localise("validator.label.syntax.duplicateInputField", headerName), headerLine, errors);
-                });
+                // Header appears multiple times in exactly the same way.
+                duplicateHeaders.forEach(headerName -> handleSyntaxViolation(csvSettings.getDuplicateInputFieldViolationLevel(), headerName, localiser.localise("validator.label.syntax.duplicateInputField", headerName), headerLine, errors));
                 for (Map.Entry<String, List<Integer>> nameToIndexEntry: fieldNameToHeaderIndexes.entrySet()) {
                     if (nameToIndexEntry.getValue().size() > 1) {
                         // Multiple headers map to the same schema field.
@@ -389,13 +387,13 @@ public class CSVValidator {
             long previousLineNumber = -1;
             // Validation per row.
             long recordCounter = 0L;
-            for (CSVRecord record: parser) {
+            for (CSVRecord csvRecord: parser) {
                 long reportedLineNumber = parser.getCurrentLineNumber();
                 if (reportedLineNumber == previousLineNumber) {
                     // This can come up in the last record if there is no EOL at the end of the file.
                     reportedLineNumber += 1;
                 }
-                validateRow(record, reportedLineNumber, inputFieldIndexToSchemaFieldMap, schema.getFields().size(), csvSettings, errors);
+                validateRow(csvRecord, reportedLineNumber, inputFieldIndexToSchemaFieldMap, schema.getFields().size(), csvSettings, errors);
                 previousLineNumber = reportedLineNumber;
                 recordCounter += 1;
                 if (progressListener != null && recordCounter % 1000 == 0) {
@@ -460,7 +458,7 @@ public class CSVValidator {
                 }
                 FileUtils.deleteQuietly(inputFile);
                 FileUtils.moveFile(fileCopy, inputFile);
-                LOG.info("Converted input file from ["+charsetToUse+"] to [UTF-8].");
+                LOG.info("Converted input file from [{}] to [UTF-8].", charsetToUse);
             } catch (IOException e) {
                 throw new ValidatorException("validator.label.exception.unableToReadInputFile", e);
             }
@@ -492,41 +490,41 @@ public class CSVValidator {
     /**
      * Validate the provided row.
      *
-     * @param record The row to validate.
+     * @param csvRecord The row to validate.
      * @param lineNumber The current line number.
      * @param inputFieldIndexToSchemaFieldMap The mapping of input fields to schema field definitions.
      * @param schemaFieldCount The number of schema fields.
      * @param csvSettings The CSV syntax settings being considered.
      * @param aggregatedErrors The messages to add to.
      */
-    private void validateRow(CSVRecord record, long lineNumber, Map<Integer, Field<?>> inputFieldIndexToSchemaFieldMap, int schemaFieldCount, CSVSettings csvSettings, List<ReportItem> aggregatedErrors) {
+    private void validateRow(CSVRecord csvRecord, long lineNumber, Map<Integer, Field<?>> inputFieldIndexToSchemaFieldMap, int schemaFieldCount, CSVSettings csvSettings, List<ReportItem> aggregatedErrors) {
         if (csvSettings.isHasHeaders()) {
             // Parser based on headers.
-            if (record.size() != record.getParser().getHeaderNames().size()) {
+            if (csvRecord.size() != csvRecord.getParser().getHeaderNames().size()) {
                 // Record has wrong number of fields.
-                handleFieldViolation(null, localiser.localise("validator.label.field.rowFieldCountDoesNotMatchHeaderCount", record.size(), record.getParser().getHeaderNames().size()), lineNumber, null, aggregatedErrors);
+                handleFieldViolation(null, localiser.localise("validator.label.field.rowFieldCountDoesNotMatchHeaderCount", csvRecord.size(), csvRecord.getParser().getHeaderNames().size()), lineNumber, null, aggregatedErrors);
             } else {
                 int fieldIndex = 0;
-                for (String fieldValue: record) {
+                for (String fieldValue: csvRecord) {
                     Field<?> schemaField = inputFieldIndexToSchemaFieldMap.get(fieldIndex);
                     if (schemaField != null) {
                         // Ignore fields not part of the schema. If this is to be an error this is reported as part of the header checks.
-                        validateField(fieldValue, record.getParser().getHeaderNames().get(fieldIndex), schemaField, lineNumber, aggregatedErrors);
+                        validateField(fieldValue, csvRecord.getParser().getHeaderNames().get(fieldIndex), schemaField, lineNumber, aggregatedErrors);
                     }
                     fieldIndex += 1;
                 }
             }
         } else {
             // Parse based on index.
-            if (record.size() == schemaFieldCount) {
+            if (csvRecord.size() == schemaFieldCount) {
                 int fieldIndex = 0;
-                for (String fieldValue: record) {
+                for (String fieldValue: csvRecord) {
                     Field<?> schemaField = inputFieldIndexToSchemaFieldMap.get(fieldIndex);
                     validateField(fieldValue, schemaField.getName(), schemaField, lineNumber, aggregatedErrors);
                     fieldIndex += 1;
                 }
             } else {
-                handleFieldViolation(null, localiser.localise("validator.label.field.rowFieldCountNotMatchingExpectedCount", record.size(), schemaFieldCount), lineNumber, null, aggregatedErrors);
+                handleFieldViolation(null, localiser.localise("validator.label.field.rowFieldCountNotMatchingExpectedCount", csvRecord.size(), schemaFieldCount), lineNumber, null, aggregatedErrors);
             }
         }
     }
@@ -667,7 +665,7 @@ public class CSVValidator {
     private String prettifyConstraintFailure(String constraintKey, Object constraintValue, Field<?> field, String fieldNameToUse, String rowValue) {
         String message;
         if (Field.CONSTRAINT_KEY_ENUM.equals(constraintKey)) {
-            if (domainConfig.getDisplayEnumValuesInMessages().get(validationType)) {
+            if (Boolean.TRUE.equals(domainConfig.getDisplayEnumValuesInMessages().get(validationType))) {
                 message = localiser.localise("validator.label.field.notInExpectedValuesWithParam", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
             } else {
                 message = localiser.localise("validator.label.field.notInExpectedValues", rowValue, fieldNameToUse);

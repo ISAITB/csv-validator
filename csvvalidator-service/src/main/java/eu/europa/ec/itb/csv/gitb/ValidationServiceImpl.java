@@ -174,8 +174,8 @@ public class ValidationServiceImpl implements ValidationService {
             boolean addInputToReport = getInputAsBoolean(validateRequest, ValidationConstants.INPUT_ADD_INPUT_TO_REPORT, true);
             // CSV settings.
             Boolean inputHeaders = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_HAS_HEADERS, domainConfig.getCsvOptions().getUserInputForHeader().get(validationType), Boolean::valueOf);
-            String inputDelimiter = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DELIMITER, domainConfig.getCsvOptions().getUserInputForDelimiter().get(validationType), (s) -> s);
-            String inputQuote = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_QUOTE, domainConfig.getCsvOptions().getUserInputForQuote().get(validationType), (s) -> s);
+            String inputDelimiter = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DELIMITER, domainConfig.getCsvOptions().getUserInputForDelimiter().get(validationType), s -> s);
+            String inputQuote = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_QUOTE, domainConfig.getCsvOptions().getUserInputForQuote().get(validationType), s -> s);
             ViolationLevel inputDifferentInputFieldCountViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);
             ViolationLevel inputDifferentInputFieldSequenceViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);
             ViolationLevel inputDuplicateInputFieldsViolationLevel = validateAndGetSyntaxInput(validateRequest, ValidationConstants.INPUT_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL, domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount().get(validationType), ViolationLevel::byName);

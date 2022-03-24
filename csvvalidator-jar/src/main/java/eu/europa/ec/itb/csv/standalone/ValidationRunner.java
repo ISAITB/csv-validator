@@ -35,21 +35,22 @@ import java.util.Locale;
 @Scope("prototype")
 public class ValidationRunner extends BaseValidationRunner<DomainConfig> implements ProgressListener {
 
-    private static final String FLAG__NO_REPORTS = "-noreports";
-    private static final String FLAG__VALIDATION_TYPE = "-"+ValidationConstants.INPUT_VALIDATION_TYPE;
-    private static final String FLAG__INPUT = "-input";
-    private static final String FLAG__SCHEMA = "-"+ValidationConstants.INPUT_EXTERNAL_SCHEMA;
-    private static final String FLAG__NO_HEADERS = "-noHeaders";
-    private static final String FLAG__DELIMITER = "-"+ValidationConstants.INPUT_DELIMITER;
-    private static final String FLAG__QUOTE = "-"+ValidationConstants.INPUT_QUOTE;
-    private static final String FLAG__DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL;
-    private static final String FLAG__DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL;
-    private static final String FLAG__DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL;
-    private static final String FLAG__FIELD_CASE_MISMATCH_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_FIELD_CASE_MISMATCH_VIOLATION_LEVEL;
-    private static final String FLAG__MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL;
-    private static final String FLAG__UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL;
-    private static final String FLAG__UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL;
-    private static final String FLAG__LOCALE = "-locale";
+    private static final String FLAG_NO_REPORTS = "-noreports";
+    private static final String FLAG_VALIDATION_TYPE = "-"+ValidationConstants.INPUT_VALIDATION_TYPE;
+    private static final String FLAG_INPUT = "-input";
+    private static final String FLAG_SCHEMA = "-"+ValidationConstants.INPUT_EXTERNAL_SCHEMA;
+    private static final String FLAG_NO_HEADERS = "-noHeaders";
+    private static final String FLAG_DELIMITER = "-"+ValidationConstants.INPUT_DELIMITER;
+    private static final String FLAG_QUOTE = "-"+ValidationConstants.INPUT_QUOTE;
+    private static final String FLAG_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL;
+    private static final String FLAG_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL;
+    private static final String FLAG_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL;
+    private static final String FLAG_FIELD_CASE_MISMATCH_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_FIELD_CASE_MISMATCH_VIOLATION_LEVEL;
+    private static final String FLAG_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL;
+    private static final String FLAG_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL;
+    private static final String FLAG_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL = "-"+ValidationConstants.INPUT_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL;
+    private static final String FLAG_LOCALE = "-locale";
+    private static final String PLACEHOLDER_VIOLATION_LEVEL = "VIOLATION_LEVEL";
 
     @Autowired
     private ApplicationContext ctx;
@@ -88,46 +89,44 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
         try {
             int i = 0;
             while (i < args.length) {
-                if (FLAG__NO_REPORTS.equalsIgnoreCase(args[i])) {
+                if (FLAG_NO_REPORTS.equalsIgnoreCase(args[i])) {
                     noReports = true;
-                } else if (FLAG__VALIDATION_TYPE.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_VALIDATION_TYPE.equalsIgnoreCase(args[i])) {
                     validationType = argumentAsString(args, i);
                     if (validationType != null && !domainConfig.getType().contains(validationType)) {
                         throw new IllegalArgumentException("Unknown validation type. One of [" + String.join("|", domainConfig.getType()) + "] is needed.");
                     }
-                } else if (FLAG__INPUT.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_INPUT.equalsIgnoreCase(args[i])) {
                     if (args.length > i+1) {
                         String path = args[++i];
                         inputs.add(new ValidationInput(getContent(path, parentFolder), path));
                     }
-                } else if (FLAG__SCHEMA.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_SCHEMA.equalsIgnoreCase(args[i])) {
                     if (args.length > i + 1) {
                         externalSchemaFileInfo = List.of(new FileInfo(getContent(args[++i], parentFolder)));
                     }
-                } else if (FLAG__NO_HEADERS.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_NO_HEADERS.equalsIgnoreCase(args[i])) {
                     inputHeaders = Boolean.FALSE;
-                } else if (FLAG__DELIMITER.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_DELIMITER.equalsIgnoreCase(args[i])) {
                     inputDelimiter = argumentAsString(args, i);
-                } else if (FLAG__QUOTE.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_QUOTE.equalsIgnoreCase(args[i])) {
                     inputQuote = argumentAsString(args, i);
-                } else if (FLAG__DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
                     inputDifferentInputFieldCountViolationLevel = argumentAsViolationLevel(args, i);
-                } else if (FLAG__DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
                     inputDifferentInputFieldSequenceViolationLevel = argumentAsViolationLevel(args, i);
-                } else if (FLAG__DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
                     inputDuplicateInputFieldsViolationLevel = argumentAsViolationLevel(args, i);
-                } else if (FLAG__FIELD_CASE_MISMATCH_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_FIELD_CASE_MISMATCH_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
                     inputFieldCaseMismatchViolationLevel = argumentAsViolationLevel(args, i);
-                } else if (FLAG__MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
                     inputMultipleInputFieldsForSchemaFieldViolationLevel = argumentAsViolationLevel(args, i);
-                } else if (FLAG__UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
                     inputUnknownInputViolationLevel = argumentAsViolationLevel(args, i);
-                } else if (FLAG__UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
+                } else if (FLAG_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL.equalsIgnoreCase(args[i])) {
                     inputUnspecifiedSchemaFieldViolationLevel = argumentAsViolationLevel(args, i);
-                } else if (FLAG__LOCALE.equalsIgnoreCase(args[i])) {
-                    if (args.length > i+1) {
-                        locale = args[++i];
-                    }
+                } else if (FLAG_LOCALE.equalsIgnoreCase(args[i]) && args.length > i+1) {
+                    locale = args[++i];
                 }
                 i++;
             }
@@ -139,12 +138,12 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
                 }
             }
         } catch (ValidatorException e) {
-            LOGGER_FEEDBACK.info("\nInvalid arguments provided: "+e.getMessageForDisplay(new LocalisationHelper(domainConfig, Locale.ENGLISH))+"\n");
-            LOGGER.error("Invalid arguments provided: "+e.getMessageForLog(), e);
+            LOGGER_FEEDBACK.info("\nInvalid arguments provided: {}\n", e.getMessageForDisplay(new LocalisationHelper(domainConfig, Locale.ENGLISH)));
+            LOGGER.error(String.format("Invalid arguments provided: %s", e.getMessageForLog()), e);
             inputs.clear();
         } catch (IllegalArgumentException e) {
-            LOGGER_FEEDBACK.info("\nInvalid arguments provided: "+e.getMessage()+"\n");
-            LOGGER.error("Invalid arguments provided: "+e.getMessage(), e);
+            LOGGER_FEEDBACK.info("\nInvalid arguments provided: {}\n", e.getMessage());
+            LOGGER.error(String.format("Invalid arguments provided: %s", e.getMessage()), e);
             inputs.clear();
         } catch (Exception e) {
             LOGGER_FEEDBACK.info("\nAn error occurred while processing the provided arguments.\n");
@@ -160,7 +159,7 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
             int i = 0;
             var localiser = new LocalisationHelper(domainConfig, Utils.getSupportedLocale(LocaleUtils.toLocale(locale), domainConfig));
             for (ValidationInput input: inputs) {
-                LOGGER_FEEDBACK.info(String.format("\nValidating %s of %s ...", i+1, inputs.size()));
+                LOGGER_FEEDBACK.info("\nValidating {} of {} ...", i+1, inputs.size());
                 try {
                     InputHelper.Inputs settingInputs = InputHelper.Inputs.newInstance()
                             .withInputHeaders(inputHeaders)
@@ -203,19 +202,20 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
                         }
                     }
                 } catch (ValidatorException e) {
-                    LOGGER_FEEDBACK.info("\nAn error occurred while executing the validation: "+e.getMessageForDisplay(localiser));
-                    LOGGER.error("An error occurred while executing the validation: "+e.getMessageForLog(), e);
+                    LOGGER_FEEDBACK.info("\nAn error occurred while executing the validation: {}", e.getMessageForDisplay(localiser));
+                    LOGGER.error(String.format("An error occurred while executing the validation: %s", e.getMessageForLog()), e);
                     break;
                 } catch (Exception e) {
                     LOGGER_FEEDBACK.info("\nAn error occurred while executing the validation.");
-                    LOGGER.error("An error occurred while executing the validation: "+e.getMessage(), e);
+                    LOGGER.error(String.format("An error occurred while executing the validation: %s", e.getMessage()), e);
                     break;
                 }
                 i++;
                 LOGGER_FEEDBACK.info(" Done.");
             }
-            LOGGER_FEEDBACK.info(summary.toString());
-            LOGGER_FEEDBACK_FILE.info(summary.toString());
+            var summaryString = summary.toString();
+            LOGGER_FEEDBACK.info(summaryString);
+            LOGGER_FEEDBACK_FILE.info(summaryString);
         }
     }
 
@@ -268,53 +268,53 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
     private void printUsage(boolean requireType) {
         StringBuilder usageMessage = new StringBuilder();
         StringBuilder parametersMessage = new StringBuilder();
-        usageMessage.append("\nExpected usage: java -jar validator.jar ").append(FLAG__INPUT).append(" FILE_OR_URI_1 ... [").append(FLAG__INPUT).append(" FILE_OR_URI_N] [").append(FLAG__NO_REPORTS).append("] [").append(FLAG__LOCALE).append(" LOCALE]");
+        usageMessage.append("\nExpected usage: java -jar validator.jar ").append(FLAG_INPUT).append(" FILE_OR_URI_1 ... [").append(FLAG_INPUT).append(" FILE_OR_URI_N] [").append(FLAG_NO_REPORTS).append("] [").append(FLAG_LOCALE).append(" LOCALE]");
         if (requireType) {
-            usageMessage.append(" [").append(FLAG__VALIDATION_TYPE).append(" VALIDATION_TYPE]");
+            usageMessage.append(" [").append(FLAG_VALIDATION_TYPE).append(" VALIDATION_TYPE]");
             parametersMessage.append("\n").append(PAD).append(PAD).append("- VALIDATION_TYPE is the type of validation to perform, one of [").append(String.join("|", domainConfig.getType())).append("].");
         }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForHeader())) {
-            usageMessage.append(" [").append(FLAG__NO_HEADERS).append("]");
+            usageMessage.append(" [").append(FLAG_NO_HEADERS).append("]");
         }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDelimiter())) {
-            usageMessage.append(" [").append(FLAG__DELIMITER).append(" DELIMITER]");
+            usageMessage.append(" [").append(FLAG_DELIMITER).append(" DELIMITER]");
             parametersMessage.append("\n").append(PAD).append(PAD).append("- DELIMITER is the delimiter character to use.");
         }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForQuote())) {
-            usageMessage.append(" [").append(FLAG__QUOTE).append(" QUOTE]");
+            usageMessage.append(" [").append(FLAG_QUOTE).append(" QUOTE]");
             parametersMessage.append("\n").append(PAD).append(PAD).append("- QUOTE is the quote character to use.");
         }
         boolean hasViolationLevel = false;
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDifferentInputFieldCount())) {
-            usageMessage.append(" [").append(FLAG__DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL).append(" VIOLATION_LEVEL]");
+            usageMessage.append(" [").append(FLAG_DIFFERENT_INPUT_FIELD_COUNT_VIOLATION_LEVEL).append(" ").append(PLACEHOLDER_VIOLATION_LEVEL).append("]");
             hasViolationLevel = true;
         }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDifferentInputFieldSequence())) {
-            usageMessage.append(" [").append(FLAG__DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL).append(" VIOLATION_LEVEL]");
+            usageMessage.append(" [").append(FLAG_DIFFERENT_INPUT_FIELD_SEQUENCE_VIOLATION_LEVEL).append(" ").append(PLACEHOLDER_VIOLATION_LEVEL).append("]");
             hasViolationLevel = true;
         }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForDuplicateInputFields())) {
-            usageMessage.append(" [").append(FLAG__DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL).append(" VIOLATION_LEVEL]");
+            usageMessage.append(" [").append(FLAG_DUPLICATE_INPUT_FIELDS_VIOLATION_LEVEL).append(" ").append(PLACEHOLDER_VIOLATION_LEVEL).append("]");
             hasViolationLevel = true;
         }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForInputFieldCaseMismatch())) {
-            usageMessage.append(" [").append(FLAG__FIELD_CASE_MISMATCH_VIOLATION_LEVEL).append(" VIOLATION_LEVEL]");
+            usageMessage.append(" [").append(FLAG_FIELD_CASE_MISMATCH_VIOLATION_LEVEL).append(" ").append(PLACEHOLDER_VIOLATION_LEVEL).append("]");
             hasViolationLevel = true;
         }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForMultipleInputFieldsForSchemaField())) {
-            usageMessage.append(" [").append(FLAG__MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL).append(" VIOLATION_LEVEL]");
+            usageMessage.append(" [").append(FLAG_MULTIPLE_INPUT_FIELDS_FOR_SCHEMA_FIELD_VIOLATION_LEVEL).append(" ").append(PLACEHOLDER_VIOLATION_LEVEL).append("]");
             hasViolationLevel = true;
         }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForUnknownInputField())) {
-            usageMessage.append(" [").append(FLAG__UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL).append(" VIOLATION_LEVEL]");
+            usageMessage.append(" [").append(FLAG_UNKNOWN_INPUT_FIELD_VIOLATION_LEVEL).append(" ").append(PLACEHOLDER_VIOLATION_LEVEL).append("]");
             hasViolationLevel = true;
         }
         if (domainConfig.definesTypesWithSettingInputs(domainConfig.getCsvOptions().getUserInputForUnspecifiedSchemaField())) {
-            usageMessage.append(" [").append(FLAG__UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL).append(" VIOLATION_LEVEL]");
+            usageMessage.append(" [").append(FLAG_UNSPECIFIED_SCHEMA_FIELD_VIOLATION_LEVEL).append(" ").append(PLACEHOLDER_VIOLATION_LEVEL).append("]");
             hasViolationLevel = true;
         }
         if (domainConfig.definesTypeWithExternalSchemas()) {
-            usageMessage.append(" [").append(FLAG__SCHEMA).append(" SCHEMA_FILE_OR_URI]");
+            usageMessage.append(" [").append(FLAG_SCHEMA).append(" SCHEMA_FILE_OR_URI]");
             parametersMessage.append("\n").append(PAD).append(PAD).append("- SCHEMA_FILE_OR_URI is the full file path or URI to a schema for the validation.");
         }
         if (hasViolationLevel) {
@@ -348,7 +348,7 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
     @Override
     public void schemaValidationUpdate(long counter) {
         if (counter % 50000 == 0) {
-            LOGGER.info(String.format("Validated %s records", counter));
+            LOGGER.info("Validated {} records", counter);
         }
     }
 
@@ -359,7 +359,7 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
      */
     @Override
     public void schemaValidationEnd(long counter) {
-        LOGGER.info(String.format("Validated %s records", counter));
+        LOGGER.info("Validated {} records", counter);
         LOGGER.info("Finished schema validation");
     }
 
