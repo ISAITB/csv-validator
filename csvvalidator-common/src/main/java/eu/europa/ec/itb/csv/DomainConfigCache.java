@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
+import static eu.europa.ec.itb.validation.commons.config.ParseUtils.*;
+
 /**
  * Reads, stores and shares the configuration properties for the validator's domains.
  */
