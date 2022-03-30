@@ -267,15 +267,15 @@ public class CSVValidator {
         counterWarnings = 0L;
         counterInformationMessages = 0L;
         List<ReportItem> errors = new ArrayList<>();
-        CSVFormat format = CSVFormat.RFC4180
-                .withIgnoreHeaderCase(false)
-                .withAllowDuplicateHeaderNames(true)
-                .withIgnoreSurroundingSpaces(true)
-                .withRecordSeparator("\n")
-                .withDelimiter(csvSettings.getDelimiter())
-                .withQuote(csvSettings.getQuote());
+        var format = CSVFormat.RFC4180.builder()
+                .setIgnoreHeaderCase(false)
+                .setAllowDuplicateHeaderNames(true)
+                .setIgnoreSurroundingSpaces(true)
+                .setRecordSeparator("\n")
+                .setDelimiter(csvSettings.getDelimiter())
+                .setQuote(csvSettings.getQuote());
         if (csvSettings.isHasHeaders()) {
-            format = format.withHeader();
+            format = format.setHeader();
         }
         Schema schema;
         try (InputStream schemaStream = toStream(schemaFile, false)) {
@@ -288,7 +288,7 @@ public class CSVValidator {
         short headerLine = 1;
         try (
                 Reader inputReader = new BomStrippingReader(toStream(inputFile, true));
-                CSVParser parser = new CSVParser(inputReader, format)
+                CSVParser parser = new CSVParser(inputReader, format.build())
         ) {
             Map<Integer, Field<?>> inputFieldIndexToSchemaFieldMap = new HashMap<>();
             if (csvSettings.isHasHeaders()) {
@@ -760,7 +760,7 @@ public class CSVValidator {
      * @return The request to pass to the plugin(s).
      */
     private ValidateRequest preparePluginInput(File pluginTmpFolder) {
-        File pluginInputFile = new File(pluginTmpFolder, UUID.randomUUID().toString()+".csv");
+        File pluginInputFile = new File(pluginTmpFolder, UUID.randomUUID() +".csv");
         try {
             FileUtils.copyFile(inputFileToValidate, pluginInputFile);
         } catch (IOException e) {
