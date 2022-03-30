@@ -55,7 +55,7 @@
         <version.cxf>3.4.5</version.cxf>
         <version.commonsConfiguration>2.7</version.commonsConfiguration>
         <version.commonsLang>3.10</version.commonsLang>
-        <version.commonsCsv>1.8</version.commonsCsv>
+        <version.commonsCsv>1.9.0</version.commonsCsv>
         <version.commonsIo>2.7</version.commonsIo>
         <version.commonsCompress>1.21</version.commonsCompress>
         <version.commonsValidator>1.7</version.commonsValidator>

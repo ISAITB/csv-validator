@@ -4,6 +4,7 @@ import com.gitb.tr.TAR;
 import eu.europa.ec.itb.csv.DomainConfig;
 import eu.europa.ec.itb.csv.InputHelper;
 import eu.europa.ec.itb.csv.validation.*;
+import eu.europa.ec.itb.validation.commons.CsvReportGenerator;
 import eu.europa.ec.itb.validation.commons.FileInfo;
 import eu.europa.ec.itb.validation.commons.LocalisationHelper;
 import eu.europa.ec.itb.validation.commons.Utils;
@@ -60,6 +61,8 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
     private FileManager fileManager;
     @Autowired
     private ReportGeneratorBean reportGenerator;
+    @Autowired
+    private CsvReportGenerator csvReportGenerator;
 
     /**
      * Run the validation.
@@ -189,15 +192,18 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
                             // Create XML report
                             fileManager.saveReport(report, xmlReportFile, domainConfig);
                             if (itemCount <= domainConfig.getMaximumReportsForDetailedOutput()) {
-                                // Create PDF report
+                                // Create PDF and CSV reports
                                 File pdfReportFile = new File(xmlReportFile.getParentFile(), "report."+i+".pdf");
+                                File csvReportFile = new File(xmlReportFile.getParentFile(), "report."+i+".csv");
                                 Files.deleteIfExists(pdfReportFile.toPath());
+                                Files.deleteIfExists(csvReportFile.toPath());
                                 reportGenerator.writeReport(xmlReportFile, pdfReportFile, localiser);
-                                summary.append("- Detailed reports in [").append(xmlReportFile.getAbsolutePath()).append("] and [").append(pdfReportFile.getAbsolutePath()).append("] \n");
+                                csvReportGenerator.writeReport(xmlReportFile, csvReportFile, localiser, domainConfig);
+                                summary.append("- Detailed reports in [").append(xmlReportFile.getAbsolutePath()).append("], [").append(pdfReportFile.getAbsolutePath()).append("] and [").append(csvReportFile.getAbsolutePath()).append("]\n");
                             } else if (report.getCounters() != null && (report.getCounters().getNrOfAssertions().longValue() + report.getCounters().getNrOfErrors().longValue() + report.getCounters().getNrOfWarnings().longValue()) <= domainConfig.getMaximumReportsForXmlOutput()) {
-                                summary.append("- Detailed report in [").append(xmlReportFile.getAbsolutePath()).append("] (PDF report skipped due to large number of report items) \n");
+                                summary.append("- Detailed report in [").append(xmlReportFile.getAbsolutePath()).append("] (PDF and CSV reports skipped due to large number of report items) \n");
                             } else {
-                                summary.append("- Detailed report in [").append(xmlReportFile.getAbsolutePath()).append("] (report limited to first ").append(domainConfig.getMaximumReportsForXmlOutput()).append(" items and PDF report skipped) \n");
+                                summary.append("- Detailed report in [").append(xmlReportFile.getAbsolutePath()).append("] (report limited to first ").append(domainConfig.getMaximumReportsForXmlOutput()).append(" items, and skipped PDF and CSV reports) \n");
                             }
                         }
                     }
@@ -328,8 +334,8 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
         usageMessage.append("\n").append(PAD).append(PAD).append("- FILE_OR_URI_X is the full file path or URI to the content to validate.");
         usageMessage.append("\n").append(PAD).append(PAD).append("- LOCALE is the language code to consider for reporting of results. If the provided locale is not supported by the validator the default locale will be used instead (e.g. 'fr', 'fr_FR').");
         usageMessage.append(parametersMessage);
-        usageMessage.append("\n\nThe summary of each validation will be printed and the detailed reports produced in the current directory (as \"report.X.xml\" and \"report.X.pdf\").");
-        System.out.println(usageMessage.toString());
+        usageMessage.append("\n\nThe summary of each validation will be printed and the detailed reports produced in the current directory (as \"report.X.xml\", \"report.X.pdf\" and \"report.X.csv\").");
+        System.out.println(usageMessage);
     }
 
     /**
