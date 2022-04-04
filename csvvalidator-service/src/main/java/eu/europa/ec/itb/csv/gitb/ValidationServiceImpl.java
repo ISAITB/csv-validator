@@ -6,10 +6,7 @@ import com.gitb.vs.Void;
 import com.gitb.vs.*;
 import eu.europa.ec.itb.csv.DomainConfig;
 import eu.europa.ec.itb.csv.InputHelper;
-import eu.europa.ec.itb.csv.validation.CSVValidator;
-import eu.europa.ec.itb.csv.validation.FileManager;
-import eu.europa.ec.itb.csv.validation.ValidationConstants;
-import eu.europa.ec.itb.csv.validation.ViolationLevel;
+import eu.europa.ec.itb.csv.validation.*;
 import eu.europa.ec.itb.validation.commons.FileInfo;
 import eu.europa.ec.itb.validation.commons.LocalisationHelper;
 import eu.europa.ec.itb.validation.commons.Utils;
@@ -196,8 +193,12 @@ public class ValidationServiceImpl implements ValidationService {
                     .withMultipleInputFieldsForSchemaFieldViolationLevel(inputMultipleInputFieldsForSchemaFieldViolationLevel)
                     .withUnknownInputFieldViolationLevel(inputUnknownInputViolationLevel)
                     .withUnspecifiedSchemaFieldViolationLevel(inputUnspecifiedSchemaFieldViolationLevel);
-            CSVValidator validator = ctx.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs), localiser);
-            TAR report = validator.validate();
+            CSVValidator validator = ctx.getBean(CSVValidator.class, ValidationSpecs.builder(contentToValidate, inputHelper.buildCSVSettings(domainConfig, validationType, inputs), localiser, domainConfig)
+                    .withValidationType(validationType)
+                    .withExternalSchemas(externalSchemas)
+                    .build()
+            );
+            TAR report = validator.validate().getDetailedReport();
             if (addInputToReport) {
                 addContext(report, contentToValidate);
             }

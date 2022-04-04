@@ -72,30 +72,33 @@ public class FileManager extends BaseFileManager<ApplicationConfig> {
      * Construct a PDF report file name based on the provided unique identifier.
      *
      * @param uuid The identifier.
+     * @param aggregate Whether the report is an aggregate.
      * @return The file name to use.
      */
-    public String getReportFileNamePdf(String uuid) {
-        return "TAR-"+uuid+".pdf";
+    public String getReportFileNamePdf(String uuid, boolean aggregate) {
+        return "TAR-"+uuid+(aggregate?"_aggregate":"")+".pdf";
     }
 
     /**
      * Construct a XML report file name based on the provided unique identifier.
      *
      * @param uuid The identifier.
+     * @param aggregate Whether the report is an aggregate.
      * @return The file name to use.
      */
-    public String getReportFileNameXml(String uuid) {
-        return "TAR-"+uuid+".xml";
+    public String getReportFileNameXml(String uuid, boolean aggregate) {
+        return "TAR-"+uuid+(aggregate?"_aggregate":"")+".xml";
     }
 
     /**
      * Returns the name of a CSV report file based on the provided identifier.
      *
      * @param uuid The UUID to consider.
+     * @param aggregate Whether the report is an aggregate.
      * @return The file name.
      */
-    public String getReportFileNameCsv(String uuid) {
-        return "TAR-"+uuid+".csv";
+    public String getReportFileNameCsv(String uuid, boolean aggregate) {
+        return "TAR-"+uuid+(aggregate?"_aggregate":"")+".csv";
     }
 
 }
