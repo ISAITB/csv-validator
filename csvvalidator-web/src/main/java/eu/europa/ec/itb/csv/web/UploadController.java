@@ -1,15 +1,16 @@
 package eu.europa.ec.itb.csv.web;
 
-import com.gitb.tr.TAR;
 import eu.europa.ec.itb.csv.ApplicationConfig;
 import eu.europa.ec.itb.csv.DomainConfig;
 import eu.europa.ec.itb.csv.DomainConfigCache;
 import eu.europa.ec.itb.csv.InputHelper;
 import eu.europa.ec.itb.csv.validation.CSVValidator;
 import eu.europa.ec.itb.csv.validation.FileManager;
+import eu.europa.ec.itb.csv.validation.ValidationSpecs;
 import eu.europa.ec.itb.csv.validation.ViolationLevel;
 import eu.europa.ec.itb.validation.commons.FileInfo;
 import eu.europa.ec.itb.validation.commons.LocalisationHelper;
+import eu.europa.ec.itb.validation.commons.Utils;
 import eu.europa.ec.itb.validation.commons.ValidatorChannel;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
 import eu.europa.ec.itb.validation.commons.artifact.ValidationArtifactInfo;
@@ -25,7 +26,10 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -226,10 +230,17 @@ public class UploadController {
                             .withMultipleInputFieldsForSchemaFieldViolationLevel(ViolationLevel.byName(inputMultipleInputFieldsForSchemaFieldViolationLevel))
                             .withUnknownInputFieldViolationLevel(ViolationLevel.byName(inputUnknownInputViolationLevel))
                             .withUnspecifiedSchemaFieldViolationLevel(ViolationLevel.byName(inputUnspecifiedSchemaFieldViolationLevel));
-                    CSVValidator validator = beans.getBean(CSVValidator.class, contentToValidate, validationType, externalSchemas, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, inputs), localisationHelper);
-                    TAR report = validator.validate();
-                    attributes.put(PARAM_REPORT, report);
-                    attributes.put(PARAM_DATE, report.getDate().toString());
+                    CSVValidator validator = beans.getBean(CSVValidator.class, ValidationSpecs.builder(contentToValidate, inputHelper.buildCSVSettings(domainConfig, validationType, inputs), localisationHelper, domainConfig)
+                            .withValidationType(validationType)
+                            .withExternalSchemas(externalSchemas)
+                            .produceAggregateReport()
+                            .build()
+                    );
+                    var reports = validator.validate();
+                    attributes.put(PARAM_REPORT, reports.getDetailedReport());
+                    attributes.put(PARAM_AGGREGATE_REPORT, reports.getAggregateReport());
+                    attributes.put(PARAM_SHOW_AGGREGATE_REPORT, Utils.aggregateDiffers(reports.getDetailedReport(), reports.getAggregateReport()));
+                    attributes.put(PARAM_DATE, reports.getDetailedReport().getDate().toString());
                     if (contentType.equals(CONTENT_TYPE_FILE)) {
                         attributes.put(PARAM_FILE_NAME, file.getOriginalFilename());
                     } else if (contentType.equals(CONTENT_TYPE_URI)) {
@@ -241,7 +252,8 @@ public class UploadController {
                     try {
                         String inputID = fileManager.writeCSV(domainConfig.getDomainName(), contentToValidate);
                         attributes.put(PARAM_INPUT_ID, inputID);
-                        fileManager.saveReport(report, inputID, domainConfig);
+                        fileManager.saveReport(reports.getDetailedReport(), inputID, domainConfig);
+                        fileManager.saveReport(reports.getAggregateReport(), inputID, domainConfig, true);
                     } catch (IOException e) {
                         LOG.error("Error generating detailed report [" + e.getMessage() + "]", e);
                         attributes.put(PARAM_MESSAGE, localisationHelper.localise("validator.label.exception.errorGeneratingReport", e.getMessage()));

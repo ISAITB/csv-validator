@@ -1,6 +1,5 @@
 package eu.europa.ec.itb.csv.standalone;
 
-import com.gitb.tr.TAR;
 import eu.europa.ec.itb.csv.DomainConfig;
 import eu.europa.ec.itb.csv.InputHelper;
 import eu.europa.ec.itb.csv.validation.*;
@@ -175,8 +174,12 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
                             .withMultipleInputFieldsForSchemaFieldViolationLevel(inputMultipleInputFieldsForSchemaFieldViolationLevel)
                             .withUnknownInputFieldViolationLevel(inputUnknownInputViolationLevel)
                             .withUnspecifiedSchemaFieldViolationLevel(inputUnspecifiedSchemaFieldViolationLevel);
-                    CSVValidator validator = ctx.getBean(CSVValidator.class, input.getInputFile(), validationType, externalSchemaFileInfo, domainConfig, inputHelper.buildCSVSettings(domainConfig, validationType, settingInputs), this, localiser);
-                    TAR report = validator.validate();
+                    CSVValidator validator = ctx.getBean(CSVValidator.class, ValidationSpecs.builder(input.getInputFile(), inputHelper.buildCSVSettings(domainConfig, validationType, settingInputs), localiser, domainConfig)
+                            .withValidationType(validationType)
+                            .withExternalSchemas(externalSchemaFileInfo)
+                            .withProgressListener(this)
+                            .build());
+                    var report = validator.validate().getDetailedReport();
                     if (report == null) {
                         summary.append("\nNo validation report was produced.\n");
                     } else {
