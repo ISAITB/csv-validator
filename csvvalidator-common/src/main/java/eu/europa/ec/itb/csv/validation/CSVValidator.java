@@ -288,11 +288,11 @@ public class CSVValidator {
                             if (otherNames != null && !otherNames.isEmpty()) {
                                 if (otherNames.size() > 1) {
                                     // Header name is ambiguous - matched multiple schema fields.
-                                    handleSyntaxViolation(ViolationLevel.ERROR, headerName, specs.getLocalisationHelper().localise("validator.label.syntax.ambiguousHeader", headerName, otherNames), headerLine, errors);
+                                    handleSyntaxViolation(ViolationLevel.ERROR, headerName,"validator.label.syntax.ambiguousHeader", new Object[] { headerName, otherNames }, headerLine, errors);
                                 } else {
                                     // Matched header in schema fields but with different casing.
                                     String schemaFieldName = otherNames.iterator().next();
-                                    handleSyntaxViolation(specs.getCSVSettings().getInputFieldCaseMismatchViolationLevel(), headerName, specs.getLocalisationHelper().localise("validator.label.syntax.inputFieldCaseMismatch", headerName, schemaFieldName), headerLine, errors);
+                                    handleSyntaxViolation(specs.getCSVSettings().getInputFieldCaseMismatchViolationLevel(), headerName, "validator.label.syntax.inputFieldCaseMismatch", new Object[] { headerName, schemaFieldName }, headerLine, errors);
                                     fieldInfo = fieldMap.get(schemaFieldName);
                                 }
                             }
@@ -300,11 +300,11 @@ public class CSVValidator {
                     }
                     if (fieldInfo == null) {
                         // Could not match header in schema fields.
-                        handleSyntaxViolation(specs.getCSVSettings().getUnknownInputFieldViolationLevel(), headerName, specs.getLocalisationHelper().localise("validator.label.syntax.unknownInputField", headerName), headerLine, errors);
+                        handleSyntaxViolation(specs.getCSVSettings().getUnknownInputFieldViolationLevel(), headerName, "validator.label.syntax.unknownInputField", new Object[] { headerName }, headerLine, errors);
                     } else  {
                         if (fieldInfo.getIndex() != headerIndex) {
                             // Header appears in unexpected position.
-                            handleSyntaxViolation(specs.getCSVSettings().getDifferentInputFieldSequenceViolationLevel(), headerName, specs.getLocalisationHelper().localise("validator.label.syntax.differentInputFieldSequence", headerName, headerIndex, fieldInfo.getIndex()), headerLine, errors);
+                            handleSyntaxViolation(specs.getCSVSettings().getDifferentInputFieldSequenceViolationLevel(), headerName,"validator.label.syntax.differentInputFieldSequence", new Object[] { headerName, headerIndex, fieldInfo.getIndex() }, headerLine, errors);
                         }
                         matchedSchemaFields.add(fieldInfo.getField().getName());
                         fieldNameToHeaderIndexes.computeIfAbsent(fieldInfo.getField().getName(), n -> new ArrayList<>()).add(headerIndex);
@@ -322,19 +322,19 @@ public class CSVValidator {
                         // Schema field not found in input.
                         if (field.getConstraints() != null && (Boolean)field.getConstraints().getOrDefault(Field.CONSTRAINT_KEY_REQUIRED, Boolean.FALSE)) {
                             // Missing required field - always an error.
-                            handleSyntaxViolation(ViolationLevel.ERROR, null, specs.getLocalisationHelper().localise("validator.label.syntax.missingRequiredHeader", field.getName()), headerLine, errors);
+                            handleSyntaxViolation(ViolationLevel.ERROR, null,"validator.label.syntax.missingRequiredHeader", new Object[] { field.getName() }, headerLine, errors);
                         } else {
                             // Missing optional field - depends on configuration.
-                            handleSyntaxViolation(specs.getCSVSettings().getUnspecifiedSchemaFieldViolationLevel(), null, specs.getLocalisationHelper().localise("validator.label.syntax.unspecifiedSchemaField", field.getName()), headerLine, errors);
+                            handleSyntaxViolation(specs.getCSVSettings().getUnspecifiedSchemaFieldViolationLevel(), null, "validator.label.syntax.unspecifiedSchemaField", new Object[] { field.getName() }, headerLine, errors);
                         }
                     }
                 });
                 if (schema.getFields().size() != parser.getHeaderNames().size()) {
                     // Different field counts.
-                    handleSyntaxViolation(specs.getCSVSettings().getDifferentInputFieldCountViolationLevel(), null, specs.getLocalisationHelper().localise("validator.label.syntax.differentInputFieldCount", parser.getHeaderNames().size(), schema.getFields().size()), headerLine, errors);
+                    handleSyntaxViolation(specs.getCSVSettings().getDifferentInputFieldCountViolationLevel(), null,"validator.label.syntax.differentInputFieldCount", new Object[] { parser.getHeaderNames().size(), schema.getFields().size() }, headerLine, errors);
                 }
                 // Header appears multiple times in exactly the same way.
-                duplicateHeaders.forEach(headerName -> handleSyntaxViolation(specs.getCSVSettings().getDuplicateInputFieldViolationLevel(), headerName, specs.getLocalisationHelper().localise("validator.label.syntax.duplicateInputField", headerName), headerLine, errors));
+                duplicateHeaders.forEach(headerName -> handleSyntaxViolation(specs.getCSVSettings().getDuplicateInputFieldViolationLevel(), headerName, "validator.label.syntax.duplicateInputField", new Object[] { headerName }, headerLine, errors));
                 for (Map.Entry<String, List<Integer>> nameToIndexEntry: fieldNameToHeaderIndexes.entrySet()) {
                     if (nameToIndexEntry.getValue().size() > 1) {
                         // Multiple headers map to the same schema field.
@@ -342,7 +342,7 @@ public class CSVValidator {
                         for (Integer pos: nameToIndexEntry.getValue()) {
                             headers.add(parser.getHeaderNames().get(pos));
                         }
-                        handleSyntaxViolation(specs.getCSVSettings().getMultipleInputFieldsForSchemaFieldViolationLevel(), null, specs.getLocalisationHelper().localise("validator.label.syntax.multipleInputFieldsForSchemaField", headers, nameToIndexEntry.getKey()), headerLine, errors);
+                        handleSyntaxViolation(specs.getCSVSettings().getMultipleInputFieldsForSchemaFieldViolationLevel(), null, "validator.label.syntax.multipleInputFieldsForSchemaField", new Object[] { headers, nameToIndexEntry.getKey() }, headerLine, errors);
                     }
                 }
             } else {
@@ -395,7 +395,7 @@ public class CSVValidator {
         if (e != null && e.getMessage() != null && !e.getMessage().isBlank()) {
             for (DomainConfig.ParserError parserError: specs.getDomainConfig().getParserErrors().values()) {
                 if (parserError.getPattern().matcher(e.getMessage()).matches()) {
-                    handleSyntaxViolation(ViolationLevel.ERROR, null, specs.getLocalisationHelper().localise(String.format("validator.parserError.%s.message", parserError.getName())), headerLine, aggregatedErrors);
+                    handleSyntaxViolation(ViolationLevel.ERROR, null, String.format("validator.parserError.%s.message", parserError.getName()), null, headerLine, aggregatedErrors);
                     handled = true;
                 }
             }
@@ -471,7 +471,7 @@ public class CSVValidator {
             // Parser based on headers.
             if (csvRecord.size() != csvRecord.getParser().getHeaderNames().size()) {
                 // Record has wrong number of fields.
-                handleFieldViolation(null, specs.getLocalisationHelper().localise("validator.label.field.rowFieldCountDoesNotMatchHeaderCount", csvRecord.size(), csvRecord.getParser().getHeaderNames().size()), lineNumber, null, aggregatedErrors);
+                handleFieldViolation(null, "validator.label.field.rowFieldCountDoesNotMatchHeaderCount", new Object[] { csvRecord.size(), csvRecord.getParser().getHeaderNames().size() }, lineNumber, null, aggregatedErrors);
             } else {
                 int fieldIndex = 0;
                 for (String fieldValue: csvRecord) {
@@ -493,7 +493,7 @@ public class CSVValidator {
                     fieldIndex += 1;
                 }
             } else {
-                handleFieldViolation(null, specs.getLocalisationHelper().localise("validator.label.field.rowFieldCountNotMatchingExpectedCount", csvRecord.size(), schemaFieldCount), lineNumber, null, aggregatedErrors);
+                handleFieldViolation(null, "validator.label.field.rowFieldCountNotMatchingExpectedCount", new Object[] { csvRecord.size(), schemaFieldCount }, lineNumber, null, aggregatedErrors);
             }
         }
     }
@@ -512,17 +512,18 @@ public class CSVValidator {
             Object fieldValue = field.castValue(textValue, false, field.getOptions());
             // Check format.
             if (!field.valueHasValidFormat(textValue)) {
-                handleFieldViolation(fieldNameToUse, specs.getLocalisationHelper().localise("validator.label.field.invalidFormat", textValue, fieldNameToUse, field.getFormat()), lineNumber, textValue, aggregatedErrors);
+                handleFieldViolation(fieldNameToUse, "validator.label.field.invalidFormat", new Object[] { textValue, fieldNameToUse, field.getFormat() }, lineNumber, textValue, aggregatedErrors);
             }
             // Check constraints.
             if (field.getConstraints() != null && !field.getConstraints().isEmpty()) {
                 Map<String, Object> violations = field.checkConstraintViolations(fieldValue);
                 for (Map.Entry<String, Object> entry: violations.entrySet()) {
-                    handleFieldViolation(fieldNameToUse, prettifyConstraintFailure(entry.getKey(), entry.getValue(), field, fieldNameToUse, textValue), lineNumber, textValue, aggregatedErrors);
+                    var messageWithParams = prettifyConstraintFailure(entry.getKey(), entry.getValue(), field, fieldNameToUse, textValue);
+                    handleFieldViolation(fieldNameToUse, messageWithParams.getKey(), messageWithParams.getParams(), lineNumber, textValue, aggregatedErrors);
                 }
             }
         } catch (InvalidCastException e) {
-            handleFieldViolation(fieldNameToUse, specs.getLocalisationHelper().localise("validator.label.field.invalidType", textValue, fieldNameToUse, field.getType()), lineNumber, textValue, aggregatedErrors);
+            handleFieldViolation(fieldNameToUse, "validator.label.field.invalidType", new Object[] { textValue, fieldNameToUse, field.getType() }, lineNumber, textValue, aggregatedErrors);
         } catch (ValidatorException e) {
             throw e;
         } catch (Exception e) {
@@ -534,16 +535,17 @@ public class CSVValidator {
      * Handle a specific field violation.
      *
      * @param fieldName The name of the field.
-     * @param message The error message.
+     * @param messageKey The message key (to be localised).
+     * @param messageParams The parameters to use when localising the message (optional).
      * @param lineNumber The current line number.
      * @param fieldValue The text value of the field.
      * @param aggregatedErrors The list of messages to add to.
      */
-    private void handleFieldViolation(String fieldName, String message, long lineNumber, String fieldValue, List<ReportItem> aggregatedErrors) {
+    private void handleFieldViolation(String fieldName, String messageKey, Object[] messageParams, long lineNumber, String fieldValue, List<ReportItem> aggregatedErrors) {
         counterErrors += 1;
         counterTotalErrors += 1;
         if (counterTotalErrors + counterTotalWarnings + counterTotalInformationMessages <= specs.getDomainConfig().getMaximumReportsForXmlOutput()) {
-            aggregatedErrors.add(new ReportItem(messageFormatter, message, fieldName, lineNumber, fieldValue));
+            aggregatedErrors.add(new ReportItem(messageFormatter, messageKey, messageParams, fieldName, lineNumber, fieldValue));
         }
     }
 
@@ -552,11 +554,12 @@ public class CSVValidator {
      *
      * @param violationLevel The violation level for this kind of problem.
      * @param fieldName The name of the field.
-     * @param message The error message.
+     * @param messageKey The message key (to be localised).
+     * @param messageParams The parameters to use when localising the message (optional).
      * @param lineNumber The current line number.
      * @param aggregatedErrors The list of messages to add to.
      */
-    private void handleSyntaxViolation(ViolationLevel violationLevel, String fieldName, String message, long lineNumber, List<ReportItem> aggregatedErrors) {
+    private void handleSyntaxViolation(ViolationLevel violationLevel, String fieldName, String messageKey, Object[] messageParams, long lineNumber, List<ReportItem> aggregatedErrors) {
         if (violationLevel != null && violationLevel != ViolationLevel.NONE) {
             if (violationLevel == ViolationLevel.ERROR) {
                 counterErrors += 1;
@@ -569,7 +572,7 @@ public class CSVValidator {
                 counterTotalInformationMessages += 1;
             }
             if (counterTotalErrors + counterTotalWarnings + counterTotalInformationMessages <= specs.getDomainConfig().getMaximumReportsForXmlOutput()) {
-                aggregatedErrors.add(new ReportItem(messageFormatter, message, fieldName, lineNumber, null, violationLevel));
+                aggregatedErrors.add(new ReportItem(messageFormatter, messageKey, messageParams, fieldName, lineNumber, null, violationLevel));
             }
         }
     }
@@ -599,7 +602,7 @@ public class CSVValidator {
                 if (element != null) {
                     report.getReports().getInfoOrWarningOrError().add(element);
                     if (aggregateReportItems != null) {
-                        aggregateReportItems.updateForReportItem(element, e -> String.format("%s|%s", errorMessage.getViolationLevel(), errorMessage.getMessage()));
+                        aggregateReportItems.updateForReportItem(element, e -> String.format("%s|%s|%s", errorMessage.getFieldName(), errorMessage.getViolationLevel(), errorMessage.getMessageKey()));
                     }
                 }
             }
@@ -658,30 +661,30 @@ public class CSVValidator {
      * @param rowValue The text value of the field in the parsed row.
      * @return The user-friendly error message.
      */
-    private String prettifyConstraintFailure(String constraintKey, Object constraintValue, Field<?> field, String fieldNameToUse, String rowValue) {
-        String message;
+    private MessageWithParams prettifyConstraintFailure(String constraintKey, Object constraintValue, Field<?> field, String fieldNameToUse, String rowValue) {
+        MessageWithParams message;
         if (Field.CONSTRAINT_KEY_ENUM.equals(constraintKey)) {
             if (Boolean.TRUE.equals(specs.getDomainConfig().getDisplayEnumValuesInMessages().get(specs.getValidationType()))) {
-                message = specs.getLocalisationHelper().localise("validator.label.field.notInExpectedValuesWithParam", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+                message = new MessageWithParams("validator.label.field.notInExpectedValuesWithParam", new Object[] {rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field)});
             } else {
-                message = specs.getLocalisationHelper().localise("validator.label.field.notInExpectedValues", rowValue, fieldNameToUse);
+                message = new MessageWithParams("validator.label.field.notInExpectedValues", new Object[] { rowValue, fieldNameToUse} );
             }
         } else if (Field.CONSTRAINT_KEY_MAX_LENGTH.equals(constraintKey)) {
-            message = specs.getLocalisationHelper().localise("validator.label.field.lengthExceedsMaximum", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            message = new MessageWithParams("validator.label.field.lengthExceedsMaximum", new Object[] { rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field) });
         } else if (Field.CONSTRAINT_KEY_MIN_LENGTH.equals(constraintKey)) {
-            message = specs.getLocalisationHelper().localise("validator.label.field.lengthBelowMinimum", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            message = new MessageWithParams("validator.label.field.lengthBelowMinimum", new Object[] { rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field) });
         } else if (Field.CONSTRAINT_KEY_MAXIMUM.equals(constraintKey)) {
-            message = specs.getLocalisationHelper().localise("validator.label.field.valueExceedsMaximum", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            message = new MessageWithParams("validator.label.field.valueExceedsMaximum", new Object[] { rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field) });
         } else if (Field.CONSTRAINT_KEY_MINIMUM.equals(constraintKey)) {
-            message = specs.getLocalisationHelper().localise("validator.label.field.valueBelowMinimum", rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field));
+            message = new MessageWithParams("validator.label.field.valueBelowMinimum", new Object[] { rowValue, fieldNameToUse, Field.formatValueAsString(constraintValue, field) });
         } else if (Field.CONSTRAINT_KEY_PATTERN.equals(constraintKey)) {
-            message = specs.getLocalisationHelper().localise("validator.label.field.valueNotMatchingPattern", rowValue, fieldNameToUse);
+            message = new MessageWithParams("validator.label.field.valueNotMatchingPattern", new Object[] { rowValue, fieldNameToUse });
         } else if (Field.CONSTRAINT_KEY_REQUIRED.equals(constraintKey)) {
-            message = specs.getLocalisationHelper().localise("validator.label.field.missingValue", fieldNameToUse);
+            message = new MessageWithParams("validator.label.field.missingValue", new Object[] { fieldNameToUse} );
         } else if (Field.CONSTRAINT_KEY_UNIQUE.equals(constraintKey)) {
-            message = specs.getLocalisationHelper().localise("validator.label.field.expectedUniqueValue", rowValue, fieldNameToUse);
+            message = new MessageWithParams("validator.label.field.expectedUniqueValue", new Object[] { rowValue, fieldNameToUse });
         } else {
-            message = specs.getLocalisationHelper().localise("validator.label.field.constraintViolated", constraintKey, fieldNameToUse, rowValue);
+            message = new MessageWithParams("validator.label.field.constraintViolated", new Object[] { constraintKey, fieldNameToUse, rowValue });
         }
         return message;
     }
@@ -774,4 +777,37 @@ public class CSVValidator {
         return request;
     }
 
+    /**
+     * Class to hold a message key and its (optional) parameters.
+     */
+    static class MessageWithParams {
+
+        private final String key;
+        private final Object[] params;
+
+        /**
+         * Constructor.
+         *
+         * @param key The key.
+         * @param params The parameters (can be null);
+         */
+        public MessageWithParams(String key, Object[] params) {
+            this.key = Objects.requireNonNull(key);
+            this.params = params;
+        }
+
+        /**
+         * @return The key.
+         */
+        public String getKey() {
+            return key;
+        }
+
+        /**
+         * @return Thr parameters.
+         */
+        public Object[] getParams() {
+            return params;
+        }
+    }
 }
