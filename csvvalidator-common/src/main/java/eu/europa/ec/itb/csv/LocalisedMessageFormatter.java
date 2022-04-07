@@ -23,15 +23,16 @@ public class LocalisedMessageFormatter implements MessageFormatter {
      *
      * @param lineNumber The line number to include as the location.
      * @param fieldName The relevant field name (null is no header fields are defined).
-     * @param message The message.
+     * @param messageKey The message key (to be localised).
+     * @param messageParams The parameters to use when localising the message (optional).
      * @return The formatted message.
      */
     @Override
-    public String formatMessage(long lineNumber, String fieldName, String message) {
+    public String formatMessage(long lineNumber, String fieldName, String messageKey, Object[] messageParams) {
         if (fieldName == null) {
-            return String.format("[%s %s]: %s", localiser.localise("validator.label.lineMessagePrefix"), lineNumber, message);
+            return String.format("[%s %s]: %s", localiser.localise("validator.label.lineMessagePrefix"), lineNumber, localiser.localise(messageKey, messageParams));
         } else {
-            return String.format("[%s %s][%s %s]: %s", localiser.localise("validator.label.lineMessagePrefix"), lineNumber, localiser.localise("validator.label.fieldMessagePrefix"), fieldName, message);
+            return String.format("[%s %s][%s %s]: %s", localiser.localise("validator.label.lineMessagePrefix"), lineNumber, localiser.localise("validator.label.fieldMessagePrefix"), fieldName, localiser.localise(messageKey, messageParams));
         }
     }
 
