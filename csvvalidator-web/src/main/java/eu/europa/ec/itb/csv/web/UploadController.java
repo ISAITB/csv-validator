@@ -26,7 +26,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -41,7 +40,6 @@ import java.io.InputStream;
 import java.util.*;
 
 import static eu.europa.ec.itb.validation.commons.web.Constants.*;
-import static eu.europa.ec.itb.validation.commons.web.Constants.IS_MINIMAL;
 
 /**
  * Controller to manage the validator's web user interface.
@@ -76,7 +74,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      */
     @GetMapping(value = "/{domain}/upload")
     public ModelAndView upload(@PathVariable("domain") String domain, HttpServletRequest request, HttpServletResponse response) {
-        var config = validateDomain(request, domain);
+        var config = getDomainConfig(request);
         Map<String, Object> attributes = new HashMap<>();
         attributes.put(PARAM_DOMAIN_CONFIG, config);
         attributes.put(PARAM_APP_CONFIG, appConfig);
@@ -98,7 +96,6 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      */
     @GetMapping(value = "/{domain}/uploadm")
     public ModelAndView uploadMinimal(@PathVariable("domain") String domain, HttpServletRequest request, HttpServletResponse response) {
-        setMinimalUIFlag(request, true);
         return upload(domain, request, response);
     }
 
@@ -155,7 +152,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                                    RedirectAttributes redirectAttributes,
                                                    HttpServletRequest request,
                                                    HttpServletResponse response) {
-        var domainConfig = validateDomain(request, domain);
+        var domainConfig = getDomainConfig(request);
         var localisationHelper = new LocalisationHelper(domainConfig, localeResolver.resolveLocale(request, response, domainConfig, appConfig));
         var result = new UploadResult<>();
 
@@ -298,8 +295,6 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                       RedirectAttributes redirectAttributes,
                                       HttpServletRequest request,
                                       HttpServletResponse response) {
-
-        setMinimalUIFlag(request, true);
         return handleUpload(
                 domain, file, uri, string, validationType, contentType,
                 externalSchema, externalSchemaFiles, externalSchemaUri,
@@ -383,7 +378,6 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                                     RedirectAttributes redirectAttributes,
                                                     HttpServletRequest request,
                                                     HttpServletResponse response) {
-        setMinimalUIFlag(request, true);
         return handleUploadEmbedded(
                 domain, file, uri, string, validationType, contentType,
                 externalSchema, externalSchemaFiles, externalSchemaUri,
