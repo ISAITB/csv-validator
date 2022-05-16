@@ -130,7 +130,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     @PostMapping(value = "/{domain}/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public UploadResult<Translations> handleUpload(@PathVariable("domain") String domain,
-                                                   @RequestParam("file") MultipartFile file,
+                                                   @RequestParam(value = "file", required = false) MultipartFile file,
                                                    @RequestParam(value = "uri", defaultValue = "") String uri,
                                                    @RequestParam(value = "text-editor", defaultValue = "") String string,
                                                    @RequestParam(value = "validationType", defaultValue = "") String validationType,
@@ -165,9 +165,9 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
         } else {
             InputStream stream = null;
             try {
-                try (InputStream fis = getInputStream(contentType, file.getInputStream(), uri, string)) {
+                try (InputStream fis = getInputStream(contentType, file, uri, string)) {
                     if (fileManager.checkFileType(fis)) {
-                        stream = getInputStream(contentType, file.getInputStream(), uri, string);
+                        stream = getInputStream(contentType, file, uri, string);
                     } else {
                         result.setMessage(localisationHelper.localise("validator.label.exception.providedInputNotJSON"));
                     }
@@ -273,7 +273,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     @PostMapping(value = "/{domain}/uploadm", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public UploadResult<Translations> handleUploadMinimal(@PathVariable("domain") String domain,
-                                      @RequestParam("file") MultipartFile file,
+                                      @RequestParam(value = "file", required = false) MultipartFile file,
                                       @RequestParam(value = "uri", defaultValue = "") String uri,
                                       @RequestParam(value = "text-editor", defaultValue = "") String string,
                                       @RequestParam(value = "validationType", defaultValue = "") String validationType,
@@ -313,7 +313,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      */
     @PostMapping(value = "/{domain}/upload", produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView handleUploadEmbedded(@PathVariable("domain") String domain,
-                                             @RequestParam("file") MultipartFile file,
+                                             @RequestParam(value = "file", required = false) MultipartFile file,
                                              @RequestParam(value = "uri", defaultValue = "") String uri,
                                              @RequestParam(value = "text-editor", defaultValue = "") String string,
                                              @RequestParam(value = "validationType", defaultValue = "") String validationType,
@@ -356,7 +356,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      */
     @PostMapping(value = "/{domain}/uploadm", produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView handleUploadMinimalEmbedded(@PathVariable("domain") String domain,
-                                                    @RequestParam("file") MultipartFile file,
+                                                    @RequestParam(value = "file", required = false) MultipartFile file,
                                                     @RequestParam(value = "uri", defaultValue = "") String uri,
                                                     @RequestParam(value = "text-editor", defaultValue = "") String string,
                                                     @RequestParam(value = "validationType", defaultValue = "") String validationType,
@@ -483,16 +483,16 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * Load a stream from the provided input.
      *
      * @param contentType The type of input provided.
-     * @param inputStream The stream.
+     * @param file The file.
      * @param uri The URI.
      * @param string The text content
      * @return The stream to read.
      */
-    private InputStream getInputStream(String contentType, InputStream inputStream, String uri, String string) {
+    private InputStream getInputStream(String contentType, MultipartFile file, String uri, String string) throws IOException {
         InputStream is = null;
         switch (contentType) {
             case CONTENT_TYPE_FILE:
-                is = inputStream;
+                is = file.getInputStream();
                 break;
             case CONTENT_TYPE_URI:
                 is = this.fileManager.getInputStreamFromURL(uri);
