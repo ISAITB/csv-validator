@@ -49,9 +49,6 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
 
     private static final Logger LOG = LoggerFactory.getLogger(UploadController.class);
     private static final String IS_MINIMAL = "isMinimal";
-    private static final String CONTENT_TYPE_FILE = "fileType" ;
-    private static final String CONTENT_TYPE_URI = "uriType" ;
-    private static final String CONTENT_TYPE_STRING = "stringType" ;
 
     @Autowired
     private ApplicationConfig appConfig = null;
@@ -78,7 +75,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
         Map<String, Object> attributes = new HashMap<>();
         attributes.put(PARAM_DOMAIN_CONFIG, config);
         attributes.put(PARAM_APP_CONFIG, appConfig);
-        attributes.put(PARAM_MINIMAL_UI, request.getAttribute(IS_MINIMAL));
+        attributes.put(PARAM_MINIMAL_UI, isMinimalUI(request));
         attributes.put(PARAM_EXTERNAL_ARTIFACT_INFO, config.getExternalArtifactInfoMap());
         var localisationHelper = new LocalisationHelper(config, localeResolver.resolveLocale(request, response, config, appConfig));
         attributes.put(PARAM_LOCALISER, localisationHelper);
@@ -132,7 +129,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     public UploadResult<Translations> handleUpload(@PathVariable("domain") String domain,
                                                    @RequestParam(value = "file", required = false) MultipartFile file,
                                                    @RequestParam(value = "uri", defaultValue = "") String uri,
-                                                   @RequestParam(value = "text-editor", defaultValue = "") String string,
+                                                   @RequestParam(value = "text", defaultValue = "") String string,
                                                    @RequestParam(value = "validationType", defaultValue = "") String validationType,
                                                    @RequestParam(value = "contentType", defaultValue = "") String contentType,
                                                    @RequestParam(value = "contentType-external_default", required = false) String[] externalSchemaContentType,
@@ -153,6 +150,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                                    HttpServletRequest request,
                                                    HttpServletResponse response) {
         var domainConfig = getDomainConfig(request);
+        contentType = checkInputType(contentType, file, uri, string);
         var localisationHelper = new LocalisationHelper(domainConfig, localeResolver.resolveLocale(request, response, domainConfig, appConfig));
         var result = new UploadResult<>();
 
@@ -275,7 +273,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     public UploadResult<Translations> handleUploadMinimal(@PathVariable("domain") String domain,
                                       @RequestParam(value = "file", required = false) MultipartFile file,
                                       @RequestParam(value = "uri", defaultValue = "") String uri,
-                                      @RequestParam(value = "text-editor", defaultValue = "") String string,
+                                      @RequestParam(value = "text", defaultValue = "") String string,
                                       @RequestParam(value = "validationType", defaultValue = "") String validationType,
                                       @RequestParam(value = "contentType", defaultValue = "") String contentType,
                                       @RequestParam(value = "contentType-external_default", required = false) String[] externalSchema,
@@ -315,7 +313,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     public ModelAndView handleUploadEmbedded(@PathVariable("domain") String domain,
                                              @RequestParam(value = "file", required = false) MultipartFile file,
                                              @RequestParam(value = "uri", defaultValue = "") String uri,
-                                             @RequestParam(value = "text-editor", defaultValue = "") String string,
+                                             @RequestParam(value = "text", defaultValue = "") String string,
                                              @RequestParam(value = "validationType", defaultValue = "") String validationType,
                                              @RequestParam(value = "contentType", defaultValue = "") String contentType,
                                              @RequestParam(value = "contentType-external_default", required = false) String[] externalSchema,
@@ -358,7 +356,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     public ModelAndView handleUploadMinimalEmbedded(@PathVariable("domain") String domain,
                                                     @RequestParam(value = "file", required = false) MultipartFile file,
                                                     @RequestParam(value = "uri", defaultValue = "") String uri,
-                                                    @RequestParam(value = "text-editor", defaultValue = "") String string,
+                                                    @RequestParam(value = "text", defaultValue = "") String string,
                                                     @RequestParam(value = "validationType", defaultValue = "") String validationType,
                                                     @RequestParam(value = "contentType", defaultValue = "") String contentType,
                                                     @RequestParam(value = "contentType-external_default", required = false) String[] externalSchema,
