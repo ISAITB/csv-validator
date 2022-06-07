@@ -4,6 +4,7 @@ import eu.europa.ec.itb.csv.ApplicationConfig;
 import eu.europa.ec.itb.validation.commons.BaseFileManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.tika.Tika;
+import org.apache.tika.metadata.Metadata;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -37,7 +38,9 @@ public class FileManager extends BaseFileManager<ApplicationConfig> {
      */
     public boolean checkFileType(InputStream stream) throws IOException {
         Tika tika = new Tika();
-        String type = tika.detect(stream);
+        var metadata = new Metadata();
+        metadata.set(Metadata.CONTENT_TYPE, "text/csv");
+        String type = tika.detect(stream, metadata);
         return config.getAcceptedMimeTypes().contains(type);
     }
 

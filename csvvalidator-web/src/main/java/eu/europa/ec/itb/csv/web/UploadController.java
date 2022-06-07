@@ -181,7 +181,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                 var proceed = true;
                 File tempFolderForRequest = fileManager.createTemporaryFolderPath();
                 try {
-                    File contentToValidate = fileManager.getFileFromInputStream(tempFolderForRequest, stream, null, UUID.randomUUID() + ".json");
+                    File contentToValidate = fileManager.getFileFromInputStream(tempFolderForRequest, stream, null, UUID.randomUUID() + ".csv");
                     List<FileInfo> externalSchemas = new ArrayList<>();
                     try {
                         externalSchemas = getExternalFiles(externalSchemaContentType, externalSchemaFiles, externalSchemaUri, domainConfig.getSchemaInfo(validationType), tempFolderForRequest);
