@@ -1,18 +1,29 @@
 package eu.europa.ec.itb.csv.validation;
 
+import eu.europa.ec.itb.validation.commons.error.ValidatorException;
+
 /**
  * Enum for the types of violation levels linked to encountered syntax issues.
  */
 public enum ViolationLevel {
 
     /** Reported as an error in the validation report. */
-    ERROR("error"),
+    ERROR(ViolationLevel.ERROR_VALUE),
     /** Reported as a warning in the validation report. */
-    WARNING("warning"),
+    WARNING(ViolationLevel.WARNING_VALUE),
     /** Reported as an information message in the validation report. */
-    INFO("info"),
+    INFO(ViolationLevel.INFO_VALUE),
     /** Not included in the validation report (i.e. ignored). */
-    NONE("none");
+    NONE(ViolationLevel.NONE_VALUE);
+
+    /** The String value of the error level. */
+    public static final String ERROR_VALUE = "error";
+    /** The String value of the warning level. */
+    public static final String WARNING_VALUE = "warning";
+    /** The String value of the info level. */
+    public static final String INFO_VALUE = "info";
+    /** The String value of the none level. */
+    public static final String NONE_VALUE = "none";
 
     private final String name;
 
@@ -52,7 +63,7 @@ public enum ViolationLevel {
             } else if (NONE.name.equals(name)) {
                 return NONE;
             } else {
-                throw new IllegalArgumentException("Unknown violation level ["+name+"]");
+                throw new ValidatorException("validator.label.exception.invalidViolationLevel", name);
             }
         }
     }
