@@ -12,6 +12,7 @@ import eu.europa.ec.itb.validation.commons.LocalisationHelper;
 import eu.europa.ec.itb.validation.commons.Utils;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
 import eu.europa.ec.itb.validation.commons.error.ValidatorException;
+import eu.europa.ec.itb.validation.commons.web.WebServiceContextProvider;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.slf4j.Logger;
@@ -31,12 +32,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Function;
 
+import static eu.europa.ec.itb.csv.CsvValidatorUtils.addContext;
+
 /**
  * Spring component that realises the validation SOAP service.
  */
 @Component
 @Scope("prototype")
-public class ValidationServiceImpl implements ValidationService {
+public class ValidationServiceImpl implements ValidationService, WebServiceContextProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(ValidationServiceImpl.class);
 
@@ -222,27 +225,6 @@ public class ValidationServiceImpl implements ValidationService {
     }
 
     /**
-     * Add the context map to the provided validation report.
-     *
-     * @param report The report to add to.
-     * @param contentToValidate The input file.
-     */
-    private void addContext(TAR report, File contentToValidate) {
-        if (report != null) {
-            if (report.getContext() == null) {
-                report.setContext(new AnyContent());
-            }
-            try {
-                var content = Utils.createInputItem(ValidationConstants.INPUT_CONTENT, FileUtils.readFileToString(contentToValidate, StandardCharsets.UTF_8));
-                content.setMimeType("text/csv");
-                report.getContext().getItem().add(content);
-            } catch (IOException e) {
-                LOG.warn("Error while adding the "+ValidationConstants.INPUT_CONTENT+" to the report's context", e);
-            }
-        }
-    }
-
-    /**
      * Get the provided (optional) input as a boolean value.
      *
      * @param validateRequest The input parameters.
@@ -277,6 +259,7 @@ public class ValidationServiceImpl implements ValidationService {
     /**
      * @return The web service context.
      */
+    @Override
     public WebServiceContext getWebServiceContext(){
         return this.wsContext;
     }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * Component used to validate and parse user inputs.
  */
 @Component
-public class InputHelper extends BaseInputHelper<FileManager, DomainConfig, ApplicationConfig> {
+public class InputHelper extends BaseInputHelper<ApplicationConfig, FileManager, DomainConfig> {
 
     /**
      * Prepare the CSV syntax settings to be considered by this validation run.
