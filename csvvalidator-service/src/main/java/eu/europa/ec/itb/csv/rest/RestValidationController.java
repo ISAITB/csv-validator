@@ -87,7 +87,8 @@ public class RestValidationController extends BaseRestController<DomainConfig, A
                     if (MediaType.APPLICATION_JSON.equals(reportType)) {
                         writeReportAsJson(outputStream, report, domainConfig);
                     } else {
-                        fileManager.saveReport(report, outputStream, domainConfig);
+                        var wrapInputInCDATA = Objects.requireNonNullElse(in.getWrapReportDataInCDATA(), true);
+                        fileManager.saveReport(report, outputStream, domainConfig, wrapInputInCDATA);
                     }
                 });
     }
@@ -179,7 +180,8 @@ public class RestValidationController extends BaseRestController<DomainConfig, A
             Output output = new Output();
             var report = executeValidationProcess(input, domainConfig);
             try (var bos = new ByteArrayOutputStream()) {
-                fileManager.saveReport(report, bos, domainConfig);
+                var wrapInputInCDATA = Objects.requireNonNullElse(input.getWrapReportDataInCDATA(), true);
+                fileManager.saveReport(report, bos, domainConfig, wrapInputInCDATA);
                 output.setReport(Base64.getEncoder().encodeToString(bos.toByteArray()));
                 outputs.add(output);
             } catch (IOException e) {
