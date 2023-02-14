@@ -127,7 +127,7 @@ applies. Note that plugin JAR files need to be built as "all-in-one" JARs.
 
 ## Input to plugins
 
-The JSON validator calls plugins in sequence passing in the following input:
+The CSV validator calls plugins in sequence passing in the following input:
 
 | Input name          | Type     | Description                                                                                                                             |
 |---------------------|----------|-----------------------------------------------------------------------------------------------------------------------------------------|
