@@ -181,7 +181,16 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                 var proceed = true;
                 File tempFolderForRequest = fileManager.createTemporaryFolderPath();
                 try {
-                    File contentToValidate = fileManager.getFileFromInputStream(tempFolderForRequest, stream, null, UUID.randomUUID() + ".csv");
+                    File contentToValidate;
+                    try {
+                        contentToValidate = fileManager.getFileFromInputStream(tempFolderForRequest, stream, null, UUID.randomUUID() + ".csv");
+                    } finally {
+                        try {
+                            stream.close();
+                        } catch (IOException e) {
+                            // Ignore.
+                        }
+                    }
                     List<FileInfo> externalSchemas = new ArrayList<>();
                     try {
                         externalSchemas = getExternalFiles(externalSchemaContentType, externalSchemaFiles, externalSchemaUri, domainConfig.getSchemaInfo(validationType), tempFolderForRequest);
@@ -467,7 +476,9 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
         File file = null;
         if (CONTENT_TYPE_FILE.equals(contentType)) {
             if (inputFile!=null && !inputFile.isEmpty()) {
-                file = this.fileManager.getFileFromInputStream(parentFolder, inputFile.getInputStream(), null, inputFile.getOriginalFilename());
+                try (var stream = inputFile.getInputStream()) {
+                    file = this.fileManager.getFileFromInputStream(parentFolder, stream, null, inputFile.getOriginalFilename());
+                }
             }
         } else if (CONTENT_TYPE_URI.equals(contentType)) {
             if (!inputUri.isEmpty()) {
