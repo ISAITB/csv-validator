@@ -111,6 +111,8 @@ public class CSVValidator {
         }
         sortReportItems(overallReportDetailed);
         sortReportItems(overallReportAggregated);
+        specs.getDomainConfig().applyMetadata(overallReportDetailed, getValidationType());
+        specs.getDomainConfig().applyMetadata(overallReportAggregated, getValidationType());
         return new ReportPair(overallReportDetailed, overallReportAggregated);
     }
 

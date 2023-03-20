@@ -27,8 +27,6 @@ import javax.annotation.Resource;
 import javax.jws.WebParam;
 import javax.xml.ws.WebServiceContext;
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Function;
 
@@ -74,11 +72,7 @@ public class ValidationServiceImpl implements ValidationService, WebServiceConte
         MDC.put("domain", domainConfig.getDomain());
         GetModuleDefinitionResponse response = new GetModuleDefinitionResponse();
         response.setModule(new ValidationModule());
-        response.getModule().setId(domainConfig.getWebServiceId());
-        response.getModule().setOperation("V");
-        response.getModule().setMetadata(new Metadata());
-        response.getModule().getMetadata().setName(domainConfig.getWebServiceId());
-        response.getModule().getMetadata().setVersion("1.0.0");
+        domainConfig.applyWebServiceMetadata(response.getModule());
         response.getModule().setInputs(new TypedParameters());
         response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_CONTENT, "binary", UsageEnumeration.R, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_CONTENT)));
         response.getModule().getInputs().getParam().add(Utils.createParameter(ValidationConstants.INPUT_EMBEDDING_METHOD, "string", UsageEnumeration.O, domainConfig.getWebServiceDescription().get(ValidationConstants.INPUT_EMBEDDING_METHOD)));
