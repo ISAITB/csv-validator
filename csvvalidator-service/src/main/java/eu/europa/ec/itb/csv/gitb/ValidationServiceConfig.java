@@ -1,8 +1,10 @@
 package eu.europa.ec.itb.csv.gitb;
 
+import eu.europa.ec.itb.csv.ApplicationConfig;
 import eu.europa.ec.itb.csv.DomainConfig;
 import eu.europa.ec.itb.csv.DomainConfigCache;
 import eu.europa.ec.itb.validation.commons.ValidatorChannel;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.servlet.CXFServlet;
@@ -25,7 +27,10 @@ public class ValidationServiceConfig {
 
     @Autowired
     private Bus cxfBus = null;
-    
+
+    @Autowired
+    private ApplicationConfig config;
+
     @Autowired
     private ApplicationContext applicationContext = null;
 
@@ -55,6 +60,10 @@ public class ValidationServiceConfig {
                 EndpointImpl endpoint = new EndpointImpl(cxfBus, applicationContext.getBean(ValidationServiceImpl.class, domainConfig));
                 endpoint.setEndpointName(new QName("http://www.gitb.com/vs/v1/", "ValidationServicePort"));
                 endpoint.setServiceName(new QName("http://www.gitb.com/vs/v1/", "ValidationService"));
+                if (StringUtils.isNotBlank(config.getBasePublicUrl())) {
+                    var url = StringUtils.appendIfMissing(config.getBasePublicUrl(), "/");
+                    endpoint.setPublishedEndpointUrl(url+domainConfig.getDomainName()+"/validation");
+                }
                 endpoint.publish("/"+domainConfig.getDomainName()+"/validation");
             }
     	}
