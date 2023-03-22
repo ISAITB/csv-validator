@@ -60,8 +60,8 @@ public class ValidationServiceConfig {
                 EndpointImpl endpoint = new EndpointImpl(cxfBus, applicationContext.getBean(ValidationServiceImpl.class, domainConfig));
                 endpoint.setEndpointName(new QName("http://www.gitb.com/vs/v1/", "ValidationServicePort"));
                 endpoint.setServiceName(new QName("http://www.gitb.com/vs/v1/", "ValidationService"));
-                if (StringUtils.isNotBlank(config.getBasePublicUrl())) {
-                    var url = StringUtils.appendIfMissing(config.getBasePublicUrl(), "/");
+                if (StringUtils.isNotBlank(config.getBaseSoapEndpointUrl())) {
+                    var url = StringUtils.appendIfMissing(config.getBaseSoapEndpointUrl(), "/");
                     endpoint.setPublishedEndpointUrl(url+domainConfig.getDomainName()+"/validation");
                 }
                 endpoint.publish("/"+domainConfig.getDomainName()+"/validation");
