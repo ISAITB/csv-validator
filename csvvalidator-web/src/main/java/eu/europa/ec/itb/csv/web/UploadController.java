@@ -177,7 +177,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                     if (fileManager.checkFileType(fis)) {
                         stream = getInputStream(contentType, file, uri, string);
                     } else {
-                        result.setMessage(localisationHelper.localise("validator.label.exception.providedInputNotJSON"));
+                        result.setMessage(localisationHelper.localise("validator.label.exception.providedInputNotCSV"));
                     }
                 }
             } catch (ValidatorException e) {
