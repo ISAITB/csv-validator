@@ -47,6 +47,9 @@ function anyViolationInputAtLevel(validationType, level) {
 }
 
 function setupSettingInputs(eventType, eventData) {
+    $('.toggleCsvSettings').off().on('click', toggleCsvSettings);
+    $('.syntaxInputChanged').off().on('change', syntaxInputChanged);
+    $('.headerCheckChanged').off().on('change', headerCheckChanged);
     $("#csvSettingsCheck").prop('checked', false);
     $('#inputDelimiter').val('');
     $('#inputQuote').val('');

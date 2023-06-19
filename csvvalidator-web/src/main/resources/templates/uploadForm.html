@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title th:replace="fragments/common :: header">Validator</title>
+        <title th:replace="~{fragments/common :: header}">Validator</title>
         <link rel="stylesheet" th:href="@{/css/style-csv.css}"/>
         <script th:src="@{/js/lib/FileSaver.min.js}"></script>
         <script th:src="@{/js/itb-upload-csv.js}"></script>
-        <script th:inline="javascript">
+        <script th:attr="nonce=${nonce}" th:inline="javascript">
             var externalArtifacts = {};
             [# th:each="artifactInfoEntry : ${externalArtifactInfo}"]
                 externalArtifacts[[# th:text="${artifactInfoEntry.key}" /]] = {}
@@ -59,29 +59,24 @@
                 labels: [(${labelConfig})]
             });
         </script>
-        <script th:inline="javascript" th:if="${reportData}">
-            $(document).ready(function() {
-                displayReport([(${reportData})]);
-            });
-        </script>
     </head>
     <body th:class="${not minimalUI} ? body-ui : ''">
         <div th:classappend="${not minimalUI} ? view-section-ui : ''" class="container view-section">
             <div class="view-section-input" th:classappend="${minimalUI} ? 'minimal-ui' : 'normal-ui'" th:if="${!minimalUI || report == null}">
-                <div th:replace="fragments/input :: pageHeader(${config}, ${minimalUI})"/>
+                <div th:replace="~{fragments/input :: pageHeader(${config}, ${minimalUI})}"/>
                 <form method="POST" enctype="multipart/form-data" th:action="@{${not minimalUI ? 'upload' : 'uploadm'}}" class="form-horizontal" novalidate="novalidate">
                     <div th:class="${minimalUI} ? panel-default : ''" th:classappend="${minimalUI} ? panel : ''">
-                        <div th:replace="fragments/input :: formHeader(${config}, ${minimalUI})"/>
+                        <div th:replace="~{fragments/input :: formHeader(${config}, ${minimalUI})}"/>
                         <div th:class="${minimalUI}?'panel-body panel-body-minimal':''">
-                            <div th:replace="fragments/input :: mainForm(${config})"/>
-                            <div th:replace="fragments/input :: externalArtifactCheck(${localiser.localise('validator.label.includeExternalArtefacts')}, ${localiser.localise('validator.label.externalArtefactsTooltip')})"/>
-                            <div th:replace="fragments/input :: externalArtifactControl('default', ${localiser.localise('validator.label.externalSchemaLabel')})"/>
+                            <div th:replace="~{fragments/input :: mainForm(${config})}"/>
+                            <div th:replace="~{fragments/input :: externalArtifactCheck(${localiser.localise('validator.label.includeExternalArtefacts')}, ${localiser.localise('validator.label.externalArtefactsTooltip')})}"/>
+                            <div th:replace="~{fragments/input :: externalArtifactControl('default', ${localiser.localise('validator.label.externalSchemaLabel')})}"/>
                             <div id="csvSettingsDiv" class="hidden">
                                 <div id="csvSettingsCheckDiv" class="form-group">
                                     <div class="col-sm-offset-2 col-sm-10">
                                         <div class="checkbox">
                                             <label>
-                                                <input type="checkbox" id="csvSettingsCheck" name="csvSettingsCheck" onclick="toggleCsvSettings()"> <span th:text="${localiser.localise('validator.label.includeCsvSyntax')}">Specify CSV syntax settings</span>
+                                                <input type="checkbox" id="csvSettingsCheck" name="csvSettingsCheck" class="toggleCsvSettings"> <span th:text="${localiser.localise('validator.label.includeCsvSyntax')}">Specify CSV syntax settings</span>
                                             </label>
                                             <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${localiser.localise('validator.label.includeCsvSyntaxTooltip')}"><i class="far fa-question-circle"></i></span>
                                         </div>
@@ -94,7 +89,7 @@
                                             <div class="row setting-input-container">
                                                 <div id="csvSettingsFormDelimiter" class="col-sm-2 setting-input">
                                                     <div class="setting-control">
-                                                        <input type="text" th:placeholder="${localiser.localise('validator.label.csvSyntaxDelimiterPlaceholder')}" class="form-control" id="inputDelimiter" name="inputDelimiter" maxlength="1" onchange="syntaxInputChanged()"/>
+                                                        <input type="text" th:placeholder="${localiser.localise('validator.label.csvSyntaxDelimiterPlaceholder')}" class="form-control syntaxInputChanged" id="inputDelimiter" name="inputDelimiter" maxlength="1"/>
                                                     </div>
                                                     <div class="setting-tooltip">
                                                         <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${localiser.localise('validator.label.csvSyntaxDelimiterTooltip')}"><i class="far fa-question-circle"></i></span>
@@ -102,7 +97,7 @@
                                                 </div>
                                                 <div id="csvSettingsFormQuote" class="col-sm-2 setting-input">
                                                     <div class="setting-control">
-                                                        <input type="text" th:placeholder="${localiser.localise('validator.label.csvSyntaxQuotePlaceholder')}" class="form-control" id="inputQuote" name="inputQuote" maxlength="1" onchange="syntaxInputChanged()"/>
+                                                        <input type="text" th:placeholder="${localiser.localise('validator.label.csvSyntaxQuotePlaceholder')}" class="form-control syntaxInputChanged" id="inputQuote" name="inputQuote" maxlength="1"/>
                                                     </div>
                                                     <div class="setting-tooltip">
                                                         <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${localiser.localise('validator.label.csvSyntaxQuoteTooltip')}"><i class="far fa-question-circle"></i></span>
@@ -111,7 +106,7 @@
                                                 <div id="csvSettingsFormHeaders" class="col-sm-6">
                                                     <div class="checkbox">
                                                         <label>
-                                                            <input type="checkbox" id="inputHeaders" name="inputHeaders" onchange="headerCheckChanged()"> <span th:text="${localiser.localise('validator.label.csvSyntaxHeaders')}">Content has header</span>
+                                                            <input type="checkbox" id="inputHeaders" name="inputHeaders" class="headerCheckChanged"> <span th:text="${localiser.localise('validator.label.csvSyntaxHeaders')}">Content has header</span>
                                                         </label>
                                                         <span data-toggle="tooltip" data-container="body" data-placement="right" th:attr="title=${localiser.localise('validator.label.csvSyntaxHeadersTooltip')}"><i class="far fa-question-circle"></i></span>
                                                     </div>
@@ -251,7 +246,7 @@
 
                                 </div>
                             </div>
-                            <div th:replace="fragments/input :: submit(${config}, ${minimalUI})"/>
+                            <div th:replace="~{fragments/input :: submit(${config}, ${minimalUI})}"/>
                         </div>
                         <div th:if="${minimalUI}" id="reportPlaceholder"></div>
                     </div>
@@ -259,11 +254,11 @@
             </div>
             <th:block th:if="${!minimalUI}">
                 <div id="reportPlaceholder"></div>
-                <div th:replace="fragments/common :: localeSelector(${config}, ${localiser.getLocale()})"/>
+                <div th:replace="~{fragments/common :: localeSelector(${config}, ${localiser.getLocale()})}"/>
             </th:block>
-            <div th:replace="fragments/common :: footer(${config}, ${minimalUI})"/>
+            <div th:replace="~{fragments/common :: footer(${config}, ${minimalUI})}"/>
         </div>
-        <div th:replace="fragments/common :: about">About</div>
-        <div th:replace="fragments/common :: buildInfo">Build info</div>
+        <div th:replace="~{fragments/common :: about}">About</div>
+        <div th:replace="~{fragments/common :: buildInfo}">Build info</div>
     </body>
 </html>
