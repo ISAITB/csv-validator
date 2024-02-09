@@ -3,6 +3,7 @@
     <head>
         <title th:replace="~{fragments/common :: header}">Validator</title>
         <link rel="stylesheet" th:href="@{/css/style-csv.css}"/>
+        <script th:src="@{/webjars/codemirror/mode/javascript/javascript.js}"></script>
         <script th:src="@{/js/lib/FileSaver.min.js}"></script>
         <script th:src="@{/js/itb-upload-csv.js}"></script>
         <script th:attr="nonce=${nonce}" th:inline="javascript">
@@ -47,6 +48,7 @@
             configure({
                 externalArtifactFileLabel: [[${localiser.localise('validator.label.optionContentFile')}]],
                 externalArtifactURILabel: [[${localiser.localise('validator.label.optionContentURI')}]],
+                externalArtifactTextLabel: [[${localiser.localise('validator.label.optionContentDirectInput')}]],
                 externalArtifactSettings: {
                     default: {
                         maxCount: 1

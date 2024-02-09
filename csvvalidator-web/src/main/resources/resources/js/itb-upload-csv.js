@@ -1,6 +1,7 @@
 addListener('FORM_READY', setupSettingInputs)
 addListener('VALIDATION_TYPE_CHANGED', setupSettingInputs);
-addListener('SUBMIT_STATUS_VALIDATED', syntaxInputChanged)
+addListener('SUBMIT_STATUS_VALIDATED', syntaxInputChanged);
+addListener('ADDED_EXTERNAL_ARTIFACT_INPUT', addedExternalSchema);
 function toggleCsvSettings() {
     var checked = $("#csvSettingsCheck").is(":checked")
     if (checked) {
@@ -9,6 +10,15 @@ function toggleCsvSettings() {
         $('#csvSettingsForm').addClass('hidden');
         $('#inputDelimiter').val('');
         $('#inputQuote').val('');
+    }
+}
+function addedExternalSchema(event, info) {
+    if (info) {
+        var codeMirror = getCodeMirrorNative('#text-editor-'+info.elementId)
+        if (codeMirror) {
+            codeMirror.setOption("mode", {name: "javascript", json: true});
+            codeMirror.refresh();
+        }
     }
 }
 function syntaxInputChanged() {
