@@ -3,14 +3,13 @@ package eu.europa.ec.itb.csv.webhook;
 import eu.europa.ec.itb.csv.web.UploadController;
 import eu.europa.ec.itb.validation.commons.web.dto.Translations;
 import eu.europa.ec.itb.validation.commons.web.dto.UploadResult;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.aspectj.lang.JoinPoint;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,7 +23,7 @@ class StatisticReportingAspectTest {
         // Use subclasses as AspectJ proxies cannot be made over Mockito mocks and spies.
         var target = new UploadController() {
             @Override
-            public UploadResult<Translations> handleUpload(String domain, MultipartFile file, String uri, String string, String validationType, String contentType, String[] externalSchemaContentType, MultipartFile[] externalSchemaFiles, String[] externalSchemaUri, Boolean csvSettingsCheck, Boolean inputHeaders, String inputDelimiter, String inputQuote, String inputDifferentInputFieldCountViolationLevel, String inputDifferentInputFieldSequenceViolationLevel, String inputDuplicateInputFieldsViolationLevel, String inputFieldCaseMismatchViolationLevel, String inputMultipleInputFieldsForSchemaFieldViolationLevel, String inputUnknownInputViolationLevel, String inputUnspecifiedSchemaFieldViolationLevel, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
+            public UploadResult<Translations> handleUpload(String domain, MultipartFile file, String uri, String string, String validationType, String contentType, String[] externalSchemaContentType, MultipartFile[] externalSchemaFiles, String[] externalSchemaUri, String[] externalSchemaString, Boolean csvSettingsCheck, Boolean inputHeaders, String inputDelimiter, String inputQuote, String inputDifferentInputFieldCountViolationLevel, String inputDifferentInputFieldSequenceViolationLevel, String inputDuplicateInputFieldsViolationLevel, String inputFieldCaseMismatchViolationLevel, String inputMultipleInputFieldsForSchemaFieldViolationLevel, String inputUnknownInputViolationLevel, String inputUnspecifiedSchemaFieldViolationLevel, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
                 assertEquals("domain1", domain);
                 assertTrue(aspectCalled[0]); // We expect the aspect to have been called before the method.
                 // We only want to check if this was called.
@@ -42,7 +41,7 @@ class StatisticReportingAspectTest {
         var aspectFactory = new AspectJProxyFactory(target);
         aspectFactory.addAspect(aspect);
         UploadController controller = aspectFactory.getProxy();
-        controller.handleUpload("domain1", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        controller.handleUpload("domain1", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         assertTrue(aspectCalled[0]);
         assertTrue(targetCalled[0]);
     }
@@ -54,7 +53,7 @@ class StatisticReportingAspectTest {
         // Use subclasses as AspectJ proxies cannot be made over Mockito mocks and spies.
         var target = new UploadController() {
             @Override
-            public UploadResult<Translations> handleUploadMinimal(String domain, MultipartFile file, String uri, String string, String validationType, String contentType, String[] externalSchema, MultipartFile[] externalSchemaFiles, String[] externalSchemaUri, Boolean csvSettingsCheck, Boolean inputHeaders, String inputDelimiter, String inputQuote, String inputDifferentInputFieldCountViolationLevel, String inputDifferentInputFieldSequenceViolationLevel, String inputDuplicateInputFieldsViolationLevel, String inputFieldCaseMismatchViolationLevel, String inputMultipleInputFieldsForSchemaFieldViolationLevel, String inputUnknownInputViolationLevel, String inputUnspecifiedSchemaFieldViolationLevel, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
+            public UploadResult<Translations> handleUploadMinimal(String domain, MultipartFile file, String uri, String string, String validationType, String contentType, String[] externalSchema, MultipartFile[] externalSchemaFiles, String[] externalSchemaUri,String[] externalSchemaString, Boolean csvSettingsCheck, Boolean inputHeaders, String inputDelimiter, String inputQuote, String inputDifferentInputFieldCountViolationLevel, String inputDifferentInputFieldSequenceViolationLevel, String inputDuplicateInputFieldsViolationLevel, String inputFieldCaseMismatchViolationLevel, String inputMultipleInputFieldsForSchemaFieldViolationLevel, String inputUnknownInputViolationLevel, String inputUnspecifiedSchemaFieldViolationLevel, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
                 assertEquals("domain1", domain);
                 assertTrue(aspectCalled[0]); // We expect the aspect to have been called before the method.
                 // We only want to check if this was called.
@@ -72,7 +71,7 @@ class StatisticReportingAspectTest {
         var aspectFactory = new AspectJProxyFactory(target);
         aspectFactory.addAspect(aspect);
         UploadController controller = aspectFactory.getProxy();
-        controller.handleUploadMinimal("domain1", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        controller.handleUploadMinimal("domain1", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         assertTrue(aspectCalled[0]);
         assertTrue(targetCalled[0]);
     }

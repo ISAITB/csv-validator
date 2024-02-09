@@ -27,8 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -51,7 +53,6 @@ import static eu.europa.ec.itb.validation.commons.web.Constants.*;
 public class UploadController extends BaseUploadController<DomainConfig, DomainConfigCache> {
 
     private static final Logger LOG = LoggerFactory.getLogger(UploadController.class);
-    private static final String IS_MINIMAL = "isMinimal";
 
     @Autowired
     private ApplicationConfig appConfig = null;
@@ -63,6 +64,18 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     private BeanFactory beans = null;
     @Autowired
     private CustomLocaleResolver localeResolver = null;
+
+    /**
+     * Prevent parameter values that contain commas to be interpreted as separate values.
+     *
+     * @param binder The data binder registry.
+     */
+    @SuppressWarnings("DataFlowIssue")
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        // Explicitly pass null to override the default (",").
+        binder.registerCustomEditor(String[].class, new StringArrayPropertyEditor(null));
+    }
 
     /**
      * Prepare the upload page.
@@ -145,9 +158,10 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                                    @RequestParam(value = "text", defaultValue = "") String string,
                                                    @RequestParam(value = "validationType", defaultValue = "") String validationType,
                                                    @RequestParam(value = "contentType", defaultValue = "") String contentType,
-                                                   @RequestParam(value = "contentType-external_default", required = false) String[] externalSchemaContentType,
+                                                   @RequestParam(value = "contentType-external_default", required = false, defaultValue = "") String[] externalSchemaContentType,
                                                    @RequestParam(value = "inputFile-external_default", required = false) MultipartFile[] externalSchemaFiles,
-                                                   @RequestParam(value = "uri-external_default", required = false, defaultValue = "-") String[] externalSchemaUri,
+                                                   @RequestParam(value = "uri-external_default", required = false, defaultValue = "") String[] externalSchemaUri,
+                                                   @RequestParam(value = "text-external_default", required = false, defaultValue = "") String[] externalSchemaString,
                                                    @RequestParam(value = "csvSettingsCheck", required = false, defaultValue = "false") Boolean csvSettingsCheck,
                                                    @RequestParam(value = "inputHeaders", required = false, defaultValue = "false") Boolean inputHeaders,
                                                    @RequestParam(value = "inputDelimiter", required = false) String inputDelimiter,
@@ -206,7 +220,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                     }
                     List<FileInfo> externalSchemas = new ArrayList<>();
                     try {
-                        externalSchemas = getExternalFiles(externalSchemaContentType, externalSchemaFiles, externalSchemaUri, domainConfig.getSchemaInfo(validationType), tempFolderForRequest);
+                        externalSchemas = getExternalFiles(externalSchemaContentType, externalSchemaFiles, externalSchemaUri, externalSchemaString, domainConfig.getSchemaInfo(validationType), tempFolderForRequest);
                     } catch (ValidatorException e) {
                         LOG.error(e.getMessageForLog(), e);
                         result.setMessage(e.getMessageForDisplay(localisationHelper));
@@ -288,7 +302,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     /**
      * Handle the upload form's submission when the user interface is minimal.
      *
-     * @see UploadController#handleUpload(String, MultipartFile, String, String, String, String, String[], MultipartFile[], String[], Boolean, Boolean, String, String, String, String, String, String, String, String, String, RedirectAttributes, HttpServletRequest, HttpServletResponse)
+     * @see UploadController#handleUpload(String, MultipartFile, String, String, String, String, String[], MultipartFile[], String[], String[], Boolean, Boolean, String, String, String, String, String, String, String, String, String, RedirectAttributes, HttpServletRequest, HttpServletResponse)
      */
     @PostMapping(value = "/{domain}/uploadm", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -298,9 +312,10 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                       @RequestParam(value = "text", defaultValue = "") String string,
                                       @RequestParam(value = "validationType", defaultValue = "") String validationType,
                                       @RequestParam(value = "contentType", defaultValue = "") String contentType,
-                                      @RequestParam(value = "contentType-external_default", required = false) String[] externalSchema,
+                                      @RequestParam(value = "contentType-external_default", required = false, defaultValue = "") String[] externalSchema,
                                       @RequestParam(value = "inputFile-external_default", required= false) MultipartFile[] externalSchemaFiles,
-                                      @RequestParam(value = "uriToValidate-external_default", required = false, defaultValue = "-") String[] externalSchemaUri,
+                                      @RequestParam(value = "uri-external_default", required = false, defaultValue = "") String[] externalSchemaUri,
+                                      @RequestParam(value = "text-external_default", required = false, defaultValue = "") String[] externalSchemaString,
                                       @RequestParam(value = "csvSettingsCheck", required = false, defaultValue = "false") Boolean csvSettingsCheck,
                                       @RequestParam(value = "inputHeaders", required = false, defaultValue = "false") Boolean inputHeaders,
                                       @RequestParam(value = "inputDelimiter", required = false) String inputDelimiter,
@@ -317,7 +332,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                       HttpServletResponse response) {
         return handleUpload(
                 domain, file, uri, string, validationType, contentType,
-                externalSchema, externalSchemaFiles, externalSchemaUri,
+                externalSchema, externalSchemaFiles, externalSchemaUri, externalSchemaString,
                 csvSettingsCheck, inputHeaders, inputDelimiter, inputQuote,
                 inputDifferentInputFieldCountViolationLevel, inputDifferentInputFieldSequenceViolationLevel,
                 inputDuplicateInputFieldsViolationLevel, inputFieldCaseMismatchViolationLevel,
@@ -329,7 +344,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     /**
      * Handle the upload form's submission when the user interface is embedded in another web page.
      *
-     * @see UploadController#handleUpload(String, MultipartFile, String, String, String, String, String[], MultipartFile[], String[], Boolean, Boolean, String, String, String, String, String, String, String, String, String, RedirectAttributes, HttpServletRequest, HttpServletResponse)
+     * @see UploadController#handleUpload(String, MultipartFile, String, String, String, String, String[], MultipartFile[], String[], String[], Boolean, Boolean, String, String, String, String, String, String, String, String, String, RedirectAttributes, HttpServletRequest, HttpServletResponse)
      */
     @PostMapping(value = "/{domain}/upload", produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView handleUploadEmbedded(@PathVariable("domain") String domain,
@@ -338,9 +353,10 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                              @RequestParam(value = "text", defaultValue = "") String string,
                                              @RequestParam(value = "validationType", defaultValue = "") String validationType,
                                              @RequestParam(value = "contentType", defaultValue = "") String contentType,
-                                             @RequestParam(value = "contentType-external_default", required = false) String[] externalSchema,
+                                             @RequestParam(value = "contentType-external_default", required = false, defaultValue = "") String[] externalSchema,
                                              @RequestParam(value = "inputFile-external_default", required= false) MultipartFile[] externalSchemaFiles,
-                                             @RequestParam(value = "uriToValidate-external_default", required = false, defaultValue = "-") String[] externalSchemaUri,
+                                             @RequestParam(value = "uri-external_default", required = false, defaultValue = "") String[] externalSchemaUri,
+                                             @RequestParam(value = "text-external_default", required = false, defaultValue = "") String[] externalSchemaString,
                                              @RequestParam(value = "csvSettingsCheck", required = false, defaultValue = "false") Boolean csvSettingsCheck,
                                              @RequestParam(value = "inputHeaders", required = false, defaultValue = "false") Boolean inputHeaders,
                                              @RequestParam(value = "inputDelimiter", required = false) String inputDelimiter,
@@ -358,7 +374,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
         var uploadForm = upload(domain, request, response);
         var uploadResult = handleUpload(
                 domain, file, uri, string, validationType, contentType,
-                externalSchema, externalSchemaFiles, externalSchemaUri,
+                externalSchema, externalSchemaFiles, externalSchemaUri, externalSchemaString,
                 csvSettingsCheck, inputHeaders, inputDelimiter, inputQuote,
                 inputDifferentInputFieldCountViolationLevel, inputDifferentInputFieldSequenceViolationLevel,
                 inputDuplicateInputFieldsViolationLevel, inputFieldCaseMismatchViolationLevel,
@@ -372,7 +388,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     /**
      * Handle the upload form's submission when the user interface is minimal and embedded in another web page.
      *
-     * @see UploadController#handleUpload(String, MultipartFile, String, String, String, String, String[], MultipartFile[], String[], Boolean, Boolean, String, String, String, String, String, String, String, String, String, RedirectAttributes, HttpServletRequest, HttpServletResponse)
+     * @see UploadController#handleUpload(String, MultipartFile, String, String, String, String, String[], MultipartFile[], String[], String[], Boolean, Boolean, String, String, String, String, String, String, String, String, String, RedirectAttributes, HttpServletRequest, HttpServletResponse)
      */
     @PostMapping(value = "/{domain}/uploadm", produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView handleUploadMinimalEmbedded(@PathVariable("domain") String domain,
@@ -381,9 +397,10 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                                     @RequestParam(value = "text", defaultValue = "") String string,
                                                     @RequestParam(value = "validationType", defaultValue = "") String validationType,
                                                     @RequestParam(value = "contentType", defaultValue = "") String contentType,
-                                                    @RequestParam(value = "contentType-external_default", required = false) String[] externalSchema,
+                                                    @RequestParam(value = "contentType-external_default", required = false, defaultValue = "") String[] externalSchema,
                                                     @RequestParam(value = "inputFile-external_default", required= false) MultipartFile[] externalSchemaFiles,
-                                                    @RequestParam(value = "uriToValidate-external_default", required = false, defaultValue = "-") String[] externalSchemaUri,
+                                                    @RequestParam(value = "uri-external_default", required = false, defaultValue = "") String[] externalSchemaUri,
+                                                    @RequestParam(value = "text-external_default", required = false, defaultValue = "") String[] externalSchemaString,
                                                     @RequestParam(value = "csvSettingsCheck", required = false, defaultValue = "false") Boolean csvSettingsCheck,
                                                     @RequestParam(value = "inputHeaders", required = false, defaultValue = "false") Boolean inputHeaders,
                                                     @RequestParam(value = "inputDelimiter", required = false) String inputDelimiter,
@@ -400,7 +417,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                                     HttpServletResponse response) {
         return handleUploadEmbedded(
                 domain, file, uri, string, validationType, contentType,
-                externalSchema, externalSchemaFiles, externalSchemaUri,
+                externalSchema, externalSchemaFiles, externalSchemaUri, externalSchemaString,
                 csvSettingsCheck, inputHeaders, inputDelimiter, inputQuote,
                 inputDifferentInputFieldCountViolationLevel, inputDifferentInputFieldSequenceViolationLevel,
                 inputDuplicateInputFieldsViolationLevel, inputFieldCaseMismatchViolationLevel,
@@ -415,28 +432,36 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @param externalContentType The directly provided schemas.
      * @param externalFiles The schemas provided as files.
      * @param externalUri The schemas provided as URIs.
+     * @param externalString The schemas provided as direct input.
      * @param schemaInfo The schema information from the domain.
      * @param parentFolder The temporary folder to use for file system storage.
      * @return The list of user-provided artifacts.
      * @throws IOException If an error occurs.
      */
-    private List<FileInfo> getExternalFiles(String[] externalContentType, MultipartFile[] externalFiles, String[] externalUri,
+    private List<FileInfo> getExternalFiles(String[] externalContentType, MultipartFile[] externalFiles, String[] externalUri, String[] externalString,
                                             ValidationArtifactInfo schemaInfo, File parentFolder) throws IOException {
         List<FileInfo> externalArtifacts = new ArrayList<>();
         if (externalContentType != null) {
             for(int i=0; i < externalContentType.length; i++) {
-                File inputFile;
-                MultipartFile currentExtFile = null;
-                String currentExtUri = "";
-                if (externalFiles != null && externalFiles.length>i) {
-                    currentExtFile = externalFiles[i];
+                if (StringUtils.isNotBlank(externalContentType[i])) {
+                    File inputFile;
+                    MultipartFile currentExtFile = null;
+                    String currentExtUri = "";
+                    String currentExtString = "";
+                    if (externalFiles != null && externalFiles.length>i) {
+                        currentExtFile = externalFiles[i];
+                    }
+                    if (externalUri != null && externalUri.length>i) {
+                        currentExtUri = externalUri[i];
+                    }
+                    if (externalString != null && externalString.length>i) {
+                        currentExtString = externalString[i];
+                    }
+                    inputFile = getInputFile(externalContentType[i], currentExtFile, currentExtUri, currentExtString, parentFolder);
+                    if (inputFile != null) {
+                        externalArtifacts.add(new FileInfo(inputFile));
+                    }
                 }
-                if (externalUri != null && externalUri.length>i) {
-                    currentExtUri = externalUri[i];
-                }
-                inputFile = getInputFile(externalContentType[i], currentExtFile, currentExtUri, parentFolder);
-                FileInfo fi = new FileInfo(inputFile);
-                externalArtifacts.add(fi);
             }
         }
         if (validateExternalFiles(externalArtifacts, schemaInfo)) {
@@ -481,11 +506,12 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @param contentType The directly provided content.
      * @param inputFile The uploaded content file.
      * @param inputUri The provided URI to load the content from.
+     * @param inputString The provided direct input to load the content from.
      * @param parentFolder The temporary folder to use.
      * @return The input content's file.
      * @throws IOException If an error occurs.
      */
-    private File getInputFile(String contentType, MultipartFile inputFile, String inputUri, File parentFolder) throws IOException {
+    private File getInputFile(String contentType, MultipartFile inputFile, String inputUri, String inputString, File parentFolder) throws IOException {
         File file = null;
         if (CONTENT_TYPE_FILE.equals(contentType)) {
             if (inputFile!=null && !inputFile.isEmpty()) {
@@ -494,8 +520,12 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                 }
             }
         } else if (CONTENT_TYPE_URI.equals(contentType)) {
-            if (!inputUri.isEmpty()) {
+            if (StringUtils.isNotBlank(inputUri)) {
                 file = this.fileManager.getFileFromURL(parentFolder, inputUri);
+            }
+        } else if (CONTENT_TYPE_STRING.equals(contentType)) {
+            if (StringUtils.isNotBlank(inputString)) {
+                file = this.fileManager.getFileFromString(parentFolder, inputString);
             }
         }
         return file;
