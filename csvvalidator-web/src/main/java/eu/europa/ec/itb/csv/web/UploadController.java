@@ -541,19 +541,12 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @return The stream to read.
      */
     private InputStream getInputStream(String contentType, MultipartFile file, String uri, String string) throws IOException {
-        InputStream is = null;
-        switch (contentType) {
-            case CONTENT_TYPE_FILE:
-                is = file.getInputStream();
-                break;
-            case CONTENT_TYPE_URI:
-                is = this.fileManager.getInputStreamFromURL(uri);
-                break;
-            case CONTENT_TYPE_STRING:
-                is = new ByteArrayInputStream(string.getBytes());
-                break;
-        }
-        return is;
+        return switch (contentType) {
+            case CONTENT_TYPE_FILE -> file.getInputStream();
+            case CONTENT_TYPE_URI -> this.fileManager.getInputStreamFromURL(uri, null).stream();
+            case CONTENT_TYPE_STRING -> new ByteArrayInputStream(string.getBytes());
+            default -> null;
+        };
     }
 
 }
