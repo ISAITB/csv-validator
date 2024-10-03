@@ -42,6 +42,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.http.HttpClient;
 import java.util.*;
 
 import static eu.europa.ec.itb.validation.commons.web.Constants.*;
@@ -190,9 +191,9 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
         } else {
             InputStream stream = null;
             try {
-                try (InputStream fis = getInputStream(contentType, file, uri, string)) {
+                try (InputStream fis = getInputStream(contentType, file, uri, string, domainConfig.getHttpVersion())) {
                     if (fileManager.checkFileType(fis)) {
-                        stream = getInputStream(contentType, file, uri, string);
+                        stream = getInputStream(contentType, file, uri, string, domainConfig.getHttpVersion());
                     } else {
                         result.setMessage(localisationHelper.localise("validator.label.exception.providedInputNotCSV"));
                     }
@@ -220,7 +221,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                     }
                     List<FileInfo> externalSchemas = new ArrayList<>();
                     try {
-                        externalSchemas = getExternalFiles(externalSchemaContentType, externalSchemaFiles, externalSchemaUri, externalSchemaString, domainConfig.getSchemaInfo(validationType), tempFolderForRequest);
+                        externalSchemas = getExternalFiles(externalSchemaContentType, externalSchemaFiles, externalSchemaUri, externalSchemaString, domainConfig.getSchemaInfo(validationType), tempFolderForRequest, domainConfig.getHttpVersion());
                     } catch (ValidatorException e) {
                         LOG.error(e.getMessageForLog(), e);
                         result.setMessage(e.getMessageForDisplay(localisationHelper));
@@ -435,11 +436,12 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @param externalString The schemas provided as direct input.
      * @param schemaInfo The schema information from the domain.
      * @param parentFolder The temporary folder to use for file system storage.
+     * @param httpVersion The HTTP version to use.
      * @return The list of user-provided artifacts.
      * @throws IOException If an error occurs.
      */
     private List<FileInfo> getExternalFiles(String[] externalContentType, MultipartFile[] externalFiles, String[] externalUri, String[] externalString,
-                                            ValidationArtifactInfo schemaInfo, File parentFolder) throws IOException {
+                                            ValidationArtifactInfo schemaInfo, File parentFolder, HttpClient.Version httpVersion) throws IOException {
         List<FileInfo> externalArtifacts = new ArrayList<>();
         if (externalContentType != null) {
             for(int i=0; i < externalContentType.length; i++) {
@@ -457,7 +459,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                     if (externalString != null && externalString.length>i) {
                         currentExtString = externalString[i];
                     }
-                    inputFile = getInputFile(externalContentType[i], currentExtFile, currentExtUri, currentExtString, parentFolder);
+                    inputFile = getInputFile(externalContentType[i], currentExtFile, currentExtUri, currentExtString, parentFolder, httpVersion);
                     if (inputFile != null) {
                         externalArtifacts.add(new FileInfo(inputFile));
                     }
@@ -508,10 +510,11 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @param inputUri The provided URI to load the content from.
      * @param inputString The provided direct input to load the content from.
      * @param parentFolder The temporary folder to use.
+     * @param httpVersion The HTTP version to use.
      * @return The input content's file.
      * @throws IOException If an error occurs.
      */
-    private File getInputFile(String contentType, MultipartFile inputFile, String inputUri, String inputString, File parentFolder) throws IOException {
+    private File getInputFile(String contentType, MultipartFile inputFile, String inputUri, String inputString, File parentFolder, HttpClient.Version httpVersion) throws IOException {
         File file = null;
         if (CONTENT_TYPE_FILE.equals(contentType)) {
             if (inputFile!=null && !inputFile.isEmpty()) {
@@ -521,7 +524,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
             }
         } else if (CONTENT_TYPE_URI.equals(contentType)) {
             if (StringUtils.isNotBlank(inputUri)) {
-                file = this.fileManager.getFileFromURL(parentFolder, inputUri);
+                file = this.fileManager.getFileFromURL(parentFolder, inputUri, httpVersion);
             }
         } else if (CONTENT_TYPE_STRING.equals(contentType)) {
             if (StringUtils.isNotBlank(inputString)) {
@@ -538,12 +541,13 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @param file The file.
      * @param uri The URI.
      * @param string The text content
+     * @param httpVersion The HTTP version to use.
      * @return The stream to read.
      */
-    private InputStream getInputStream(String contentType, MultipartFile file, String uri, String string) throws IOException {
+    private InputStream getInputStream(String contentType, MultipartFile file, String uri, String string, HttpClient.Version httpVersion) throws IOException {
         return switch (contentType) {
             case CONTENT_TYPE_FILE -> file.getInputStream();
-            case CONTENT_TYPE_URI -> this.fileManager.getInputStreamFromURL(uri, null).stream();
+            case CONTENT_TYPE_URI -> this.fileManager.getInputStreamFromURL(uri, null, httpVersion).stream();
             case CONTENT_TYPE_STRING -> new ByteArrayInputStream(string.getBytes());
             default -> null;
         };
