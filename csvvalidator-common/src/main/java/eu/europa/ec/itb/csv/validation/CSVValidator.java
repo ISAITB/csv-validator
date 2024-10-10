@@ -18,7 +18,9 @@ import io.frictionlessdata.tableschema.schema.Schema;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.DuplicateHeaderMode;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.parser.txt.CharsetDetector;
 import org.apache.tika.parser.txt.CharsetMatch;
@@ -31,7 +33,9 @@ import org.springframework.stereotype.Component;
 import jakarta.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -242,7 +246,7 @@ public class CSVValidator {
         List<ReportItem> errors = new ArrayList<>();
         var format = CSVFormat.RFC4180.builder()
                 .setIgnoreHeaderCase(false)
-                .setAllowDuplicateHeaderNames(true)
+                .setDuplicateHeaderMode(DuplicateHeaderMode.ALLOW_ALL)
                 .setIgnoreSurroundingSpaces(true)
                 .setRecordSeparator("\n")
                 .setDelimiter(specs.getCSVSettings().getDelimiter())
@@ -421,7 +425,7 @@ public class CSVValidator {
             try {
                 try (
                     Reader in = new InputStreamReader(new FileInputStream(inputFile), charsetToUse);
-                    Writer out = new OutputStreamWriter(new FileOutputStream(fileCopy), StandardCharsets.UTF_8.name())
+                    Writer out = new OutputStreamWriter(new FileOutputStream(fileCopy), StandardCharsets.UTF_8)
                 ) {
                     char[] buffer = new char[1024];
                     int len;
@@ -431,7 +435,7 @@ public class CSVValidator {
                 }
                 FileUtils.deleteQuietly(inputFile);
                 FileUtils.moveFile(fileCopy, inputFile);
-                LOG.info("Converted input file from [{}] to [UTF-8].", charsetToUse);
+                LOG.info("Converted input file from [{}] to [UTF-8]", charsetToUse);
             } catch (IOException e) {
                 throw new ValidatorException("validator.label.exception.unableToReadInputFile", e);
             }
@@ -446,16 +450,44 @@ public class CSVValidator {
      */
     private String getCharsetToUse(File inputFile) {
         String charset = null;
+        List<String> matchedCharsets = null;
         try (InputStream in = TikaInputStream.get(toStream(inputFile, true))) {
             CharsetDetector detector = new CharsetDetector();
             detector.setText(in);
-            CharsetMatch match = detector.detect();
-            charset = match.getName();
+            CharsetMatch[] matches = detector.detectAll();
+            if (matches != null) {
+                // The matched character sets are returned ordered by confidence level.
+                matchedCharsets = Arrays.stream(matches).map(CharsetMatch::getName).toList();
+            }
         } catch (IOException e) {
             LOG.warn("Error while detecting charset", e);
         }
+        List<String> ignoredCharsets = new ArrayList<>();
+        if (matchedCharsets != null) {
+            for (var matchedCharset: matchedCharsets) {
+                // Check to see that this is a supported charset.
+                try {
+                    var parsedCharset = Charset.forName(matchedCharset);
+                    charset = parsedCharset.name();
+                    break;
+                } catch (UnsupportedCharsetException e) {
+                    ignoredCharsets.add(matchedCharset);
+                }
+            }
+        }
         if (charset == null) {
             charset = StandardCharsets.UTF_8.name();
+            if (ignoredCharsets.isEmpty()) {
+                LOG.info("No character set detected - using [{}] by default", charset);
+            } else {
+                LOG.info("Ignored unsupported character sets [{}] and using [{}] as default", StringUtils.joinWith(", ", ignoredCharsets.toArray()), charset);
+            }
+        } else {
+            if (ignoredCharsets.isEmpty()) {
+                LOG.info("Detected character set [{}]", charset);
+            } else {
+                LOG.info("Ignored unsupported character sets [{}] and using [{}]", StringUtils.joinWith(", ", ignoredCharsets.toArray()), charset);
+            }
         }
         return charset;
     }
@@ -644,15 +676,12 @@ public class CSVValidator {
         error.setDescription(errorMessage.getReportMessage());
         error.setLocation(ValidationConstants.INPUT_CONTENT + ":" + errorMessage.getLineNumber() + ":0");
         error.setValue(errorMessage.getValue());
-        switch (errorMessage.getViolationLevel()) {
-            case ERROR:
-                return objectFactory.createTestAssertionGroupReportsTypeError(error);
-            case WARNING:
-                return objectFactory.createTestAssertionGroupReportsTypeWarning(error);
-            case INFO:
-                return objectFactory.createTestAssertionGroupReportsTypeInfo(error);
-        }
-        return null; // Can be NONE as a violation level.
+        return switch (errorMessage.getViolationLevel()) {
+            case ERROR -> objectFactory.createTestAssertionGroupReportsTypeError(error);
+            case WARNING -> objectFactory.createTestAssertionGroupReportsTypeWarning(error);
+            case INFO -> objectFactory.createTestAssertionGroupReportsTypeInfo(error);
+            default -> null;
+        };
     }
 
     /**
