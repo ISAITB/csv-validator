@@ -153,7 +153,7 @@ public class RestValidationController extends BaseRestController<DomainConfig, A
             var addInputToReport = Objects.requireNonNullElse(in.getAddInputToReport(), false);
             var contentEmbeddingMethod = inputHelper.getEmbeddingMethod(in.getEmbeddingMethod());
             var externalSchemas = getExternalSchemas(domainConfig, in.getExternalSchemas(), validationType, null, parentFolder);
-            var contentToValidate = inputHelper.validateContentToValidate(in.getContentToValidate(), contentEmbeddingMethod, null, parentFolder, domainConfig.getHttpVersion());
+            var contentToValidate = inputHelper.validateContentToValidate(in.getContentToValidate(), contentEmbeddingMethod, null, parentFolder, domainConfig.getHttpVersion()).getFile();
             // CSV settings.
             Boolean inputHeaders = validateAndGetSyntaxInput(in.getHasHeaders(), ValidationConstants.INPUT_HAS_HEADERS, domainConfig.getCsvOptions().getUserInputForHeader().get(validationType), Boolean::valueOf);
             String inputDelimiter = validateAndGetSyntaxInput(in.getDelimiter(), ValidationConstants.INPUT_DELIMITER, domainConfig.getCsvOptions().getUserInputForDelimiter().get(validationType), s -> s);
