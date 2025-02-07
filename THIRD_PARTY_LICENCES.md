@@ -27,7 +27,7 @@ build. These libraries are used as-is, with no modifications to source code.
 | GNU General Public License (GPL), Version 3, GNU Lesser General Public License (LGPL), Version 3.0, Mozilla Public License Version 1.1 | juniversalchardet | com.github.albfernandez:juniversalchardet | 2.4.0 | https://github.com/albfernandez/juniversalchardet |
 | The 3-Clause BSD No Nuclear License | Java Advanced Imaging Image I/O Tools API core (standalone) | com.github.jai-imageio:jai-imageio-core | 1.4.0 | https://github.com/jai-imageio/jai-imageio-core |
 | UnRAR License | Java Unrar | com.github.junrar:junrar | 7.5.5 | https://github.com/junrar/junrar |
-| BSD License | curvesapi | com.github.virtuald:curvesapi | 1.08 | https://github.com/virtuald/curvesapi |
+| The 3-Clause BSD License | curvesapi | com.github.virtuald:curvesapi | 1.08 | https://github.com/virtuald/curvesapi |
 | Apache License, Version 2.0 | FindBugs-jsr305 | com.google.code.findbugs:jsr305 | 3.0.2 | http://findbugs.sourceforge.net/ |
 | Apache License, Version 2.0 | error-prone annotations | com.google.errorprone:error_prone_annotations | 2.28.0 | https://errorprone.info/error_prone_annotations |
 | Apache License, Version 2.0 | Guava InternalFutureFailureAccess and InternalFutures | com.google.guava:failureaccess | 1.0.2 | https://github.com/google/guava/failureaccess |
@@ -67,9 +67,9 @@ build. These libraries are used as-is, with no modifications to source code.
 | Apache License, Version 2.0 | swagger-core-jakarta | io.swagger.core.v3:swagger-core-jakarta | 2.2.25 | https://github.com/swagger-api/swagger-core/modules/swagger-core-jakarta |
 | Apache License, Version 2.0 | swagger-models-jakarta | io.swagger.core.v3:swagger-models-jakarta | 2.2.25 | https://github.com/swagger-api/swagger-core/modules/swagger-models-jakarta |
 | Eclipse Distribution License - v1.0 | Jakarta Activation API | jakarta.activation:jakarta.activation-api | 2.1.2 | https://github.com/jakartaee/jaf-api |
-| Eclipse Public License - v1.0, GNU General Public License (GPL), Version 2 (with Classpath Exception) | Jakarta Annotations API | jakarta.annotation:jakarta.annotation-api | 2.1.1 | https://projects.eclipse.org/projects/ee4j.ca |
+| Eclipse Public License - v2.0, GNU General Public License (GPL), Version 2 (with Classpath Exception) | Jakarta Annotations API | jakarta.annotation:jakarta.annotation-api | 2.1.1 | https://projects.eclipse.org/projects/ee4j.ca |
 | Eclipse Distribution License - v1.0 | Jakarta Web Services Metadata API | jakarta.jws:jakarta.jws-api | 3.0.0 | https://github.com/eclipse-ee4j/jws-api |
-| Eclipse Distribution License - v1.0, Eclipse Public License - v1.0, GNU General Public License (GPL), Version 2 (with Classpath Exception) | Jakarta Mail API | jakarta.mail:jakarta.mail-api | 2.1.3 | https://projects.eclipse.org/projects/ee4j/jakarta.mail-api |
+| Eclipse Distribution License - v1.0, Eclipse Public License - v2.0, GNU General Public License (GPL), Version 2 (with Classpath Exception) | Jakarta Mail API | jakarta.mail:jakarta.mail-api | 2.1.3 | https://projects.eclipse.org/projects/ee4j/jakarta.mail-api |
 | Apache License, Version 2.0 | Jakarta Bean Validation API | jakarta.validation:jakarta.validation-api | 3.0.2 | https://beanvalidation.org |
 | Eclipse Distribution License - v1.0 | Jakarta XML Binding API | jakarta.xml.bind:jakarta.xml.bind-api | 4.0.2 | https://github.com/jakartaee/jaxb-api/jakarta.xml.bind-api |
 | Eclipse Distribution License - v1.0 | Jakarta SOAP with Attachments API | jakarta.xml.soap:jakarta.xml.soap-api | 3.0.2 | https://github.com/jakartaee/saaj-api |
@@ -152,7 +152,7 @@ build. These libraries are used as-is, with no modifications to source code.
 | The 2-Clause BSD License | Stax2 API | org.codehaus.woodstox:stax2-api | 4.2.2 | http://github.com/FasterXML/stax2-api |
 | CDDL, v1.0, GNU Lesser General Public License (LGPL), Version 2.1 | JHighlight | org.codelibs:jhighlight | 1.1.0 | https://github.com/codelibs/jhighlight |
 | Eclipse Distribution License - v1.0 | Angus Activation Registries | org.eclipse.angus:angus-activation | 2.0.2 | https://github.com/eclipse-ee4j/angus-activation/angus-activation |
-| Eclipse Distribution License - v1.0, Eclipse Public License - v1.0, GNU General Public License (GPL), Version 2 (with Classpath Exception) | Angus Mail Provider | org.eclipse.angus:angus-mail | 2.0.3 | http://eclipse-ee4j.github.io/angus-mail/angus-mail |
+| Eclipse Distribution License - v1.0, Eclipse Public License - v2.0, GNU General Public License (GPL), Version 2 (with Classpath Exception) | Angus Mail Provider | org.eclipse.angus:angus-mail | 2.0.3 | http://eclipse-ee4j.github.io/angus-mail/angus-mail |
 | Apache License, Version 2.0 | Apache FreeMarker | org.freemarker:freemarker | 2.3.32 | https://freemarker.apache.org/ |
 | Apache License, Version 2.0 | Ogg and Vorbis for Java, Core | org.gagravarr:vorbis-java-core | 0.8 | https://github.com/Gagravarr/VorbisJava |
 | Apache License, Version 2.0 | Apache Tika plugin for Ogg, Vorbis and FLAC | org.gagravarr:vorbis-java-tika | 0.8 | https://github.com/Gagravarr/VorbisJava |
@@ -195,10 +195,10 @@ build. These libraries are used as-is, with no modifications to source code.
 | Apache License, Version 2.0 | spring-security-core | org.springframework.security:spring-security-core | 6.4.2 | https://spring.io/projects/spring-security |
 | Apache License, Version 2.0 | spring-security-crypto | org.springframework.security:spring-security-crypto | 6.4.2 | https://spring.io/projects/spring-security |
 | Apache License, Version 2.0 | spring-security-web | org.springframework.security:spring-security-web | 6.4.2 | https://spring.io/projects/spring-security |
-| BSD | JMatIO | org.tallison:jmatio | 1.5 | https://github.com/tballison/jmatio |
+| The 3-Clause BSD License | JMatIO | org.tallison:jmatio | 1.5 | https://github.com/tballison/jmatio |
 | Apache License, Version 2.0 | thymeleaf | org.thymeleaf:thymeleaf | 3.1.3.RELEASE | http://www.thymeleaf.org/thymeleaf-lib/thymeleaf |
 | Apache License, Version 2.0 | thymeleaf-spring6 | org.thymeleaf:thymeleaf-spring6 | 3.1.3.RELEASE | http://www.thymeleaf.org/thymeleaf-lib/thymeleaf-spring6 |
-| Public Domain | XZ for Java | org.tukaani:xz | 1.9 | https://tukaani.org/xz/java.html |
+| The 0-Clause BSD License | XZ for Java | org.tukaani:xz | 1.9 | https://tukaani.org/xz/java.html |
 | Apache License, Version 2.0 | unbescape | org.unbescape:unbescape | 1.1.6.RELEASE | http://www.unbescape.org |
 | Apache License, Version 2.0 | Bootstrap | org.webjars:bootstrap | 3.4.1 | http://webjars.org |
 | MIT License | CodeMirror | org.webjars:codemirror | 5.62.2 | http://webjars.org |
