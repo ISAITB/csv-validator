@@ -1,3 +1,7 @@
+![Banner](https://www.itb.ec.europa.eu/files/banners/csvvalidator_banner.png)
+
+# CSV validator
+
 ![BuildStatus](https://github.com/ISAITB/csv-validator/actions/workflows/main.yml/badge.svg)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ISAITB_csv-validator&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=ISAITB_csv-validator)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ISAITB_csv-validator&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=ISAITB_csv-validator)
@@ -7,8 +11,6 @@
 [![licence](https://img.shields.io/github/license/ISAITB/csv-validator.svg?color=blue)](https://github.com/ISAITB/csv-validator/blob/master/LICENCE.txt)
 [![docs](https://img.shields.io/static/v1?label=docs&message=Test%20Bed%20guides&color=blue)](https://www.itb.ec.europa.eu/docs/guides/latest/validatingCSV/)
 [![docker](https://img.shields.io/docker/pulls/isaitb/csv-validator?color=blue&logo=docker&logoColor=white)](https://hub.docker.com/r/isaitb/csv-validator)
-
-# CSV validator
 
 The **CSV validator** is a web application to validate CSV data against [Table Schema](https://specs.frictionlessdata.io/table-schema/).
 The application provides a fully reusable core that requires only configuration to determine the supported specifications,
