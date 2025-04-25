@@ -24,7 +24,7 @@ build. These libraries are used as-is, with no modifications to source code.
 | Apache License, Version 2.0 | Jackson datatype: JSR310 | com.fasterxml.jackson.datatype:jackson-datatype-jsr310 | 2.18.3 | https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310 |
 | Apache License, Version 2.0 | Jackson-module-parameter-names | com.fasterxml.jackson.module:jackson-module-parameter-names | 2.18.3 | https://github.com/FasterXML/jackson-modules-java8/jackson-module-parameter-names |
 | Apache License, Version 2.0 | Woodstox | com.fasterxml.woodstox:woodstox-core | 7.1.0 | https://github.com/FasterXML/woodstox |
-| GNU General Public License (GPL), Version 3, GNU Lesser General Public License (LGPL), Version 3.0, Mozilla Public License Version 1.1 | juniversalchardet | com.github.albfernandez:juniversalchardet | 2.4.0 | https://github.com/albfernandez/juniversalchardet |
+| GNU General Public License (GPL), Version 3, GNU Lesser General Public License (LGPL), Version 3.0, Mozilla Public License Version 1.1 | juniversalchardet | com.github.albfernandez:juniversalchardet | 2.5.0 | https://github.com/albfernandez/juniversalchardet |
 | The 3-Clause BSD No Nuclear License | Java Advanced Imaging Image I/O Tools API core (standalone) | com.github.jai-imageio:jai-imageio-core | 1.4.0 | https://github.com/jai-imageio/jai-imageio-core |
 | UnRAR License | Java Unrar | com.github.junrar:junrar | 7.5.5 | https://github.com/junrar/junrar |
 | The 3-Clause BSD License | curvesapi | com.github.virtuald:curvesapi | 1.08 | https://github.com/virtuald/curvesapi |
@@ -36,7 +36,7 @@ build. These libraries are used as-is, with no modifications to source code.
 | Apache License, Version 2.0 | J2ObjC Annotations | com.google.j2objc:j2objc-annotations | 1.3 | https://github.com/google/j2objc/ |
 | Apache License, Version 2.0 | OWASP Java HTML Sanitizer | com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer | 20220608.1 | https://github.com/OWASP/java-html-sanitizer/owasp-java-html-sanitizer |
 | MIT License | dd-plist | com.googlecode.plist:dd-plist | 1.28 | http://www.github.com/3breadt/dd-plist |
-| Apache License, Version 2.0 | Jackcess | com.healthmarketscience.jackcess:jackcess | 4.0.5 | https://jackcess.sourceforge.io |
+| Apache License, Version 2.0 | Jackcess | com.healthmarketscience.jackcess:jackcess | 4.0.8 | https://jackcess.sourceforge.io |
 | Apache License, Version 2.0 | Jackcess Encrypt | com.healthmarketscience.jackcess:jackcess-encrypt | 4.0.2 | http://jackcessencrypt.sf.net |
 | Apache License, Version 2.0 | MaxMind DB Reader | com.maxmind.db:maxmind-db | 2.0.0 | http://dev.maxmind.com/ |
 | Apache License, Version 2.0 | MaxMind GeoIP2 API | com.maxmind.geoip2:geoip2 | 3.0.1 | https://dev.maxmind.com/geoip?lang=en |
@@ -62,8 +62,8 @@ build. These libraries are used as-is, with no modifications to source code.
 | Apache License, Version 2.0 | PDFBox-Graphics2d | de.rototor.pdfbox:graphics2d | 0.32 | https://github.com/rototor/pdfbox-graphics2d/graphics2d |
 | European Union Public Licence (EUPL) Version 1.2 | gitb-types-jakarta | eu.europa.ec.itb:gitb-types-jakarta | 1.25.1 | https://joinup.ec.europa.eu/solution/interoperability-test-bed/about/gitb-types-jakarta |
 | MIT License | ClassGraph | io.github.classgraph:classgraph | 4.8.149 | https://github.com/classgraph/classgraph |
-| Apache License, Version 2.0 | micrometer-commons | io.micrometer:micrometer-commons | 1.14.5 | https://github.com/micrometer-metrics/micrometer |
-| Apache License, Version 2.0 | micrometer-observation | io.micrometer:micrometer-observation | 1.14.5 | https://github.com/micrometer-metrics/micrometer |
+| Apache License, Version 2.0 | micrometer-commons | io.micrometer:micrometer-commons | 1.14.6 | https://github.com/micrometer-metrics/micrometer |
+| Apache License, Version 2.0 | micrometer-observation | io.micrometer:micrometer-observation | 1.14.6 | https://github.com/micrometer-metrics/micrometer |
 | Apache License, Version 2.0 | swagger-annotations-jakarta | io.swagger.core.v3:swagger-annotations-jakarta | 2.2.25 | https://github.com/swagger-api/swagger-core/modules/swagger-annotations-jakarta |
 | Apache License, Version 2.0 | swagger-core-jakarta | io.swagger.core.v3:swagger-core-jakarta | 2.2.25 | https://github.com/swagger-api/swagger-core/modules/swagger-core-jakarta |
 | Apache License, Version 2.0 | swagger-models-jakarta | io.swagger.core.v3:swagger-models-jakarta | 2.2.25 | https://github.com/swagger-api/swagger-core/modules/swagger-models-jakarta |
@@ -97,54 +97,55 @@ build. These libraries are used as-is, with no modifications to source code.
 | Apache License, Version 2.0 | Apache CXF Runtime Core for WSDL | org.apache.cxf:cxf-rt-wsdl | 4.1.0 | https://cxf.apache.org |
 | Apache License, Version 2.0 | Apache CXF Spring Boot Autoconfigure | org.apache.cxf:cxf-spring-boot-autoconfigure | 4.1.0 | https://cxf.apache.org |
 | Apache License, Version 2.0 | Apache CXF Spring Boot Starter JAX-WS | org.apache.cxf:cxf-spring-boot-starter-jaxws | 4.1.0 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache HttpClient | org.apache.httpcomponents.client5:httpclient5 | 5.4.2 | https://hc.apache.org/httpcomponents-client-5.4.x/5.4.2/httpclient5/ |
-| Apache License, Version 2.0 | Apache HttpComponents Core HTTP/1.1 | org.apache.httpcomponents.core5:httpcore5 | 5.3.3 | https://hc.apache.org/httpcomponents-core-5.3.x/5.3.3/httpcore5/ |
-| Apache License, Version 2.0 | Apache HttpComponents Core HTTP/2 | org.apache.httpcomponents.core5:httpcore5-h2 | 5.3.3 | https://hc.apache.org/httpcomponents-core-5.3.x/5.3.3/httpcore5-h2/ |
-| Apache License, Version 2.0 | Apache James :: Mime4j :: Core | org.apache.james:apache-mime4j-core | 0.8.11 | http://james.apache.org/mime4j/apache-mime4j-core |
-| Apache License, Version 2.0 | Apache James :: Mime4j :: DOM | org.apache.james:apache-mime4j-dom | 0.8.11 | http://james.apache.org/mime4j/apache-mime4j-dom |
+| Apache License, Version 2.0 | Apache HttpClient | org.apache.httpcomponents.client5:httpclient5 | 5.4.4 | https://hc.apache.org/httpcomponents-client-5.4.x/5.4.4/httpclient5/ |
+| Apache License, Version 2.0 | Apache HttpComponents Core HTTP/1.1 | org.apache.httpcomponents.core5:httpcore5 | 5.3.4 | https://hc.apache.org/httpcomponents-core-5.3.x/5.3.4/httpcore5/ |
+| Apache License, Version 2.0 | Apache HttpComponents Core HTTP/2 | org.apache.httpcomponents.core5:httpcore5-h2 | 5.3.4 | https://hc.apache.org/httpcomponents-core-5.3.x/5.3.4/httpcore5-h2/ |
+| Apache License, Version 2.0 | Apache James :: Mime4j :: Core | org.apache.james:apache-mime4j-core | 0.8.12 | http://james.apache.org/mime4j/apache-mime4j-core |
+| Apache License, Version 2.0 | Apache James :: Mime4j :: DOM | org.apache.james:apache-mime4j-dom | 0.8.12 | http://james.apache.org/mime4j/apache-mime4j-dom |
 | Apache License, Version 2.0 | Apache Log4j API | org.apache.logging.log4j:log4j-api | 2.24.3 | https://logging.apache.org/log4j/2.x/log4j/log4j-api/ |
 | Apache License, Version 2.0 | Log4j API to SLF4J Adapter | org.apache.logging.log4j:log4j-to-slf4j | 2.24.3 | https://logging.apache.org/log4j/2.x/log4j/log4j-to-slf4j/ |
 | Apache License, Version 2.0 | Apache Neethi | org.apache.neethi:neethi | 3.2.1 | https://ws.apache.org/neethi/ |
 | Apache License, Version 2.0 | Apache FontBox | org.apache.pdfbox:fontbox | 2.0.31 | http://pdfbox.apache.org/ |
+| Apache License, Version 2.0 | Apache FontBox | org.apache.pdfbox:fontbox | 2.0.33 | http://pdfbox.apache.org/ |
 | Apache License, Version 2.0 | PDFBox JBIG2 ImageIO plugin | org.apache.pdfbox:jbig2-imageio | 3.0.4 | https://www.apache.org/jbig2-imageio/ |
 | Apache License, Version 2.0 | Apache JempBox | org.apache.pdfbox:jempbox | 1.8.17 | http://www.apache.org/pdfbox-parent/jempbox/ |
 | Apache License, Version 2.0 | Apache PDFBox | org.apache.pdfbox:pdfbox | 2.0.31 | https://www.apache.org/pdfbox-parent/pdfbox/ |
-| Apache License, Version 2.0 | Apache PDFBox tools | org.apache.pdfbox:pdfbox-tools | 2.0.31 | https://www.apache.org/pdfbox-parent/pdfbox-tools/ |
+| Apache License, Version 2.0 | Apache PDFBox tools | org.apache.pdfbox:pdfbox-tools | 2.0.33 | https://www.apache.org/pdfbox-parent/pdfbox-tools/ |
 | Apache License, Version 2.0 | Apache XmpBox | org.apache.pdfbox:xmpbox | 2.0.24 | https://www.apache.org/pdfbox-parent/xmpbox/ |
-| Apache License, Version 2.0 | Apache XmpBox | org.apache.pdfbox:xmpbox | 2.0.31 | https://www.apache.org/pdfbox-parent/xmpbox/ |
-| Apache License, Version 2.0 | Apache POI - Common | org.apache.poi:poi | 5.2.5 | https://poi.apache.org/ |
-| Apache License, Version 2.0 | Apache POI - API based on OPC and OOXML schemas | org.apache.poi:poi-ooxml | 5.2.5 | https://poi.apache.org/ |
-| Apache License, Version 2.0 | Apache POI | org.apache.poi:poi-ooxml-lite | 5.2.5 | https://poi.apache.org/ |
-| Apache License, Version 2.0 | Apache POI | org.apache.poi:poi-scratchpad | 5.2.5 | https://poi.apache.org/ |
-| Apache License, Version 2.0 | Apache Tika core | org.apache.tika:tika-core | 2.9.2 | https://tika.apache.org/ |
-| Apache License, Version 2.0 | Apache Tika Apple parser module | org.apache.tika:tika-parser-apple-module | 2.9.2 | https://tika.apache.org/tika-parser-apple-module/ |
-| Apache License, Version 2.0 | Apache Tika audiovideo parser module | org.apache.tika:tika-parser-audiovideo-module | 2.9.2 | https://tika.apache.org/tika-parser-audiovideo-module/ |
-| Apache License, Version 2.0 | Apache Tika cad parser module | org.apache.tika:tika-parser-cad-module | 2.9.2 | https://tika.apache.org/tika-parser-cad-module/ |
-| Apache License, Version 2.0 | Apache Tika code parser module | org.apache.tika:tika-parser-code-module | 2.9.2 | https://tika.apache.org/tika-parser-code-module/ |
-| Apache License, Version 2.0 | Apache Tika crypto parser module | org.apache.tika:tika-parser-crypto-module | 2.9.2 | https://tika.apache.org/tika-parser-crypto-module/ |
-| Apache License, Version 2.0 | Apache Tika digest commons | org.apache.tika:tika-parser-digest-commons | 2.9.2 | https://tika.apache.org/tika-parser-digest-commons/ |
-| Apache License, Version 2.0 | Apache Tika font parser module | org.apache.tika:tika-parser-font-module | 2.9.2 | https://tika.apache.org/tika-parser-font-module/ |
-| Apache License, Version 2.0 | Apache Tika html parser module | org.apache.tika:tika-parser-html-module | 2.9.2 | https://tika.apache.org/tika-parser-html-module/ |
-| Apache License, Version 2.0 | Apache Tika image parser module | org.apache.tika:tika-parser-image-module | 2.9.2 | https://tika.apache.org/tika-parser-image-module/ |
-| Apache License, Version 2.0 | Apache Tika mail commons | org.apache.tika:tika-parser-mail-commons | 2.9.2 | https://tika.apache.org/tika-parser-mail-commons/ |
-| Apache License, Version 2.0 | Apache Tika mail parser module | org.apache.tika:tika-parser-mail-module | 2.9.2 | https://tika.apache.org/tika-parser-mail-module/ |
-| Apache License, Version 2.0 | Apache Tika Microsoft parser module | org.apache.tika:tika-parser-microsoft-module | 2.9.2 | https://tika.apache.org/tika-parser-microsoft-module/ |
-| Apache License, Version 2.0 | Apache Tika miscellaneous office format parser module | org.apache.tika:tika-parser-miscoffice-module | 2.9.2 | https://tika.apache.org/tika-parser-miscoffice-module/ |
-| Apache License, Version 2.0 | Apache Tika news parser module | org.apache.tika:tika-parser-news-module | 2.9.2 | https://tika.apache.org/tika-parser-news-module/ |
-| Apache License, Version 2.0 | Apache Tika OCR parser module | org.apache.tika:tika-parser-ocr-module | 2.9.2 | https://tika.apache.org/tika-parser-ocr-module/ |
-| Apache License, Version 2.0 | Apache Tika PDF parser module | org.apache.tika:tika-parser-pdf-module | 2.9.2 | https://tika.apache.org/tika-parser-pdf-module/ |
-| Apache License, Version 2.0 | Apache Tika package parser module | org.apache.tika:tika-parser-pkg-module | 2.9.2 | https://tika.apache.org/tika-parser-pkg-module/ |
-| Apache License, Version 2.0 | Apache Tika text parser module | org.apache.tika:tika-parser-text-module | 2.9.2 | https://tika.apache.org/tika-parser-text-module/ |
-| Apache License, Version 2.0 | Apache Tika WARC parser module | org.apache.tika:tika-parser-webarchive-module | 2.9.2 | https://tika.apache.org/tika-parser-webarchive-module/ |
-| Apache License, Version 2.0 | Apache Tika XML parser module | org.apache.tika:tika-parser-xml-module | 2.9.2 | https://tika.apache.org/tika-parser-xml-module/ |
-| Apache License, Version 2.0 | Apache Tika XMP commons | org.apache.tika:tika-parser-xmp-commons | 2.9.2 | https://tika.apache.org/tika-parser-xmp-commons/ |
-| Apache License, Version 2.0 | Apache Tika ZIP commons | org.apache.tika:tika-parser-zip-commons | 2.9.2 | https://tika.apache.org/tika-parser-zip-commons/ |
-| Apache License, Version 2.0 | Apache Tika standard parser package | org.apache.tika:tika-parsers-standard-package | 2.9.2 | https://tika.apache.org/tika-parsers/tika-parsers-standard/tika-parsers-standard-package/ |
-| Apache License, Version 2.0 | tomcat-embed-core | org.apache.tomcat.embed:tomcat-embed-core | 10.1.39 | https://tomcat.apache.org/ |
-| Apache License, Version 2.0 | tomcat-embed-el | org.apache.tomcat.embed:tomcat-embed-el | 10.1.39 | https://tomcat.apache.org/ |
-| Apache License, Version 2.0 | tomcat-embed-websocket | org.apache.tomcat.embed:tomcat-embed-websocket | 10.1.39 | https://tomcat.apache.org/ |
+| Apache License, Version 2.0 | Apache XmpBox | org.apache.pdfbox:xmpbox | 2.0.33 | https://www.apache.org/pdfbox-parent/xmpbox/ |
+| Apache License, Version 2.0 | Apache POI - Common | org.apache.poi:poi | 5.4.0 | https://poi.apache.org/ |
+| Apache License, Version 2.0 | Apache POI - API based on OPC and OOXML schemas | org.apache.poi:poi-ooxml | 5.4.0 | https://poi.apache.org/ |
+| Apache License, Version 2.0 | Apache POI | org.apache.poi:poi-ooxml-lite | 5.4.0 | https://poi.apache.org/ |
+| Apache License, Version 2.0 | Apache POI | org.apache.poi:poi-scratchpad | 5.4.0 | https://poi.apache.org/ |
+| Apache License, Version 2.0 | Apache Tika core | org.apache.tika:tika-core | 2.9.3 | https://tika.apache.org/ |
+| Apache License, Version 2.0 | Apache Tika Apple parser module | org.apache.tika:tika-parser-apple-module | 2.9.3 | https://tika.apache.org/tika-parser-apple-module/ |
+| Apache License, Version 2.0 | Apache Tika audiovideo parser module | org.apache.tika:tika-parser-audiovideo-module | 2.9.3 | https://tika.apache.org/tika-parser-audiovideo-module/ |
+| Apache License, Version 2.0 | Apache Tika cad parser module | org.apache.tika:tika-parser-cad-module | 2.9.3 | https://tika.apache.org/tika-parser-cad-module/ |
+| Apache License, Version 2.0 | Apache Tika code parser module | org.apache.tika:tika-parser-code-module | 2.9.3 | https://tika.apache.org/tika-parser-code-module/ |
+| Apache License, Version 2.0 | Apache Tika crypto parser module | org.apache.tika:tika-parser-crypto-module | 2.9.3 | https://tika.apache.org/tika-parser-crypto-module/ |
+| Apache License, Version 2.0 | Apache Tika digest commons | org.apache.tika:tika-parser-digest-commons | 2.9.3 | https://tika.apache.org/tika-parser-digest-commons/ |
+| Apache License, Version 2.0 | Apache Tika font parser module | org.apache.tika:tika-parser-font-module | 2.9.3 | https://tika.apache.org/tika-parser-font-module/ |
+| Apache License, Version 2.0 | Apache Tika html parser module | org.apache.tika:tika-parser-html-module | 2.9.3 | https://tika.apache.org/tika-parser-html-module/ |
+| Apache License, Version 2.0 | Apache Tika image parser module | org.apache.tika:tika-parser-image-module | 2.9.3 | https://tika.apache.org/tika-parser-image-module/ |
+| Apache License, Version 2.0 | Apache Tika mail commons | org.apache.tika:tika-parser-mail-commons | 2.9.3 | https://tika.apache.org/tika-parser-mail-commons/ |
+| Apache License, Version 2.0 | Apache Tika mail parser module | org.apache.tika:tika-parser-mail-module | 2.9.3 | https://tika.apache.org/tika-parser-mail-module/ |
+| Apache License, Version 2.0 | Apache Tika Microsoft parser module | org.apache.tika:tika-parser-microsoft-module | 2.9.3 | https://tika.apache.org/tika-parser-microsoft-module/ |
+| Apache License, Version 2.0 | Apache Tika miscellaneous office format parser module | org.apache.tika:tika-parser-miscoffice-module | 2.9.3 | https://tika.apache.org/tika-parser-miscoffice-module/ |
+| Apache License, Version 2.0 | Apache Tika news parser module | org.apache.tika:tika-parser-news-module | 2.9.3 | https://tika.apache.org/tika-parser-news-module/ |
+| Apache License, Version 2.0 | Apache Tika OCR parser module | org.apache.tika:tika-parser-ocr-module | 2.9.3 | https://tika.apache.org/tika-parser-ocr-module/ |
+| Apache License, Version 2.0 | Apache Tika PDF parser module | org.apache.tika:tika-parser-pdf-module | 2.9.3 | https://tika.apache.org/tika-parser-pdf-module/ |
+| Apache License, Version 2.0 | Apache Tika package parser module | org.apache.tika:tika-parser-pkg-module | 2.9.3 | https://tika.apache.org/tika-parser-pkg-module/ |
+| Apache License, Version 2.0 | Apache Tika text parser module | org.apache.tika:tika-parser-text-module | 2.9.3 | https://tika.apache.org/tika-parser-text-module/ |
+| Apache License, Version 2.0 | Apache Tika WARC parser module | org.apache.tika:tika-parser-webarchive-module | 2.9.3 | https://tika.apache.org/tika-parser-webarchive-module/ |
+| Apache License, Version 2.0 | Apache Tika XML parser module | org.apache.tika:tika-parser-xml-module | 2.9.3 | https://tika.apache.org/tika-parser-xml-module/ |
+| Apache License, Version 2.0 | Apache Tika XMP commons | org.apache.tika:tika-parser-xmp-commons | 2.9.3 | https://tika.apache.org/tika-parser-xmp-commons/ |
+| Apache License, Version 2.0 | Apache Tika ZIP commons | org.apache.tika:tika-parser-zip-commons | 2.9.3 | https://tika.apache.org/tika-parser-zip-commons/ |
+| Apache License, Version 2.0 | Apache Tika standard parser package | org.apache.tika:tika-parsers-standard-package | 2.9.3 | https://tika.apache.org/tika-parsers/tika-parsers-standard/tika-parsers-standard-package/ |
+| Apache License, Version 2.0 | tomcat-embed-core | org.apache.tomcat.embed:tomcat-embed-core | 10.1.40 | https://tomcat.apache.org/ |
+| Apache License, Version 2.0 | tomcat-embed-el | org.apache.tomcat.embed:tomcat-embed-el | 10.1.40 | https://tomcat.apache.org/ |
+| Apache License, Version 2.0 | tomcat-embed-websocket | org.apache.tomcat.embed:tomcat-embed-websocket | 10.1.40 | https://tomcat.apache.org/ |
 | Apache License, Version 2.0 | XmlSchema Core | org.apache.ws.xmlschema:xmlschema-core | 2.3.1 | https://ws.apache.org/commons/xmlschema20/xmlschema-core/ |
-| Apache License, Version 2.0 | XmlBeans | org.apache.xmlbeans:xmlbeans | 5.2.0 | https://xmlbeans.apache.org/ |
+| Apache License, Version 2.0 | XmlBeans | org.apache.xmlbeans:xmlbeans | 5.3.0 | https://xmlbeans.apache.org/ |
 | Apache License, Version 2.0 | org.apache.xmlgraphics:batik-anim | org.apache.xmlgraphics:batik-anim | 1.17 | http://xmlgraphics.apache.org/batik/batik-anim/ |
 | Apache License, Version 2.0 | org.apache.xmlgraphics:batik-awt-util | org.apache.xmlgraphics:batik-awt-util | 1.17 | http://xmlgraphics.apache.org/batik/batik-awt-util/ |
 | Apache License, Version 2.0 | org.apache.xmlgraphics:batik-bridge | org.apache.xmlgraphics:batik-bridge | 1.17 | http://xmlgraphics.apache.org/batik/batik-bridge/ |
@@ -188,7 +189,7 @@ build. These libraries are used as-is, with no modifications to source code.
 | JDOM License | JDOM | org.jdom:jdom2 | 2.0.6.1 | http://www.jdom.org |
 | MIT License | jsoup Java HTML Parser | org.jsoup:jsoup | 1.15.4 | https://jsoup.org/ |
 | Apache License, Version 2.0 | JSpecify annotations | org.jspecify:jspecify | 1.0.0 | http://jspecify.org/ |
-| Apache License, Version 2.0 | jwarc | org.netpreserve:jwarc | 0.29.0 | https://github.com/iipc/jwarc |
+| Apache License, Version 2.0 | jwarc | org.netpreserve:jwarc | 0.31.1 | https://github.com/iipc/jwarc |
 | The 3-Clause BSD License | asm | org.ow2.asm:asm | 9.7.1 | http://asm.ow2.io/ |
 | Apache License, Version 2.0 | JCL 1.2 implemented over SLF4J | org.slf4j:jcl-over-slf4j | 2.0.17 | http://www.slf4j.org |
 | MIT License | JUL to SLF4J bridge | org.slf4j:jul-to-slf4j | 2.0.17 | http://www.slf4j.org |
@@ -196,33 +197,33 @@ build. These libraries are used as-is, with no modifications to source code.
 | Apache License, Version 2.0 | springdoc-openapi-starter-common | org.springdoc:springdoc-openapi-starter-common | 2.7.0 | https://springdoc.org/springdoc-openapi-starter-common/ |
 | Apache License, Version 2.0 | springdoc-openapi-starter-webmvc-api | org.springdoc:springdoc-openapi-starter-webmvc-api | 2.7.0 | https://springdoc.org/springdoc-openapi-starter-webmvc-api/ |
 | Apache License, Version 2.0 | springdoc-openapi-starter-webmvc-ui | org.springdoc:springdoc-openapi-starter-webmvc-ui | 2.7.0 | https://springdoc.org/springdoc-openapi-starter-webmvc-ui/ |
-| Apache License, Version 2.0 | Spring AOP | org.springframework:spring-aop | 6.2.5 | https://github.com/spring-projects/spring-framework |
-| Apache License, Version 2.0 | Spring Beans | org.springframework:spring-beans | 6.2.5 | https://github.com/spring-projects/spring-framework |
-| Apache License, Version 2.0 | Spring Context | org.springframework:spring-context | 6.2.5 | https://github.com/spring-projects/spring-framework |
-| Apache License, Version 2.0 | Spring Core | org.springframework:spring-core | 6.2.5 | https://github.com/spring-projects/spring-framework |
-| Apache License, Version 2.0 | Spring Expression Language (SpEL) | org.springframework:spring-expression | 6.2.5 | https://github.com/spring-projects/spring-framework |
-| Apache License, Version 2.0 | Spring Commons Logging Bridge | org.springframework:spring-jcl | 6.2.5 | https://github.com/spring-projects/spring-framework |
-| Apache License, Version 2.0 | Spring Web | org.springframework:spring-web | 6.2.5 | https://github.com/spring-projects/spring-framework |
-| Apache License, Version 2.0 | Spring Web MVC | org.springframework:spring-webmvc | 6.2.5 | https://github.com/spring-projects/spring-framework |
-| Apache License, Version 2.0 | spring-boot | org.springframework.boot:spring-boot | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-autoconfigure | org.springframework.boot:spring-boot-autoconfigure | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-starter | org.springframework.boot:spring-boot-starter | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-starter-aop | org.springframework.boot:spring-boot-starter-aop | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-starter-json | org.springframework.boot:spring-boot-starter-json | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-starter-logging | org.springframework.boot:spring-boot-starter-logging | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-starter-security | org.springframework.boot:spring-boot-starter-security | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-starter-thymeleaf | org.springframework.boot:spring-boot-starter-thymeleaf | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-starter-tomcat | org.springframework.boot:spring-boot-starter-tomcat | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-starter-validation | org.springframework.boot:spring-boot-starter-validation | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-boot-starter-web | org.springframework.boot:spring-boot-starter-web | 3.4.4 | https://spring.io/projects/spring-boot |
-| Apache License, Version 2.0 | spring-security-config | org.springframework.security:spring-security-config | 6.4.4 | https://spring.io/projects/spring-security |
-| Apache License, Version 2.0 | spring-security-core | org.springframework.security:spring-security-core | 6.4.4 | https://spring.io/projects/spring-security |
-| Apache License, Version 2.0 | spring-security-crypto | org.springframework.security:spring-security-crypto | 6.4.4 | https://spring.io/projects/spring-security |
-| Apache License, Version 2.0 | spring-security-web | org.springframework.security:spring-security-web | 6.4.4 | https://spring.io/projects/spring-security |
+| Apache License, Version 2.0 | Spring AOP | org.springframework:spring-aop | 6.2.6 | https://github.com/spring-projects/spring-framework |
+| Apache License, Version 2.0 | Spring Beans | org.springframework:spring-beans | 6.2.6 | https://github.com/spring-projects/spring-framework |
+| Apache License, Version 2.0 | Spring Context | org.springframework:spring-context | 6.2.6 | https://github.com/spring-projects/spring-framework |
+| Apache License, Version 2.0 | Spring Core | org.springframework:spring-core | 6.2.6 | https://github.com/spring-projects/spring-framework |
+| Apache License, Version 2.0 | Spring Expression Language (SpEL) | org.springframework:spring-expression | 6.2.6 | https://github.com/spring-projects/spring-framework |
+| Apache License, Version 2.0 | Spring Commons Logging Bridge | org.springframework:spring-jcl | 6.2.6 | https://github.com/spring-projects/spring-framework |
+| Apache License, Version 2.0 | Spring Web | org.springframework:spring-web | 6.2.6 | https://github.com/spring-projects/spring-framework |
+| Apache License, Version 2.0 | Spring Web MVC | org.springframework:spring-webmvc | 6.2.6 | https://github.com/spring-projects/spring-framework |
+| Apache License, Version 2.0 | spring-boot | org.springframework.boot:spring-boot | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-autoconfigure | org.springframework.boot:spring-boot-autoconfigure | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-starter | org.springframework.boot:spring-boot-starter | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-starter-aop | org.springframework.boot:spring-boot-starter-aop | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-starter-json | org.springframework.boot:spring-boot-starter-json | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-starter-logging | org.springframework.boot:spring-boot-starter-logging | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-starter-security | org.springframework.boot:spring-boot-starter-security | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-starter-thymeleaf | org.springframework.boot:spring-boot-starter-thymeleaf | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-starter-tomcat | org.springframework.boot:spring-boot-starter-tomcat | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-starter-validation | org.springframework.boot:spring-boot-starter-validation | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-boot-starter-web | org.springframework.boot:spring-boot-starter-web | 3.4.5 | https://spring.io/projects/spring-boot |
+| Apache License, Version 2.0 | spring-security-config | org.springframework.security:spring-security-config | 6.4.5 | https://spring.io/projects/spring-security |
+| Apache License, Version 2.0 | spring-security-core | org.springframework.security:spring-security-core | 6.4.5 | https://spring.io/projects/spring-security |
+| Apache License, Version 2.0 | spring-security-crypto | org.springframework.security:spring-security-crypto | 6.4.5 | https://spring.io/projects/spring-security |
+| Apache License, Version 2.0 | spring-security-web | org.springframework.security:spring-security-web | 6.4.5 | https://spring.io/projects/spring-security |
 | The 3-Clause BSD License | JMatIO | org.tallison:jmatio | 1.5 | https://github.com/tballison/jmatio |
 | Apache License, Version 2.0 | thymeleaf | org.thymeleaf:thymeleaf | 3.1.3.RELEASE | http://www.thymeleaf.org/thymeleaf-lib/thymeleaf |
 | Apache License, Version 2.0 | thymeleaf-spring6 | org.thymeleaf:thymeleaf-spring6 | 3.1.3.RELEASE | http://www.thymeleaf.org/thymeleaf-lib/thymeleaf-spring6 |
-| The 0-Clause BSD License | XZ for Java | org.tukaani:xz | 1.9 | https://tukaani.org/xz/java.html |
+| The 0-Clause BSD License | XZ for Java | org.tukaani:xz | 1.10 | https://tukaani.org/xz/java.html |
 | Apache License, Version 2.0 | unbescape | org.unbescape:unbescape | 1.1.6.RELEASE | http://www.unbescape.org |
 | Apache License, Version 2.0 | Bootstrap | org.webjars:bootstrap | 3.4.1 | http://webjars.org |
 | MIT License | CodeMirror | org.webjars:codemirror | 5.62.2 | http://webjars.org |
