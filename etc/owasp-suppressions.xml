@@ -14,4 +14,11 @@
         <packageUrl regex="true">^pkg:maven/xerces/xercesImpl@.*$</packageUrl>
         <vulnerabilityName>CVE-2017-10355</vulnerabilityName>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: commons-beanutils-1.9.4.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons-beanutils/commons-beanutils@.*$</packageUrl>
+        <vulnerabilityName>CVE-2025-48734</vulnerabilityName>
+    </suppress>
 </suppressions>
