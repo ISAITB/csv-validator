@@ -217,7 +217,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                 LOG.error(e.getMessageForLog(), e);
                 result.setMessage(e.getMessageForDisplay(localisationHelper));
             } catch (Exception e) {
-                LOG.error("Error while reading provided content [" + e.getMessage() + "]", e);
+                LOG.error("Error while reading provided content [{}]", e.getMessage(), e);
                 result.setMessage(localisationHelper.localise("validator.label.exception.errorReadingContent", e.getMessage()));
             }
             if (stream != null) {
@@ -228,11 +228,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                     try {
                         contentToValidate = fileManager.getFileFromInputStream(tempFolderForRequest, stream, null, UUID.randomUUID() + ".csv");
                     } finally {
-                        try {
-                            stream.close();
-                        } catch (IOException e) {
-                            // Ignore.
-                        }
+                        closeStreamSilently(stream);
                     }
                     List<FileInfo> externalSchemas = new ArrayList<>();
                     try {
@@ -242,7 +238,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                         result.setMessage(e.getMessageForDisplay(localisationHelper));
                         proceed = false;
                     } catch (Exception e) {
-                        LOG.error("Error while reading uploaded file [" + e.getMessage() + "]", e);
+                        LOG.error("Error while reading uploaded file [{}]", e.getMessage(), e);
                         result.setMessage(localisationHelper.localise("validator.label.exception.errorInUpload", e.getMessage()));
                         proceed = false;
                     }
@@ -313,6 +309,19 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
             }
         }
         return result;
+    }
+
+    /**
+     * Close the provided stream without raising errors.
+     *
+     * @param stream The stream to close.
+     */
+    private void closeStreamSilently(InputStream stream) {
+        try {
+            stream.close();
+        } catch (IOException e) {
+            // Ignore.
+        }
     }
 
     /**

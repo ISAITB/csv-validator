@@ -494,13 +494,13 @@ public class CSVValidator {
             charset = StandardCharsets.UTF_8.name();
             if (ignoredCharsets.isEmpty()) {
                 LOG.info("No character set detected - using [{}] by default", charset);
-            } else {
+            } else if (LOG.isInfoEnabled()) {
                 LOG.info("Ignored unsupported character sets [{}] and using [{}] as default", StringUtils.joinWith(", ", ignoredCharsets.toArray()), charset);
             }
         } else {
             if (ignoredCharsets.isEmpty()) {
                 LOG.info("Detected character set [{}]", charset);
-            } else {
+            } else if (LOG.isInfoEnabled()) {
                 LOG.info("Ignored unsupported character sets [{}] and using [{}]", StringUtils.joinWith(", ", ignoredCharsets.toArray()), charset);
             }
         }
