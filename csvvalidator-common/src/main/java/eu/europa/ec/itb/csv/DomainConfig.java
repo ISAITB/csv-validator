@@ -133,7 +133,7 @@ public class DomainConfig extends WebDomainConfig {
 
     /**
      * Class holding configuration to provide user-friendly error messages for known parser errors.
-     *
+     * <p>
      * These are errors that are raised from the parsing itself before any validation rules can be executed.
      */
     public static class ParserError {

@@ -291,7 +291,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                     reports.getDetailedReport(), reports.getAggregateReport(),
                                     new Translations(localisationHelper, reports.getDetailedReport(), domainConfig));
                         } catch (IOException e) {
-                            LOG.error("Error generating detailed report [" + e.getMessage() + "]", e);
+                            LOG.error("Error generating detailed report [{}]", e.getMessage(), e);
                             result.setMessage(localisationHelper.localise("validator.label.exception.errorGeneratingReport", e.getMessage()));
                         }
                     }
@@ -299,7 +299,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                     LOG.error(e.getMessageForLog(), e);
                     result.setMessage(e.getMessageForDisplay(localisationHelper));
                 } catch (Exception e) {
-                    LOG.error("An error occurred during the validation [" + e.getMessage() + "]", e);
+                    LOG.error("An error occurred during the validation [{}]", e.getMessage(), e);
                     result.setMessage(localisationHelper.localise("validator.label.exception.errorDuringValidation", e.getMessage()));
                 } finally {
                     // Cleanup temporary resources for request.

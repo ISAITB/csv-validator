@@ -157,7 +157,7 @@ public class ValidationServiceImpl implements ValidationService, WebServiceConte
                 throw new ValidatorException("validator.label.exception.multipleInputsProvided", inputName);
             } else if (!inputValues.isEmpty()) {
                 String value = inputValues.get(0).getValue();
-                if (value.trim().equals("")) {
+                if (value.trim().isEmpty()) {
                     throw new ValidatorException("validator.label.exception.emptyInputProvided", inputName);
                 }
                 result = fnValueProvider.apply(value);
@@ -168,7 +168,7 @@ public class ValidationServiceImpl implements ValidationService, WebServiceConte
 
     /**
      * The validate operation is called to validate the input and produce a validation report.
-     *
+     * <p>
      * The expected input is described for the service's client through the getModuleDefinition call.
      *
      * @param validateRequest The input parameters and configuration for the validation.
