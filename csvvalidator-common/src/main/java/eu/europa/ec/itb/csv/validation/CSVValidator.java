@@ -760,7 +760,7 @@ public class CSVValidator {
                         response = plugin.validate(pluginInput);
                     } catch (Exception e) {
                         // Do not propagate the failure as this will block all validation reporting.
-                        LOG.warn(String.format("Unable to correctly process plugin [%s]", e.getMessage()), e);
+                        LOG.warn("Unable to correctly process plugin [{}]", e.getMessage(), e);
                     }
                     if (response != null && response.getReport() != null && response.getReport().getCounters() != null) {
                         long pluginErrors = response.getReport().getCounters().getNrOfErrors().longValue();
