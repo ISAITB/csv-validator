@@ -57,6 +57,7 @@ public class ValidationServiceImpl implements ValidationService, WebServiceConte
     private static final Logger LOG = LoggerFactory.getLogger(ValidationServiceImpl.class);
 
     private final DomainConfig domainConfig;
+    private final DomainConfig requestedDomainConfig;
 
     @Autowired
     private ApplicationContext ctx = null;
@@ -71,9 +72,11 @@ public class ValidationServiceImpl implements ValidationService, WebServiceConte
      * Constructor.
      *
      * @param domainConfig The domain configuration (each domain has its own instance).
+     * @param requestedDomainConfig The resolved domain configuration (in case of aliases).
      */
-    public ValidationServiceImpl(DomainConfig domainConfig) {
+    public ValidationServiceImpl(DomainConfig domainConfig, DomainConfig requestedDomainConfig) {
         this.domainConfig = domainConfig;
+        this.requestedDomainConfig = requestedDomainConfig;
     }
 
     /**
@@ -180,7 +183,7 @@ public class ValidationServiceImpl implements ValidationService, WebServiceConte
             // Validation of the input data
             ValueEmbeddingEnumeration contentEmbeddingMethod = inputHelper.validateContentEmbeddingMethod(validateRequest, ValidationConstants.INPUT_EMBEDDING_METHOD);
             File contentToValidate = inputHelper.validateContentToValidate(validateRequest, ValidationConstants.INPUT_CONTENT, contentEmbeddingMethod, null, tempFolderPath, domainConfig.getHttpVersion()).getFile();
-            String validationType = inputHelper.validateValidationType(domainConfig, validateRequest, ValidationConstants.INPUT_VALIDATION_TYPE);
+            String validationType = inputHelper.validateValidationType(requestedDomainConfig.getDomainName(), domainConfig, validateRequest, ValidationConstants.INPUT_VALIDATION_TYPE);
             List<FileInfo> externalSchemas = inputHelper.validateExternalArtifacts(domainConfig, validateRequest, ValidationConstants.INPUT_EXTERNAL_SCHEMA, ValidationConstants.INPUT_EXTERNAL_SCHEMA_CONTENT, ValidationConstants.INPUT_EMBEDDING_METHOD, validationType, null, tempFolderPath);
             boolean addInputToReport = getInputAsBoolean(validateRequest, ValidationConstants.INPUT_ADD_INPUT_TO_REPORT, true);
             // CSV settings.

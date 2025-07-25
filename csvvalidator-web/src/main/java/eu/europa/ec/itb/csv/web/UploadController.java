@@ -197,9 +197,10 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
         var localisationHelper = new LocalisationHelper(domainConfig, localeResolver.resolveLocale(request, response, domainConfig, appConfig));
         var result = new UploadResult<>();
 
-        if (StringUtils.isBlank(validationType)) {
-            validationType = domainConfig.getType().get(0);
+        if (!isOwnSubmission(request)) {
+            validationType = inputHelper.determineValidationType(validationType, domain, domainConfig);
         }
+        validationType = inputHelper.validateValidationType(domainConfig, validationType);
         if (domainConfig.hasMultipleValidationTypes() && (validationType == null || !domainConfig.getType().contains(validationType))) {
             // A validation type is required.
             result.setMessage(localisationHelper.localise("validator.label.exception.providedValidationTypeNotValid"));
