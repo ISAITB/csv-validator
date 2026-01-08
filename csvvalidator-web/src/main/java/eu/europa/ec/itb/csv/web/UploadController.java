@@ -25,6 +25,8 @@ import eu.europa.ec.itb.csv.validation.ValidationSpecs;
 import eu.europa.ec.itb.csv.validation.ViolationLevel;
 import eu.europa.ec.itb.validation.commons.FileInfo;
 import eu.europa.ec.itb.validation.commons.LocalisationHelper;
+import eu.europa.ec.itb.validation.commons.RateLimitPolicy;
+import eu.europa.ec.itb.validation.commons.RateLimited;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
 import eu.europa.ec.itb.validation.commons.artifact.TypedValidationArtifactInfo;
 import eu.europa.ec.itb.validation.commons.artifact.ValidationArtifactInfo;
@@ -168,6 +170,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      */
     @PostMapping(value = "/{domain}/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
+    @RateLimited(policy = RateLimitPolicy.UI_VALIDATE)
     public UploadResult<Translations> handleUpload(@PathVariable("domain") String domain,
                                                    @RequestParam(value = "file", required = false) MultipartFile file,
                                                    @RequestParam(value = "uri", defaultValue = "") String uri,
@@ -332,6 +335,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      */
     @PostMapping(value = "/{domain}/uploadm", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
+    @RateLimited(policy = RateLimitPolicy.UI_VALIDATE)
     public UploadResult<Translations> handleUploadMinimal(@PathVariable("domain") String domain,
                                       @RequestParam(value = "file", required = false) MultipartFile file,
                                       @RequestParam(value = "uri", defaultValue = "") String uri,
@@ -373,6 +377,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @see UploadController#handleUpload(String, MultipartFile, String, String, String, String, String[], MultipartFile[], String[], String[], Boolean, Boolean, String, String, String, String, String, String, String, String, String, RedirectAttributes, HttpServletRequest, HttpServletResponse)
      */
     @PostMapping(value = "/{domain}/upload", produces = MediaType.TEXT_HTML_VALUE)
+    @RateLimited(policy = RateLimitPolicy.UI_VALIDATE)
     public ModelAndView handleUploadEmbedded(@PathVariable("domain") String domain,
                                              @RequestParam(value = "file", required = false) MultipartFile file,
                                              @RequestParam(value = "uri", defaultValue = "") String uri,
@@ -417,6 +422,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @see UploadController#handleUpload(String, MultipartFile, String, String, String, String, String[], MultipartFile[], String[], String[], Boolean, Boolean, String, String, String, String, String, String, String, String, String, RedirectAttributes, HttpServletRequest, HttpServletResponse)
      */
     @PostMapping(value = "/{domain}/uploadm", produces = MediaType.TEXT_HTML_VALUE)
+    @RateLimited(policy = RateLimitPolicy.UI_VALIDATE)
     public ModelAndView handleUploadMinimalEmbedded(@PathVariable("domain") String domain,
                                                     @RequestParam(value = "file", required = false) MultipartFile file,
                                                     @RequestParam(value = "uri", defaultValue = "") String uri,
