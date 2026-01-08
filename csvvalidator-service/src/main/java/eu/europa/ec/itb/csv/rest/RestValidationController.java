@@ -22,6 +22,8 @@ import eu.europa.ec.itb.csv.InputHelper;
 import eu.europa.ec.itb.csv.rest.model.Input;
 import eu.europa.ec.itb.csv.validation.*;
 import eu.europa.ec.itb.validation.commons.LocalisationHelper;
+import eu.europa.ec.itb.validation.commons.RateLimitPolicy;
+import eu.europa.ec.itb.validation.commons.RateLimited;
 import eu.europa.ec.itb.validation.commons.Utils;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
 import eu.europa.ec.itb.validation.commons.error.ValidatorException;
@@ -83,6 +85,7 @@ public class RestValidationController extends BaseRestController<DomainConfig, A
     @ApiResponse(responseCode = "500", description = "Error (If a problem occurred with processing the request)", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
     @ApiResponse(responseCode = "404", description = "Not found (for an invalid domain value)", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
     @PostMapping(value = "/{domain}/api/validate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+    @RateLimited(policy = RateLimitPolicy.REST_VALIDATE)
     public ResponseEntity<StreamingResponseBody> validate(
             @Parameter(required = true, name = "domain", description = "A fixed value corresponding to the specific validation domain.",
                     examples = {
@@ -228,6 +231,7 @@ public class RestValidationController extends BaseRestController<DomainConfig, A
     @ApiResponse(responseCode = "500", description = "Error (If a problem occurred with processing the request)", content = @Content)
     @ApiResponse(responseCode = "404", description = "Not found (for an invalid domain value)", content = @Content)
     @PostMapping(value = "/{domain}/api/validateMultiple", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RateLimited(policy = RateLimitPolicy.REST_VALIDATE_MULTIPLE)
     public Output[] validateMultiple(
             @Parameter(required = true, name = "domain", description = "A fixed value corresponding to the specific validation domain.",
                     examples = {
