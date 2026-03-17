@@ -37,6 +37,8 @@ import eu.europa.ec.itb.validation.commons.web.Constants;
 import eu.europa.ec.itb.validation.commons.web.dto.Translations;
 import eu.europa.ec.itb.validation.commons.web.dto.UploadResult;
 import eu.europa.ec.itb.validation.commons.web.locale.CustomLocaleResolver;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -53,14 +55,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static eu.europa.ec.itb.validation.commons.web.Constants.*;
 
@@ -236,7 +238,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                     }
                     List<FileInfo> externalSchemas = new ArrayList<>();
                     try {
-                        externalSchemas = getExternalFiles(externalSchemaContentType, externalSchemaFiles, externalSchemaUri, externalSchemaString, domainConfig.getSchemaInfo(validationType), tempFolderForRequest, domainConfig.getHttpVersion());
+                        externalSchemas = getExternalFiles(externalSchemaContentType, externalSchemaFiles, externalSchemaUri, externalSchemaString, domainConfig.getSchemaInfo(validationType), tempFolderForRequest, domainConfig.getHttpVersion(), domainConfig);
                     } catch (ValidatorException e) {
                         LOG.error(e.getMessageForLog(), e);
                         result.setMessage(e.getMessageForDisplay(localisationHelper));
@@ -468,14 +470,16 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @param schemaInfo The schema information from the domain.
      * @param parentFolder The temporary folder to use for file system storage.
      * @param httpVersion The HTTP version to use.
+     * @param domainConfig The domain configuration.
      * @return The list of user-provided artifacts.
      * @throws IOException If an error occurs.
      */
     private List<FileInfo> getExternalFiles(String[] externalContentType, MultipartFile[] externalFiles, String[] externalUri, String[] externalString,
-                                            ValidationArtifactInfo schemaInfo, File parentFolder, HttpClient.Version httpVersion) throws IOException {
+                                            ValidationArtifactInfo schemaInfo, File parentFolder, HttpClient.Version httpVersion, DomainConfig domainConfig) throws IOException {
         List<FileInfo> externalArtifacts = new ArrayList<>();
         if (externalContentType != null) {
-            for(int i=0; i < externalContentType.length; i++) {
+            Consumer<HttpRequest.Builder> requestDecorator = fileManager.createRemoteFileRequestDecorator(domainConfig, schemaInfo);
+            for (int i=0; i < externalContentType.length; i++) {
                 if (StringUtils.isNotBlank(externalContentType[i])) {
                     File inputFile;
                     MultipartFile currentExtFile = null;
@@ -490,9 +494,9 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                     if (externalString != null && externalString.length>i) {
                         currentExtString = externalString[i];
                     }
-                    inputFile = getInputFile(externalContentType[i], currentExtFile, currentExtUri, currentExtString, parentFolder, httpVersion);
+                    inputFile = getInputFile(externalContentType[i], currentExtFile, currentExtUri, currentExtString, parentFolder, httpVersion, requestDecorator);
                     if (inputFile != null) {
-                        externalArtifacts.add(new FileInfo(inputFile));
+                        externalArtifacts.add(new FileInfo(inputFile, null, null, requestDecorator));
                     }
                 }
             }
@@ -542,10 +546,11 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
      * @param inputString The provided direct input to load the content from.
      * @param parentFolder The temporary folder to use.
      * @param httpVersion The HTTP version to use.
+     * @param requestDecorator The request decorator to use.
      * @return The input content's file.
      * @throws IOException If an error occurs.
      */
-    private File getInputFile(String contentType, MultipartFile inputFile, String inputUri, String inputString, File parentFolder, HttpClient.Version httpVersion) throws IOException {
+    private File getInputFile(String contentType, MultipartFile inputFile, String inputUri, String inputString, File parentFolder, HttpClient.Version httpVersion, Consumer<HttpRequest.Builder> requestDecorator) throws IOException {
         File file = null;
         if (CONTENT_TYPE_FILE.equals(contentType)) {
             if (inputFile!=null && !inputFile.isEmpty()) {
@@ -555,7 +560,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
             }
         } else if (CONTENT_TYPE_URI.equals(contentType)) {
             if (StringUtils.isNotBlank(inputUri)) {
-                file = this.fileManager.getFileFromURL(parentFolder, inputUri, httpVersion);
+                file = this.fileManager.getFileFromURL(parentFolder, inputUri, null, null, null, null, null, null, httpVersion, requestDecorator).getFile();
             }
         } else if (CONTENT_TYPE_STRING.equals(contentType)) {
             if (StringUtils.isNotBlank(inputString)) {
