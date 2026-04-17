@@ -1,4 +1,5 @@
 org.webjars--font-awesome--5.13.0=MIT License
 com.github.virtuald--curvesapi--1.08=The 3-Clause BSD License
 org.tallison--jmatio--1.5=The 3-Clause BSD License
-org.tukaani--xz--1.10=The 0-Clause BSD License
+org.tukaani--xz--1.12=The 0-Clause BSD License
+com.github.luben--zstd-jni--1.5.7-4=The 2-Clause BSD License
