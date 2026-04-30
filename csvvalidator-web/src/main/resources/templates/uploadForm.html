@@ -58,7 +58,8 @@
                 isMinimalUI: [[${minimalUI}]],
                 artifactTypes: ['default'],
                 externalArtifacts: externalArtifacts,
-                labels: [(${labelConfig})]
+                labels: [(${labelConfig})],
+                allowUriInputs: [[${appConfig.allowUriInputs}]]
             });
         </script>
         <script th:attr="nonce=${nonce}" th:inline="javascript" th:if="${reportData}">

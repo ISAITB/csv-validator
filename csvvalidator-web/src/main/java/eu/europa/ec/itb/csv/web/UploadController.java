@@ -559,7 +559,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                 }
             }
         } else if (CONTENT_TYPE_URI.equals(contentType)) {
-            if (StringUtils.isNotBlank(inputUri)) {
+            if (StringUtils.isNotBlank(inputUri) && appConfig.isUriReadAllowed(inputUri)) {
                 file = this.fileManager.getFileFromURL(parentFolder, inputUri, null, null, null, null, null, null, httpVersion, requestDecorator).getFile();
             }
         } else if (CONTENT_TYPE_STRING.equals(contentType)) {
@@ -583,7 +583,13 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
     private InputStream getInputStream(String contentType, MultipartFile file, String uri, String string, HttpClient.Version httpVersion) throws IOException {
         return switch (contentType) {
             case CONTENT_TYPE_FILE -> file.getInputStream();
-            case CONTENT_TYPE_URI -> this.fileManager.getInputStreamFromURL(uri, null, httpVersion).stream();
+            case CONTENT_TYPE_URI -> {
+                if (appConfig.isUriReadAllowed(uri)) {
+                    yield this.fileManager.getInputStreamFromURL(uri, null, httpVersion).stream();
+                } else {
+                    yield null;
+                }
+            }
             case CONTENT_TYPE_STRING -> new ByteArrayInputStream(string.getBytes());
             default -> null;
         };
