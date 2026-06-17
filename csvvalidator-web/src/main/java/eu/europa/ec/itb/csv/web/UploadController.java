@@ -23,10 +23,7 @@ import eu.europa.ec.itb.csv.validation.CSVValidator;
 import eu.europa.ec.itb.csv.validation.FileManager;
 import eu.europa.ec.itb.csv.validation.ValidationSpecs;
 import eu.europa.ec.itb.csv.validation.ViolationLevel;
-import eu.europa.ec.itb.validation.commons.FileInfo;
-import eu.europa.ec.itb.validation.commons.LocalisationHelper;
-import eu.europa.ec.itb.validation.commons.RateLimitPolicy;
-import eu.europa.ec.itb.validation.commons.RateLimited;
+import eu.europa.ec.itb.validation.commons.*;
 import eu.europa.ec.itb.validation.commons.artifact.ExternalArtifactSupport;
 import eu.europa.ec.itb.validation.commons.artifact.TypedValidationArtifactInfo;
 import eu.europa.ec.itb.validation.commons.artifact.ValidationArtifactInfo;
@@ -272,12 +269,12 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                                 .withMultipleInputFieldsForSchemaFieldViolationLevel(ViolationLevel.byName(inputMultipleInputFieldsForSchemaFieldViolationLevel))
                                 .withUnknownInputFieldViolationLevel(ViolationLevel.byName(inputUnknownInputViolationLevel))
                                 .withUnspecifiedSchemaFieldViolationLevel(ViolationLevel.byName(inputUnspecifiedSchemaFieldViolationLevel));
-                        CSVValidator validator = beans.getBean(CSVValidator.class, ValidationSpecs.builder(contentToValidate, inputHelper.buildCSVSettings(domainConfig, validationType, inputs), localisationHelper, domainConfig)
+                        ValidationSpecs specs = ValidationSpecs.builder(contentToValidate, inputHelper.buildCSVSettings(domainConfig, validationType, inputs), localisationHelper, domainConfig)
                                 .withValidationType(validationType)
                                 .withExternalSchemas(externalSchemas)
                                 .produceAggregateReport()
-                                .build()
-                        );
+                                .build();
+                        CSVValidator validator = beans.getBean(CSVValidator.class, specs);
                         var reports = validator.validate();
                         // Cache detailed report.
                         try {
@@ -292,6 +289,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
                             } else {
                                 fileName = "-";
                             }
+                            fileManager.saveReportProperties(new ReportProperties(fileName, specs.getValidationType()), inputID);
                             result.populateCommon(localisationHelper, validationType, domainConfig, inputID, fileName,
                                     reports.getDetailedReport(), reports.getAggregateReport(),
                                     new Translations(localisationHelper, reports.getDetailedReport(), domainConfig));
