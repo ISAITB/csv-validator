@@ -19,10 +19,7 @@ import eu.europa.ec.itb.csv.ApplicationConfig;
 import eu.europa.ec.itb.csv.DomainConfig;
 import eu.europa.ec.itb.csv.InputHelper;
 import eu.europa.ec.itb.csv.validation.*;
-import eu.europa.ec.itb.validation.commons.CsvReportGenerator;
-import eu.europa.ec.itb.validation.commons.FileInfo;
-import eu.europa.ec.itb.validation.commons.LocalisationHelper;
-import eu.europa.ec.itb.validation.commons.Utils;
+import eu.europa.ec.itb.validation.commons.*;
 import eu.europa.ec.itb.validation.commons.error.ValidatorException;
 import eu.europa.ec.itb.validation.commons.jar.BaseValidationRunner;
 import eu.europa.ec.itb.validation.commons.jar.FileReport;
@@ -207,7 +204,8 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
                                 File csvReportFile = new File(xmlReportFile.getParentFile(), "report."+i+".csv");
                                 Files.deleteIfExists(pdfReportFile.toPath());
                                 Files.deleteIfExists(csvReportFile.toPath());
-                                reportGenerator.writeReport(xmlReportFile, pdfReportFile, localiser, domainConfig.isRichTextReports());
+                                ReportProperties reportProperties = new ReportProperties(input.getFileName(), validationType);
+                                reportGenerator.writeReport(xmlReportFile, pdfReportFile, localiser, reportProperties, domainConfig);
                                 csvReportGenerator.writeReport(xmlReportFile, csvReportFile, localiser, domainConfig);
                                 summary.append("- Detailed reports in [").append(xmlReportFile.getAbsolutePath()).append("], [").append(pdfReportFile.getAbsolutePath()).append("] and [").append(csvReportFile.getAbsolutePath()).append("]\n");
                             } else if (report.getCounters() != null && (report.getCounters().getNrOfAssertions().longValue() + report.getCounters().getNrOfErrors().longValue() + report.getCounters().getNrOfWarnings().longValue()) <= domainConfig.getMaximumReportsForXmlOutput()) {
