@@ -27,12 +27,12 @@ This product depends on software developed by third parties as listed in the fol
 | Apache License, Version 2.0 | parso | com.epam:parso | 2.0.14 | https://github.com/epam/parso |
 | Apache License, Version 2.0 | ClassMate | com.fasterxml:classmate | 1.7.3 | https://github.com/FasterXML/java-classmate |
 | Apache License, Version 2.0 | Jackson-annotations | com.fasterxml.jackson.core:jackson-annotations | 2.22 | https://github.com/FasterXML/jackson |
-| Apache License, Version 2.0 | Jackson-core | com.fasterxml.jackson.core:jackson-core | 2.22.3 | https://github.com/FasterXML/jackson-core |
-| Apache License, Version 2.0 | jackson-databind | com.fasterxml.jackson.core:jackson-databind | 2.22.3 | https://github.com/FasterXML/jackson |
-| Apache License, Version 2.0 | Jackson-dataformat-CSV | com.fasterxml.jackson.dataformat:jackson-dataformat-csv | 2.22.3 | https://github.com/FasterXML/jackson-dataformats-text |
-| Apache License, Version 2.0 | Jackson-dataformat-YAML | com.fasterxml.jackson.dataformat:jackson-dataformat-yaml | 2.22.3 | https://github.com/FasterXML/jackson-dataformats-text |
-| Apache License, Version 2.0 | Jackson datatype: JSR310 | com.fasterxml.jackson.datatype:jackson-datatype-jsr310 | 2.22.3 | https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310 |
-| Apache License, Version 2.0 | Woodstox | com.fasterxml.woodstox:woodstox-core | 7.2.1 | https://github.com/FasterXML/woodstox |
+| Apache License, Version 2.0 | Jackson-core | com.fasterxml.jackson.core:jackson-core | 2.22.4 | https://github.com/FasterXML/jackson-core |
+| Apache License, Version 2.0 | jackson-databind | com.fasterxml.jackson.core:jackson-databind | 2.22.4 | https://github.com/FasterXML/jackson |
+| Apache License, Version 2.0 | Jackson-dataformat-CSV | com.fasterxml.jackson.dataformat:jackson-dataformat-csv | 2.22.4 | https://github.com/FasterXML/jackson-dataformats-text |
+| Apache License, Version 2.0 | Jackson-dataformat-YAML | com.fasterxml.jackson.dataformat:jackson-dataformat-yaml | 2.22.4 | https://github.com/FasterXML/jackson-dataformats-text |
+| Apache License, Version 2.0 | Jackson datatype: JSR310 | com.fasterxml.jackson.datatype:jackson-datatype-jsr310 | 2.22.4 | https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310 |
+| Apache License, Version 2.0 | Woodstox | com.fasterxml.woodstox:woodstox-core | 7.2.2 | https://github.com/FasterXML/woodstox |
 | GNU General Public License (GPL), Version 3, GNU Lesser General Public License (LGPL), Version 3.0, Mozilla Public License Version 1.1 | juniversalchardet | com.github.albfernandez:juniversalchardet | 2.5.0 | https://github.com/albfernandez/juniversalchardet |
 | Apache License, Version 2.0 | Caffeine cache | com.github.ben-manes.caffeine:caffeine | 3.3.0 | https://github.com/ben-manes/caffeine |
 | The 3-Clause BSD No Nuclear License | Java Advanced Imaging Image I/O Tools API core (standalone) | com.github.jai-imageio:jai-imageio-core | 1.4.0 | https://github.com/jai-imageio/jai-imageio-core |
@@ -46,9 +46,7 @@ This product depends on software developed by third parties as listed in the fol
 | Apache License, Version 2.0 | Guava: Google Core Libraries for Java | com.google.guava:guava | 29.0-jre | https://github.com/google/guava/guava |
 | Apache License, Version 2.0 | Guava ListenableFuture only | com.google.guava:listenablefuture | 9999.0-empty-to-avoid-conflict-with-guava | https://github.com/google/guava/listenablefuture |
 | Apache License, Version 2.0 | J2ObjC Annotations | com.google.j2objc:j2objc-annotations | 1.3 | https://github.com/google/j2objc/ |
-| Apache License, Version 2.0 | Java 10 Shim | com.googlecode.owasp-java-html-sanitizer:java10-shim | 20260313.1 | https://github.com/OWASP/java-html-sanitizer |
-| Apache License, Version 2.0 | Java 8 Shim | com.googlecode.owasp-java-html-sanitizer:java8-shim | 20260313.1 | https://github.com/OWASP/java-html-sanitizer |
-| Apache License, Version 2.0 | OWASP Java HTML Sanitizer | com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer | 20260313.1 | https://github.com/OWASP/java-html-sanitizer |
+| Apache License, Version 2.0, BSD 2-Clause License | OWASP Java HTML Sanitizer | com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer | 20261011.1 | https://github.com/OWASP/java-html-sanitizer |
 | MIT License | dd-plist | com.googlecode.plist:dd-plist | 1.29 | http://www.github.com/3breadt/dd-plist |
 | Apache License, Version 2.0 | Jackcess | com.healthmarketscience.jackcess:jackcess | 4.0.11 | https://jackcess.sourceforge.io |
 | Apache License, Version 2.0 | Jackcess Encrypt | com.healthmarketscience.jackcess:jackcess-encrypt | 4.0.3 | http://jackcessencrypt.sf.net |
@@ -64,7 +62,7 @@ This product depends on software developed by third parties as listed in the fol
 | Apache License, Version 2.0 | rome-utils | com.rometools:rome-utils | 2.1.0 | http://rometools.com/rome-utils |
 | Eclipse Distribution License - v1.0 | istack common utility code runtime | com.sun.istack:istack-commons-runtime | 4.1.2 | https://projects.eclipse.org/projects/ee4j/istack-commons/istack-commons-runtime |
 | Apache License, Version 2.0 | SparseBitSet | com.zaxxer:SparseBitSet | 1.3 | https://github.com/brettwooldridge/SparseBitSet |
-| Apache License, Version 2.0 | Apache Commons BeanUtils | commons-beanutils:commons-beanutils | 1.9.4 | https://commons.apache.org/proper/commons-beanutils/ |
+| Apache License, Version 2.0 | Apache Commons BeanUtils | commons-beanutils:commons-beanutils | 1.11.0 | https://commons.apache.org/proper/commons-beanutils |
 | Apache License, Version 2.0 | Apache Commons Codec | commons-codec:commons-codec | 1.21.0 | https://commons.apache.org/proper/commons-codec/ |
 | Apache License, Version 2.0 | Apache Commons Collections | commons-collections:commons-collections | 3.2.2 | http://commons.apache.org/collections/ |
 | Apache License, Version 2.0 | Commons Digester | commons-digester:commons-digester | 2.1 | http://commons.apache.org/digester/ |
@@ -103,19 +101,19 @@ This product depends on software developed by third parties as listed in the fol
 | Apache License, Version 2.0 | Apache Commons Lang | org.apache.commons:commons-lang3 | 3.20.0 | https://commons.apache.org/proper/commons-lang/ |
 | Apache License, Version 2.0 | Apache Commons Math | org.apache.commons:commons-math3 | 3.6.1 | http://commons.apache.org/proper/commons-math/ |
 | Apache License, Version 2.0 | Apache Commons Text | org.apache.commons:commons-text | 1.15.0 | https://commons.apache.org/proper/commons-text |
-| Apache License, Version 2.0 | Apache CXF Core | org.apache.cxf:cxf-core | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Runtime SOAP Binding | org.apache.cxf:cxf-rt-bindings-soap | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Runtime XML Binding | org.apache.cxf:cxf-rt-bindings-xml | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Runtime JAXB DataBinding | org.apache.cxf:cxf-rt-databinding-jaxb | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Metrics Feature | org.apache.cxf:cxf-rt-features-metrics | 4.2.3 | https://cxf.apache.org/cxf-rt-features-metrics |
-| Apache License, Version 2.0 | Apache CXF Runtime JAX-WS Frontend | org.apache.cxf:cxf-rt-frontend-jaxws | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Runtime Simple Frontend | org.apache.cxf:cxf-rt-frontend-simple | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Runtime HTTP Transport | org.apache.cxf:cxf-rt-transports-http | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Runtime WS Addressing | org.apache.cxf:cxf-rt-ws-addr | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Runtime WS Policy | org.apache.cxf:cxf-rt-ws-policy | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Runtime Core for WSDL | org.apache.cxf:cxf-rt-wsdl | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Spring Boot Autoconfigure | org.apache.cxf:cxf-spring-boot-autoconfigure | 4.2.3 | https://cxf.apache.org |
-| Apache License, Version 2.0 | Apache CXF Spring Boot Starter JAX-WS | org.apache.cxf:cxf-spring-boot-starter-jaxws | 4.2.3 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Core | org.apache.cxf:cxf-core | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Runtime SOAP Binding | org.apache.cxf:cxf-rt-bindings-soap | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Runtime XML Binding | org.apache.cxf:cxf-rt-bindings-xml | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Runtime JAXB DataBinding | org.apache.cxf:cxf-rt-databinding-jaxb | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Metrics Feature | org.apache.cxf:cxf-rt-features-metrics | 4.2.4 | https://cxf.apache.org/cxf-rt-features-metrics |
+| Apache License, Version 2.0 | Apache CXF Runtime JAX-WS Frontend | org.apache.cxf:cxf-rt-frontend-jaxws | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Runtime Simple Frontend | org.apache.cxf:cxf-rt-frontend-simple | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Runtime HTTP Transport | org.apache.cxf:cxf-rt-transports-http | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Runtime WS Addressing | org.apache.cxf:cxf-rt-ws-addr | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Runtime WS Policy | org.apache.cxf:cxf-rt-ws-policy | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Runtime Core for WSDL | org.apache.cxf:cxf-rt-wsdl | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Spring Boot Autoconfigure | org.apache.cxf:cxf-spring-boot-autoconfigure | 4.2.4 | https://cxf.apache.org |
+| Apache License, Version 2.0 | Apache CXF Spring Boot Starter JAX-WS | org.apache.cxf:cxf-spring-boot-starter-jaxws | 4.2.4 | https://cxf.apache.org |
 | Apache License, Version 2.0 | Apache James :: Mime4j :: Core | org.apache.james:apache-mime4j-core | 0.8.14 | http://james.apache.org/mime4j/apache-mime4j-core |
 | Apache License, Version 2.0 | Apache James :: Mime4j :: DOM | org.apache.james:apache-mime4j-dom | 0.8.14 | http://james.apache.org/mime4j/apache-mime4j-dom |
 | Apache License, Version 2.0 | Apache Log4j API | org.apache.logging.log4j:log4j-api | 2.25.5 | https://logging.apache.org/log4j/2.x/ |
@@ -156,10 +154,10 @@ This product depends on software developed by third parties as listed in the fol
 | Apache License, Version 2.0 | Apache Tika XMP commons | org.apache.tika:tika-parser-xmp-commons | 3.3.2 | https://tika.apache.org/tika-parser-xmp-commons/ |
 | Apache License, Version 2.0 | Apache Tika ZIP commons | org.apache.tika:tika-parser-zip-commons | 3.3.2 | https://tika.apache.org/tika-parser-zip-commons/ |
 | Apache License, Version 2.0 | Apache Tika standard parser package | org.apache.tika:tika-parsers-standard-package | 3.3.2 | https://tika.apache.org/tika-parsers/tika-parsers-standard/tika-parsers-standard-package/ |
-| Apache License, Version 2.0 | tomcat-embed-core | org.apache.tomcat.embed:tomcat-embed-core | 11.0.26 | https://tomcat.apache.org/ |
-| Apache License, Version 2.0 | tomcat-embed-el | org.apache.tomcat.embed:tomcat-embed-el | 11.0.26 | https://tomcat.apache.org/ |
-| Apache License, Version 2.0 | tomcat-embed-websocket | org.apache.tomcat.embed:tomcat-embed-websocket | 11.0.26 | https://tomcat.apache.org/ |
-| Apache License, Version 2.0 | XmlSchema Core | org.apache.ws.xmlschema:xmlschema-core | 2.3.2 | https://ws.apache.org/commons/xmlschema20/xmlschema-core/ |
+| Apache License, Version 2.0 | tomcat-embed-core | org.apache.tomcat.embed:tomcat-embed-core | 11.0.27 | https://tomcat.apache.org/ |
+| Apache License, Version 2.0 | tomcat-embed-el | org.apache.tomcat.embed:tomcat-embed-el | 11.0.27 | https://tomcat.apache.org/ |
+| Apache License, Version 2.0 | tomcat-embed-websocket | org.apache.tomcat.embed:tomcat-embed-websocket | 11.0.27 | https://tomcat.apache.org/ |
+| Apache License, Version 2.0 | XmlSchema Core | org.apache.ws.xmlschema:xmlschema-core | 2.3.3 | https://ws.apache.org/commons/xmlschema20/xmlschema-core/ |
 | Apache License, Version 2.0 | XmlBeans | org.apache.xmlbeans:xmlbeans | 5.3.0 | https://xmlbeans.apache.org/ |
 | Apache License, Version 2.0 | org.apache.xmlgraphics:batik-anim | org.apache.xmlgraphics:batik-anim | 1.19 | http://xmlgraphics.apache.org/batik/batik-anim/ |
 | Apache License, Version 2.0 | org.apache.xmlgraphics:batik-awt-util | org.apache.xmlgraphics:batik-awt-util | 1.19 | http://xmlgraphics.apache.org/batik/batik-awt-util/ |
@@ -183,10 +181,10 @@ This product depends on software developed by third parties as listed in the fol
 | Eclipse Public License - v2.0 | AspectJ Weaver | org.aspectj:aspectjweaver | 1.9.25.1 | https://www.eclipse.org/aspectj/ |
 | Apache License, Version 2.0 | attoparser | org.attoparser:attoparser | 2.0.7.RELEASE | https://www.attoparser.org |
 | Bouncy Castle Licence | Bouncy Castle JavaMail Jakarta S/MIME APIs | org.bouncycastle:bcjmail-jdk18on | 1.85 | https://www.bouncycastle.org/download/bouncy-castle-java/ |
-| Bouncy Castle Licence | Bouncy Castle JavaMail S/MIME APIs | org.bouncycastle:bcmail-jdk18on | 1.85 | https://www.bouncycastle.org/download/bouncy-castle-java/ |
-| Bouncy Castle Licence | Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs | org.bouncycastle:bcpkix-jdk18on | 1.85 | https://www.bouncycastle.org/download/bouncy-castle-java/ |
-| Bouncy Castle Licence | Bouncy Castle Provider | org.bouncycastle:bcprov-jdk18on | 1.85 | https://www.bouncycastle.org/download/bouncy-castle-java/ |
-| Bouncy Castle Licence | Bouncy Castle ASN.1 Extension and Utility APIs | org.bouncycastle:bcutil-jdk18on | 1.85 | https://www.bouncycastle.org/download/bouncy-castle-java/ |
+| Bouncy Castle Licence | Bouncy Castle JavaMail S/MIME APIs | org.bouncycastle:bcmail-jdk18on | 1.86 | https://www.bouncycastle.org/download/bouncy-castle-java/ |
+| Bouncy Castle Licence | Bouncy Castle PKIX, CMS, EAC, TSP, PKCS, OCSP, CMP, and CRMF APIs | org.bouncycastle:bcpkix-jdk18on | 1.86 | https://www.bouncycastle.org/download/bouncy-castle-java/ |
+| Bouncy Castle Licence | Bouncy Castle Provider | org.bouncycastle:bcprov-jdk18on | 1.86 | https://www.bouncycastle.org/download/bouncy-castle-java/ |
+| Bouncy Castle Licence | Bouncy Castle ASN.1 Extension and Utility APIs | org.bouncycastle:bcutil-jdk18on | 1.86 | https://www.bouncycastle.org/download/bouncy-castle-java/ |
 | MIT License | org.brotli:dec | org.brotli:dec | 0.1.2 | http://brotli.org/dec |
 | MIT License | Checker Qual | org.checkerframework:checker-qual | 2.11.1 | https://checkerframework.org |
 | The 2-Clause BSD License | Stax2 API | org.codehaus.woodstox:stax2-api | 4.3.0 | http://github.com/FasterXML/stax2-api |
@@ -207,7 +205,7 @@ This product depends on software developed by third parties as listed in the fol
 | MIT License | jsoup Java HTML Parser | org.jsoup:jsoup | 1.23.2 | https://jsoup.org/ |
 | Apache License, Version 2.0 | JSpecify annotations | org.jspecify:jspecify | 1.0.1 | https://jspecify.dev/ |
 | Apache License, Version 2.0 | jwarc | org.netpreserve:jwarc | 0.36.0 | https://github.com/iipc/jwarc |
-| The 3-Clause BSD License | asm | org.ow2.asm:asm | 9.10.1 | http://asm.ow2.io/ |
+| The 3-Clause BSD License | asm | org.ow2.asm:asm | 9.11.1 | http://asm.ow2.io/ |
 | Apache License, Version 2.0 | JCL 1.2 implemented over SLF4J | org.slf4j:jcl-over-slf4j | 2.0.18 | http://www.slf4j.org |
 | MIT License | JUL to SLF4J bridge | org.slf4j:jul-to-slf4j | 2.0.18 | http://www.slf4j.org |
 | MIT License | SLF4J API Module | org.slf4j:slf4j-api | 2.0.18 | http://www.slf4j.org |
@@ -265,8 +263,8 @@ This product depends on software developed by third parties as listed in the fol
 | MIT License | webjars-locator-lite | org.webjars:webjars-locator-lite | 1.1.4 | https://webjars.org |
 | Apache License, Version 2.0 | XML Resolver | org.xmlresolver:xmlresolver | 5.3.3 | https://github.com/xmlresolver/xmlresolver |
 | Apache License, Version 2.0 | SnakeYAML | org.yaml:snakeyaml | 2.6 | https://bitbucket.org/snakeyaml/snakeyaml |
-| Apache License, Version 2.0 | Jackson-core | tools.jackson.core:jackson-core | 3.2.3 | https://github.com/FasterXML/jackson-core |
-| Apache License, Version 2.0 | jackson-databind | tools.jackson.core:jackson-databind | 3.2.3 | https://github.com/FasterXML/jackson |
+| Apache License, Version 2.0 | Jackson-core | tools.jackson.core:jackson-core | 3.2.4 | https://github.com/FasterXML/jackson-core |
+| Apache License, Version 2.0 | jackson-databind | tools.jackson.core:jackson-databind | 3.2.4 | https://github.com/FasterXML/jackson |
 | Common Public License 1.0 | WSDL4J | wsdl4j:wsdl4j | 1.6.3 | http://sf.net/projects/wsdl4j |
 | Apache License, Version 2.0 | XML Commons External Components XML APIs | xml-apis:xml-apis | 1.0.b2 | http://xml.apache.org/commons/#external |
 | Apache License, Version 2.0 | XML Commons External Components XML APIs Extensions | xml-apis:xml-apis-ext | 1.3.04 | http://xml.apache.org/commons/components/external/ |
