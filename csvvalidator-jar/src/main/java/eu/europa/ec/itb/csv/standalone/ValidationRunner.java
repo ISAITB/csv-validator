@@ -166,7 +166,7 @@ public class ValidationRunner extends BaseValidationRunner<DomainConfig> impleme
             var localiser = new LocalisationHelper(domainConfig, Utils.getSupportedLocale(LocaleUtils.toLocale(locale), domainConfig));
             for (ValidationInput input: inputs) {
                 LOGGER_FEEDBACK.info("\nValidating {} of {} ...", i+1, inputs.size());
-                try {
+                try (var ignored = openRemoteBudget()) {
                     InputHelper.Inputs settingInputs = InputHelper.Inputs.newInstance()
                             .withInputHeaders(inputHeaders)
                             .withInputDelimiter(inputDelimiter)
