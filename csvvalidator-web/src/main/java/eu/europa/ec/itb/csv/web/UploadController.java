@@ -558,7 +558,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
             }
         } else if (CONTENT_TYPE_URI.equals(contentType)) {
             if (StringUtils.isNotBlank(inputUri) && appConfig.isUriReadAllowed(inputUri)) {
-                file = this.fileManager.getFileFromURL(parentFolder, inputUri, null, null, null, null, null, null, httpVersion, requestDecorator).getFile();
+                file = this.fileManager.getFileFromURL(parentFolder, inputUri, null, null, null, null, null, null, httpVersion, requestDecorator, this.fileManager.userInputGuard(inputUri)).getFile();
             }
         } else if (CONTENT_TYPE_STRING.equals(contentType)) {
             if (StringUtils.isNotBlank(inputString)) {
@@ -583,7 +583,7 @@ public class UploadController extends BaseUploadController<DomainConfig, DomainC
             case CONTENT_TYPE_FILE -> file.getInputStream();
             case CONTENT_TYPE_URI -> {
                 if (appConfig.isUriReadAllowed(uri)) {
-                    yield this.fileManager.getInputStreamFromURL(uri, null, httpVersion).stream();
+                    yield this.fileManager.getInputStreamFromURL(uri, null, httpVersion, null, this.fileManager.userInputGuard(uri)).stream();
                 } else {
                     yield null;
                 }
