@@ -192,7 +192,7 @@ public class CSVValidator {
             prepareInputFile(specs.getInput());
             for (FileInfo aSchemaFile: schemaFiles) {
                 LOG.info("Validating against [{}]", aSchemaFile.getFile().getName());
-                reportItems.addAll(validateAgainstSchema(specs.getInput(), aSchemaFile.getFile()));
+                reportItems.addAll(validateAgainstSchema(specs.getInput(), aSchemaFile));
                 LOG.info("Validated against [{}]", aSchemaFile.getFile().getName());
             }
         }
@@ -210,7 +210,11 @@ public class CSVValidator {
         try {
             return Files.newInputStream(file.toPath());
         } catch (IOException e) {
-            throw new ValidatorException((isInput?"validator.label.exception.unableToReadInputFile":"validator.label.exception.unableToReadInputSchema"), e);
+            var error = new ValidatorException((isInput?"validator.label.exception.unableToReadInputFile":"validator.label.exception.unableToReadInputSchema"), e);
+            if (isInput) {
+                error.withInputReference(ValidationConstants.INPUT_CONTENT);
+            }
+            throw error;
         }
     }
 
@@ -248,10 +252,11 @@ public class CSVValidator {
      * Validate the provided input against a single schema file.
      *
      * @param inputFile The input to validate.
-     * @param schemaFile The schema.
+     * @param schemaInfo The schema.
      * @return The validation report items.
      */
-    private List<ReportItem> validateAgainstSchema(File inputFile, File schemaFile) {
+    private List<ReportItem> validateAgainstSchema(File inputFile, FileInfo schemaInfo) {
+        File schemaFile = schemaInfo.getFile();
         if (specs.getProgressListener() != null) {
             specs.getProgressListener().schemaValidationStart();
         }
@@ -273,14 +278,14 @@ public class CSVValidator {
         try (InputStream schemaStream = toStream(schemaFile, false)) {
             schema = Schema.fromJsonWithOptions(schemaStream, false, Map.of(Schema.SCHEMA_OPTION_JAVA_BASED_DATE_FORMATS, String.valueOf(specs.getDomainConfig().getJavaBasedDateFormats().get(specs.getValidationType()))));
         } catch (ValidatorException e) {
-            throw e;
+            throw e.withInputReference(schemaInfo.getInputReference());
         } catch (Exception e) {
-            throw new ValidatorException("validator.label.exception.providedSchemaCouldNotBeParsed", e, getRootCause(e).getMessage());
+            throw new ValidatorException("validator.label.exception.providedSchemaCouldNotBeParsed", e, getRootCause(e).getMessage()).withInputReference(schemaInfo.getInputReference());
         }
         short headerLine = 1;
         try (
                 Reader inputReader = new BomStrippingReader(toStream(inputFile, true));
-                CSVParser parser = new CSVParser(inputReader, format.build())
+                CSVParser parser = CSVParser.builder().setReader(inputReader).setFormat(format.get()).get()
         ) {
             Map<Integer, Field<?>> inputFieldIndexToSchemaFieldMap = new HashMap<>();
             if (specs.getCSVSettings().isHasHeaders()) {
@@ -289,7 +294,7 @@ public class CSVValidator {
                 int index = 0;
                 for (Field<?> field: schema.getFields()) {
                     if (fieldMap.containsKey(field.getName())) {
-                        throw new ValidatorException("validator.label.exception.schemaDefinesTwoFieldsWithSameName", field.getName());
+                        throw new ValidatorException("validator.label.exception.schemaDefinesTwoFieldsWithSameName", field.getName()).withInputReference(schemaInfo.getInputReference());
                     } else {
                         fieldMap.put(field.getName(), new FieldInfo(field, index));
                         lowerCaseFieldNameMap.computeIfAbsent(field.getName().toLowerCase(), n -> new HashSet<>()).add(field.getName());
@@ -399,7 +404,7 @@ public class CSVValidator {
             throw e;
         } catch (Exception e) {
             if (!checkAndHandleKnownErrors(e, headerLine, errors)) {
-                throw new ValidatorException("validator.label.exception.providedInputCouldNotBeParsed", getRootCause(e).getMessage(), e);
+                throw new ValidatorException("validator.label.exception.providedInputCouldNotBeParsed", e, getRootCause(e).getMessage()).withInputReference(ValidationConstants.INPUT_CONTENT);
             }
         }
         return errors;
@@ -452,7 +457,7 @@ public class CSVValidator {
                 FileUtils.moveFile(fileCopy, inputFile);
                 LOG.info("Converted input file from [{}] to [UTF-8]", charsetToUse);
             } catch (IOException e) {
-                throw new ValidatorException("validator.label.exception.unableToReadInputFile", e);
+                throw new ValidatorException("validator.label.exception.unableToReadInputFile", e).withInputReference(ValidationConstants.INPUT_CONTENT);
             }
         }
     }
