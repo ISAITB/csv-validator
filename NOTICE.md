@@ -63,7 +63,7 @@ This product depends on software developed by third parties as listed in the fol
 | Eclipse Distribution License - v1.0 | istack common utility code runtime | com.sun.istack:istack-commons-runtime | 4.1.2 | https://projects.eclipse.org/projects/ee4j/istack-commons/istack-commons-runtime |
 | Apache License, Version 2.0 | SparseBitSet | com.zaxxer:SparseBitSet | 1.3 | https://github.com/brettwooldridge/SparseBitSet |
 | Apache License, Version 2.0 | Apache Commons BeanUtils | commons-beanutils:commons-beanutils | 1.11.0 | https://commons.apache.org/proper/commons-beanutils |
-| Apache License, Version 2.0 | Apache Commons Codec | commons-codec:commons-codec | 1.21.0 | https://commons.apache.org/proper/commons-codec/ |
+| Apache License, Version 2.0 | Apache Commons Codec | commons-codec:commons-codec | 1.23.0 | https://commons.apache.org/proper/commons-codec/ |
 | Apache License, Version 2.0 | Apache Commons Collections | commons-collections:commons-collections | 3.2.2 | http://commons.apache.org/collections/ |
 | Apache License, Version 2.0 | Commons Digester | commons-digester:commons-digester | 2.1 | http://commons.apache.org/digester/ |
 | Apache License, Version 2.0 | Apache Commons IO | commons-io:commons-io | 2.22.0 | https://commons.apache.org/proper/commons-io/ |
